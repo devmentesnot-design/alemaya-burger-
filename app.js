@@ -16,8 +16,7 @@ const CATEGORIES = [
   {
     id: 'burgers',
     name: 'Burgers',
-    icon: 'sandwich',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 15h16"/><path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"/><path d="M7 13c1 0 1.5.8 2.5.8s1.5-.8 2.5-.8 1.5.8 2.5.8 1.5-.8 2.5-.8"/></svg>`
   },
   {
     id: 'pizza',
@@ -28,8 +27,7 @@ const CATEGORIES = [
   {
     id: 'wraps',
     name: 'Wraps',
-    icon: 'salad',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-salad"><path d="M7 21h10"/><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M11.38 12a2.4 2.4 0 0 1-.4-1.2c0-1.3 1.1-2.4 2.4-2.4.6 0 1.2.2 1.6.6"/><path d="M13 12V8"/><path d="M16.5 12c0-1.4-1.1-2.5-2.5-2.5"/></svg>`
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`
   },
   {
     id: 'sides',
@@ -596,12 +594,11 @@ function buildCategoryGrid() {
     card.onclick = () => selectCategory(cat.id);
 
     card.innerHTML = `
-      <div class="cat-icon-wrap"><i data-lucide="${cat.icon}">${cat.svg}</i></div>
+      <div class="cat-icon-wrap">${cat.svg}</div>
       <span class="cat-name">${cat.name}</span>
     `;
     container.appendChild(card);
   });
-  refreshLucideIcons();
 }
 
 function selectCategory(catId) {
@@ -679,7 +676,6 @@ function clearSearch() {
 
 function renderSearchResults() {
   const list = document.getElementById('search-results-list');
-  const heading = document.getElementById('search-results-heading');
   if (!list) return;
 
   const matches = PRODUCTS.filter(p => {
@@ -688,10 +684,6 @@ function renderSearchResults() {
       (p.description && p.description.toLowerCase().includes(q)) ||
       (p.ingredients && p.ingredients.some(i => i.toLowerCase().includes(q)));
   });
-
-  if (heading) {
-    heading.textContent = `Search results (${matches.length})`;
-  }
 
   if (matches.length === 0) {
     list.innerHTML = `
