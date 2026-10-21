@@ -23,10 +23,38 @@
   <!-- MAIN APP CONTAINER -->
   <div id="app">
     
+    <!-- TOP NAVBAR (REVERTED WITH LOGO, MENU & ORDERS/CART BADGE) -->
+    <header class="top-nav-bar">
+      <div class="top-nav-inner">
+        <div class="nav-brand" onclick="navigateTo('menu')">
+          <img src="logo.png" alt="Alemaya Grill'd" class="nav-logo">
+        </div>
+        <div class="nav-actions">
+          <button class="nav-pill-btn active" id="ntab-menu" onclick="navigateTo('menu')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12h16a1 1 0 0 1 1 1v1a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1z"/>
+              <path d="M4 9a8 8 0 0 1 16 0h-16z"/>
+              <path d="M4 18h16a2 2 0 0 1 2 2h-20a2 2 0 0 1 2 -2z"/>
+            </svg>
+            <span>Menu</span>
+          </button>
+          <button class="nav-pill-btn" id="ntab-orders" onclick="navigateTo('orders')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <span>Orders</span>
+            <span class="nav-cart-badge" id="nav-cart-badge" style="display:none">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
     <!-- VIEW: MENU (MAIN VIEW) -->
     <main id="view-menu" class="view active">
       <!-- TOP SEARCH BAR -->
-      <header class="search-header">
+      <div class="search-header">
         <div class="search-box">
           <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
@@ -35,21 +63,14 @@
           <input type="text" id="search-input" placeholder="What are you craving?" oninput="handleSearch(this.value)" autocomplete="off">
           <button id="search-clear-btn" class="search-clear hidden" onclick="clearSearch()" aria-label="Clear search">&times;</button>
         </div>
-      </header>
+      </div>
 
-      <!-- HERO BANNER -->
+      <!-- HERO BANNER (NO 'EXPLORE MENU' BUTTON, FADE LIMITED TO ~38% SO BURGER IS VISIBLE) -->
       <section class="hero-banner" id="hero-banner">
         <div class="hero-text-side">
           <span class="hero-badge">BESTSELLER</span>
           <h1 class="hero-title">Made for your cravings</h1>
           <p class="hero-sub">Big flavor. Fresh off the grill.</p>
-          <button class="hero-cta" onclick="scrollToExplore()">
-            Explore menu
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
         </div>
         <div class="hero-img-side">
           <img src="burger_classic.jpg" alt="Alemaya Signature Burger" id="hero-img">
@@ -63,7 +84,7 @@
           <span class="category-status-note" id="cat-count-note">14 categories</span>
         </div>
         
-        <!-- 4-Column Category Grid with Line-art Icons -->
+        <!-- 4-Column Category Grid with Professional Tabler Line-art Icons -->
         <div class="cat-grid" id="cat-grid" role="tablist"></div>
       </section>
 
@@ -81,33 +102,33 @@
         <div class="vertical-items-list" id="search-results-list"></div>
       </section>
 
-      <!-- REGULAR MENU CONTENT (hidden during active search) -->
-      <div id="regular-menu-content">
-        <!-- FAN FAVORITES (2-COLUMN GRID) -->
-        <section class="section-wrap" id="section-fan-favorites">
-          <h2 class="section-heading">Fan favorites</h2>
-          <div class="fan-fav-grid" id="fan-fav-grid"></div>
-        </section>
+      <!-- UNIFIED VERTICAL ITEMS LIST (NO FAN FAVORITES, NO MORE TO LOVE, NO HORIZONTAL SCROLL) -->
+      <section class="section-wrap" id="regular-menu-content">
+        <div class="section-header-row">
+          <h2 class="section-heading" id="active-category-title">Burgers</h2>
+          <span class="category-chip-active" id="active-items-count">4 items</span>
+        </div>
+        <div class="vertical-items-list" id="unified-items-list"></div>
+      </section>
 
-        <!-- MORE TO LOVE (VERTICAL ITEMS LIST) -->
-        <section class="section-wrap" id="section-more-to-love">
-          <div class="section-header-row">
-            <h2 class="section-heading" id="more-heading">More to love</h2>
-            <span class="category-chip-active" id="active-cat-name-chip">Burgers</span>
-          </div>
-          <div class="vertical-items-list" id="more-items-list"></div>
-        </section>
-      </div>
-
-      <!-- PADDING FOR BOTTOM NAV & CART BAR -->
+      <!-- BOTTOM SPACER -->
       <div class="scroll-bottom-spacer"></div>
     </main>
 
-    <!-- VIEW: ORDERS (CART + ACTIVE & PAST ORDERS) -->
+    <!-- VIEW: ORDERS (CART + RECENT ORDERS) -->
     <main id="view-orders" class="view">
       <header class="orders-header">
+        <div class="orders-nav-row">
+          <button class="back-to-menu-btn" onclick="navigateTo('menu')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back to Menu</span>
+          </button>
+        </div>
         <h1 class="orders-title">Your Orders</h1>
-        <p class="orders-subtitle">Track your freshly grilled meals & checkout</p>
+        <p class="orders-subtitle">Review your cart & order history</p>
         
         <!-- Segmented Toggle: Cart vs Past Orders -->
         <div class="orders-segment">
@@ -160,12 +181,12 @@
       <div class="scroll-bottom-spacer"></div>
     </main>
 
-    <!-- FLOATING CART BAR (WHEN ITEMS ARE IN CART, VISIBLE ON MENU VIEW) -->
+    <!-- FLOATING CART BAR (WHEN ITEMS ARE IN CART, ON MENU VIEW) -->
     <div class="floating-cart-bar hidden" id="floating-cart-bar" onclick="navigateTo('orders')">
       <div class="cart-bar-inner">
         <div class="cart-bar-left">
           <span class="cart-bar-badge" id="bar-items-count">0</span>
-          <span class="cart-bar-label">View your order</span>
+          <span class="cart-bar-label">View order & checkout</span>
         </div>
         <div class="cart-bar-right">
           <span class="cart-bar-total" id="bar-items-total">Br 0</span>
@@ -175,36 +196,6 @@
         </div>
       </div>
     </div>
-
-    <!-- BOTTOM NAVIGATION BAR (ONLY MENU & ORDERS TABS) -->
-    <nav class="bottom-nav" id="bottom-nav">
-      <!-- TAB 1: MENU -->
-      <button class="bnav-btn active" id="bnav-menu" onclick="navigateTo('menu')">
-        <div class="bnav-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 11a8 8 0 0 1 16 0H3z"></path>
-            <path d="M3 15h18"></path>
-            <path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"></path>
-          </svg>
-        </div>
-        <span class="bnav-label">Menu</span>
-      </button>
-
-      <!-- TAB 2: ORDERS (WITH NOTIFICATION BADGE) -->
-      <button class="bnav-btn" id="bnav-orders" onclick="navigateTo('orders')">
-        <div class="bnav-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-            <path d="m9 16 2 2 4-4"></path>
-          </svg>
-          <span class="bnav-badge" id="bnav-orders-badge" style="display:none">0</span>
-        </div>
-        <span class="bnav-label">Orders</span>
-      </button>
-    </nav>
 
     <!-- PRODUCT CUSTOMIZATION MODAL BOTTOM SHEET -->
     <div class="modal-overlay" id="sheet-overlay" onclick="closeSheet()"></div>

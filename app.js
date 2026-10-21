@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════
 // ALEMAYA GRILL'D - CORE APPLICATION JAVASCRIPT
-// Matches the warm cream & terracotta reference UI with line-art icons,
-// vertical item listing, and 2-tab navigation (Menu & Orders).
+// Professional Tabler Icons, Reverted Top Navbar, Single Unified Vertical List
 // ═══════════════════════════════════════════════════════════════════════
 
 // ══ CONFIGURATION ══
@@ -12,81 +11,81 @@ const CFG = {
   estimatedTime: '15-25 min'
 };
 
-// ══ CATEGORIES (WITH CLEAN VECTOR LINE-ART ICONS) ══
+// ══ PROFESSIONAL CATEGORY ICONS (OFFICIAL TABLER VECTOR ICONS 24x24) ══
 const CATEGORIES = [
   {
     id: 'burgers',
     name: 'Burgers',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 15h16"/><path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"/><path d="M7 13c1 0 1.5.8 2.5.8s1.5-.8 2.5-.8 1.5.8 2.5.8 1.5-.8 2.5-.8"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16a1 1 0 0 1 1 1v1a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1z" /><path d="M4 9a8 8 0 0 1 16 0h-16z" /><path d="M4 18h16a2 2 0 0 1 2 2h-20a2 2 0 0 1 2 -2z" /><path d="M8 15h8" /></svg>`
   },
   {
     id: 'pizza',
     name: 'Pizza',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4c7-1 14 6 18 17L3 4z"/><circle cx="7" cy="8" r="1.5"/><circle cx="11" cy="13" r="1.5"/><circle cx="15" cy="17" r="1.5"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5c-3.04 0 -5.952 -.7 -8.446 -1.944a1.5 1.5 0 0 1 -.554 -2.056l7.5 -13.5a1.5 1.5 0 0 1 2.6 0l7.5 13.5a1.5 1.5 0 0 1 -.554 2.056c-2.494 1.244 -5.406 1.944 -8.446 1.944z" /><circle cx="12" cy="11" r="1.2" fill="currentColor"/><circle cx="10" cy="16" r="1.2" fill="currentColor"/><circle cx="14" cy="16" r="1.2" fill="currentColor"/></svg>`
   },
   {
     id: 'wraps',
     name: 'Wraps',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19l14 -14a3.5 3.5 0 0 1 5 5l-14 14a3.5 3.5 0 0 1 -5 -5z" /><path d="M7 13l4 4" /><path d="M10 10l4 4" /><path d="M13 7l4 4" /></svg>`
   },
   {
     id: 'sides',
     name: 'Sides',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V4h2v6M10 10V2h2v8M14 10V5h2v5M5 10l2 11h10l2-11H5z"/><path d="M5 14h14"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.5 10h11l1.5 -10z" /><path d="M5 11h14" /><path d="M7 11v-6a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v6" /><path d="M11 11v-8a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v8" /><path d="M15 11v-5a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v5" /></svg>`
   },
   {
     id: 'drinks',
     name: 'Drinks',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6h10l-1.5 14a2 2 0 0 1-2 1.8h-3a2 2 0 0 1-2-1.8L7 6z"/><path d="M6 6h12"/><path d="m14 2-2 4"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10l-1.5 12a2 2 0 0 1 -2 1.8h-3a2 2 0 0 1 -2 -1.8l-1.5 -12z" /><path d="M6 8h12" /><path d="M15 4l-3 4" /></svg>`
   },
   {
     id: 'pasta',
     name: 'Pasta',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M8 7v4M12 5v6M16 7v4M7 19h10"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1 -16 0z" /><path d="M12 3v4" /><path d="M8 4v3" /><path d="M16 4v3" /><path d="M7 19h10" /></svg>`
   },
   {
     id: 'sandwiches',
     name: 'Sandwiches',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 19 3l2 3-16 8-2-3z"/><path d="M3 17 19 9l2 3-16 8-2-3z"/><path d="m5 11 14-7"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-16a1 1 0 0 0 -1 1v1a1 1 0 0 0 1 1z" /><path d="M4 9h16a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-16a1 1 0 0 0 -1 1v1a1 1 0 0 0 1 1z" /><path d="M5 12h14" /></svg>`
   },
   {
     id: 'chicken',
     name: 'Chicken',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4a5 5 0 0 0-7.07 0l-.71.71a5 5 0 0 0 0 7.07l2.83 2.83-4.24 4.24a1.5 1.5 0 1 0 2.12 2.12l4.24-4.24 2.83 2.83a5 5 0 0 0 7.07 0l.71-.71a5 5 0 0 0 0-7.07L15 4z"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.62 3.97a6.5 6.5 0 0 1 7.23 7.23l-3.35 3.35a6.5 6.5 0 0 1 -7.23 -7.23l3.35 -3.35z" /><path d="M10.5 11l-5.5 5.5" /><circle cx="5" cy="18" r="1.5" /><circle cx="7" cy="20" r="1.5" /></svg>`
   },
   {
     id: 'breakfast',
     name: 'Breakfast',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2a10 10 0 0 0-9.8 12c1.2 4.6 6 8 10.8 8s9.5-3.4 9.8-8A10 10 0 0 0 12 2z"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4.418 0 -8 4.03 -8 9c0 4.97 3.582 9 8 9s8 -4.03 8 -9c0 -4.97 -3.582 -9 -8 -9z" /><circle cx="12" cy="12" r="3" /></svg>`
   },
   {
     id: 'protein',
     name: 'Protein',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6v12M17 6v12M4 8v8M20 8v8M4 12h16"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h1" /><path d="M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2" /><path d="M6 7v10" /><path d="M9 9v6" /><path d="M6 12h12" /><path d="M15 9v6" /><path d="M18 7v10" /><path d="M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2" /><path d="M21 12h1" /></svg>`
   },
   {
     id: 'superjuice',
     name: 'Smoothies',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1.5 13a2 2 0 0 1-2 1.8h-5a2 2 0 0 1-2-1.8L6 7z"/><path d="M5 7h14M15 2l-3 5"/><path d="M12 11a3 3 0 0 1 3 3v1a3 3 0 0 1-6 0v-1a3 3 0 0 1 3-3z"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8" /><path d="M12 15v6" /><path d="M17 3l1 7c0 3.012 -2.686 5 -6 5s-6 -1.988 -6 -5l1 -7h10z" /><path d="M6 7h12" /><circle cx="12" cy="11" r="2" /></svg>`
   },
   {
     id: 'juice',
     name: 'Juice',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6h10l-1.5 14a2 2 0 0 1-2 1.8h-3a2 2 0 0 1-2-1.8L7 6z"/><path d="M6 6h12"/><circle cx="12" cy="13" r="3"/><path d="m14 2-2 4"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10l-1.5 12a2 2 0 0 1 -2 1.8h-3a2 2 0 0 1 -2 -1.8l-1.5 -12z" /><path d="M6 8h12" /><circle cx="12" cy="14" r="2.5" /><path d="M15 4l-3 4" /></svg>`
   },
   {
     id: 'milkshakes',
     name: 'Shakes',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8l-1.5 11a2 2 0 0 1-2 1.8h-1a2 2 0 0 1-2-1.8L8 9z"/><path d="M7 9a5 5 0 0 1 10 0H7z"/><path d="m14 2-2 4"/><circle cx="12" cy="4" r="1.5"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 10l-1.5 10a2 2 0 0 1 -2 1.8h-3a2 2 0 0 1 -2 -1.8l-1.5 -10z" /><path d="M7 10a5 5 0 0 1 10 0z" /><path d="M12 5v-3" /><circle cx="12" cy="5" r="1.5" /></svg>`
   },
   {
     id: 'desserts',
     name: 'Desserts',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h18l-9-9-9 9z"/><path d="M3 13v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6"/><path d="M3 17h18"/><circle cx="12" cy="4" r="2"/></svg>`
+    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z" /><path d="M3 14.8c.3 .1 .6 .2 1 .2a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1c.4 0 .7 -.1 1 -.2" /><circle cx="12" cy="5" r="2" /></svg>`
   }
 ];
 
-// ══ CATEGORY IMAGES (FOR HERO AND BACKGROUNDS) ══
+// ══ CATEGORY IMAGES (FOR HEADER BANNER) ══
 const CAT_IMAGES = {
   burgers: 'burger_classic.jpg',
   pizza: 'pizza_margherita.jpg',
@@ -119,7 +118,6 @@ const PRODUCTS = [
     basePrice: 180,
     image: 'burger_classic.jpg',
     available: true,
-    isFanFavorite: true,
     customizations: [
       {
         id: 'cooking',
@@ -169,7 +167,6 @@ const PRODUCTS = [
     basePrice: 175,
     image: 'chicken_sandwich.jpg',
     available: true,
-    isFanFavorite: true,
     customizations: [
       {
         id: 'heat',
@@ -205,7 +202,6 @@ const PRODUCTS = [
     basePrice: 160,
     image: 'burger_classic.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'bun',
@@ -241,7 +237,6 @@ const PRODUCTS = [
     basePrice: 210,
     image: 'burger_classic.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'cooking',
@@ -269,7 +264,6 @@ const PRODUCTS = [
     basePrice: 220,
     image: 'pizza_margherita.jpg',
     available: true,
-    isFanFavorite: true,
     customizations: [
       {
         id: 'size',
@@ -305,7 +299,6 @@ const PRODUCTS = [
     basePrice: 260,
     image: 'pizza_margherita.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'size',
@@ -333,7 +326,6 @@ const PRODUCTS = [
     basePrice: 155,
     image: 'chicken_sandwich.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'sauce',
@@ -359,7 +351,6 @@ const PRODUCTS = [
     basePrice: 170,
     image: 'chicken_sandwich.jpg',
     available: true,
-    isFanFavorite: true,
     customizations: [
       {
         id: 'extras',
@@ -387,7 +378,6 @@ const PRODUCTS = [
     basePrice: 75,
     image: 'burger_classic.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'dip',
@@ -414,7 +404,6 @@ const PRODUCTS = [
     basePrice: 125,
     image: 'burger_classic.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: []
   },
 
@@ -431,7 +420,6 @@ const PRODUCTS = [
     basePrice: 65,
     image: 'smoothie_tropical.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'sweet',
@@ -458,7 +446,6 @@ const PRODUCTS = [
     basePrice: 85,
     image: 'smoothie_tropical.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: []
   },
 
@@ -475,7 +462,6 @@ const PRODUCTS = [
     basePrice: 195,
     image: 'pasta_carbonara.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'cheese',
@@ -502,7 +488,6 @@ const PRODUCTS = [
     basePrice: 165,
     image: 'chicken_sandwich.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: []
   },
 
@@ -519,7 +504,6 @@ const PRODUCTS = [
     basePrice: 110,
     image: 'milkshake_chocolate.jpg',
     available: true,
-    isFanFavorite: false,
     customizations: [
       {
         id: 'size',
@@ -559,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const splash = document.getElementById('splash');
     if (splash) splash.classList.add('hidden');
-  }, 1200);
+  }, 1000);
 
   // Restore saved cart and history from localStorage
   restoreFromStorage();
@@ -571,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderHistory();
 });
 
-// ══ CATEGORY GRID (4-COLUMN SQUIRCLE CARDS WITH LINE-ART ICONS) ══
+// ══ CATEGORY GRID (4-COLUMN SQUIRCLE CARDS WITH TABLER VECTOR ICONS) ══
 function buildCategoryGrid() {
   const container = document.getElementById('cat-grid');
   if (!container) return;
@@ -699,97 +683,55 @@ function renderSearchResults() {
   });
 }
 
-// ══ RENDER MENU (FAN FAVORITES & MORE TO LOVE) ══
+// ══ UNIFIED VERTICAL ITEMS LISTING (NO TWO SECTIONS, NO SPLIT CLASSIFICATION) ══
 function renderMenu() {
-  const fanFavGrid = document.getElementById('fan-fav-grid');
-  const moreList = document.getElementById('more-items-list');
-  const moreHeading = document.getElementById('more-heading');
-  const activeChip = document.getElementById('active-cat-name-chip');
+  const list = document.getElementById('unified-items-list');
+  const catTitle = document.getElementById('active-category-title');
+  const itemsCountBadge = document.getElementById('active-items-count');
 
   const cat = CATEGORIES.find(c => c.id === APP_STATE.activeCategory) || CATEGORIES[0];
-  if (activeChip) activeChip.textContent = cat.name;
+  if (catTitle) catTitle.textContent = cat.name;
 
-  // 1. FAN FAVORITES (2-COLUMN GRID)
-  // Show top rated items for current category, or overall bestsellers
-  if (fanFavGrid) {
-    fanFavGrid.innerHTML = '';
-    let favs = PRODUCTS.filter(p => p.categoryId === cat.id && p.isFanFavorite);
-    if (favs.length === 0) {
-      favs = PRODUCTS.filter(p => p.isFanFavorite).slice(0, 2);
-    }
-    favs.forEach(product => {
-      fanFavGrid.appendChild(createFanFavCard(product));
-    });
+  const prods = PRODUCTS.filter(p => p.categoryId === cat.id);
+  if (itemsCountBadge) itemsCountBadge.textContent = `${prods.length} ${prods.length === 1 ? 'item' : 'items'}`;
+
+  if (!list) return;
+  list.innerHTML = '';
+
+  if (prods.length === 0) {
+    list.innerHTML = `
+      <div class="empty-results">
+        <div class="empty-icon">🍽️</div>
+        <p class="empty-text">Fresh items coming soon</p>
+        <p class="empty-sub">Our kitchen is preparing delicious ${cat.name} recipes for you!</p>
+      </div>
+    `;
+    return;
   }
 
-  // 2. MORE TO LOVE (VERTICAL ITEMS LIST - NO HORIZONTAL SCROLL)
-  if (moreList) {
-    moreList.innerHTML = '';
-    const prods = PRODUCTS.filter(p => p.categoryId === cat.id);
-    
-    if (moreHeading) {
-      moreHeading.textContent = `More to love in ${cat.name}`;
-    }
-
-    if (prods.length === 0) {
-      moreList.innerHTML = `
-        <div class="empty-results">
-          <div class="empty-icon">🍽️</div>
-          <p class="empty-text">Fresh items coming soon</p>
-          <p class="empty-sub">Our kitchen is preparing delicious ${cat.name} recipes for you!</p>
-        </div>
-      `;
-      return;
-    }
-
-    prods.forEach(product => {
-      moreList.appendChild(createVerticalCard(product));
-    });
-  }
+  // Render all items for this category in one clean, unified vertical list
+  prods.forEach(product => {
+    list.appendChild(createVerticalCard(product));
+  });
 }
 
-// ══ CARD GENERATORS ══
-function createFanFavCard(p) {
-  const card = document.createElement('div');
-  card.className = 'fav-card';
-  card.onclick = () => openProduct(p.id);
-
-  const badgeHtml = p.badge ? `<span class="fav-badge-tag">${escapeHtml(p.badge)}</span>` : '';
-  const ratingVal = p.rating || 4.8;
-  const reviewsCount = p.reviewsCount || 120;
-
-  card.innerHTML = `
-    <div class="fav-img-wrap">
-      <img src="${p.image}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='logo.png'">
-      ${badgeHtml}
-    </div>
-    <div class="fav-info">
-      <h3 class="fav-title">${escapeHtml(p.name)}</h3>
-      <div class="fav-rating-row">
-        <span class="fav-star">★</span>
-        <span class="fav-rating-num">${ratingVal}</span>
-        <span class="fav-reviews">(${reviewsCount})</span>
-      </div>
-      <div class="fav-bottom-row">
-        <span class="fav-price">${formatMoney(p.basePrice)}</span>
-        <button class="btn-round-add" onclick="event.stopPropagation(); openProduct('${p.id}')" aria-label="Add to order">+</button>
-      </div>
-    </div>
-  `;
-  return card;
-}
-
+// ══ CARD GENERATOR (HIGH QUALITY VERTICAL LIST CARD) ══
 function createVerticalCard(p) {
   const card = document.createElement('div');
   card.className = 'vert-card';
   card.onclick = () => openProduct(p.id);
 
   const badgeHtml = p.badge ? `<span class="vert-badge">${escapeHtml(p.badge)}</span>` : '';
+  const ratingVal = p.rating || 4.8;
+  const reviewsCount = p.reviewsCount || 120;
 
   card.innerHTML = `
     <img src="${p.image}" alt="${escapeHtml(p.name)}" class="vert-thumb" loading="lazy" onerror="this.src='logo.png'">
     <div class="vert-details">
-      ${badgeHtml}
+      <div class="vert-badge-row">
+        ${badgeHtml}
+        <span class="vert-rating"><span class="vert-star">★</span> ${ratingVal} (${reviewsCount})</span>
+      </div>
       <h3 class="vert-name">${escapeHtml(p.name)}</h3>
       <p class="vert-desc">${escapeHtml(p.description || '')}</p>
       <span class="vert-price">${formatMoney(p.basePrice)}</span>
@@ -801,15 +743,7 @@ function createVerticalCard(p) {
   return card;
 }
 
-// ══ SMOOTH SCROLL HELPER ══
-function scrollToExplore() {
-  const target = document.getElementById('section-explore');
-  if (target) {
-    target.scrollIntoView({ behavior: 'smooth' });
-  }
-}
-
-// ══ NAVIGATION (ONLY MENU & ORDERS TABS) ══
+// ══ NAVIGATION (TOP NAVBAR MENU & ORDERS TABS) ══
 function navigateTo(tab) {
   APP_STATE.currentTab = tab;
 
@@ -818,12 +752,11 @@ function navigateTo(tab) {
   const targetView = document.getElementById('view-' + tab);
   if (targetView) targetView.classList.add('active');
 
-  // Bottom nav tab active state
-  document.querySelectorAll('.bnav-btn').forEach(btn => btn.classList.remove('active'));
-  const activeBtn = document.getElementById('bnav-' + tab);
-  if (activeBtn) activeBtn.classList.add('active');
+  // Top nav tabs active state
+  document.getElementById('ntab-menu')?.classList.toggle('active', tab === 'menu');
+  document.getElementById('ntab-orders')?.classList.toggle('active', tab === 'orders');
 
-  // Update Cart Bar visibility (only show floating bar on Menu view when cart > 0)
+  // Floating Cart Bar (only show on Menu view when cart > 0)
   updateCartUI();
 
   if (tab === 'orders') {
@@ -1019,7 +952,6 @@ function calculateSheetTotal() {
 }
 
 function updateSheetPricingUI() {
-  // Re-render only options classes for high performance
   const p = APP_STATE.sheet.product;
   if (!p) return;
 
@@ -1146,14 +1078,14 @@ function updateCartUI() {
     }
   }
 
-  // Bottom Nav Orders Badge
-  const bnavBadge = document.getElementById('bnav-orders-badge');
-  if (bnavBadge) {
+  // Top Nav Orders Badge
+  const navBadge = document.getElementById('nav-cart-badge');
+  if (navBadge) {
     if (count > 0) {
-      bnavBadge.style.display = 'flex';
-      bnavBadge.textContent = count;
+      navBadge.style.display = 'flex';
+      navBadge.textContent = count;
     } else {
-      bnavBadge.style.display = 'none';
+      navBadge.style.display = 'none';
     }
   }
 
@@ -1180,7 +1112,7 @@ function renderCart() {
         <div class="empty-icon">🛒</div>
         <p class="empty-text">Your order is empty</p>
         <p class="empty-sub">Explore our flame-grilled burgers and sides to build your meal.</p>
-        <button class="hero-cta" style="margin: 16px auto 0;" onclick="navigateTo('menu')">Browse menu &rarr;</button>
+        <button class="nav-pill-btn active" style="margin: 16px auto 0;" onclick="navigateTo('menu')">Browse menu &rarr;</button>
       </div>
     `;
     if (summary) summary.classList.add('hidden');
@@ -1192,7 +1124,6 @@ function renderCart() {
   APP_STATE.cart.forEach((item, index) => {
     const product = PRODUCTS.find(p => p.id === item.productId);
     
-    // Format customized options into human readable summary
     let optionLabels = [];
     if (product) {
       (product.customizations || []).forEach(g => {
