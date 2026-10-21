@@ -767,12 +767,26 @@ function navigateTo(tab) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function focusSearch() {
-  navigateTo('menu');
+function toggleSearch() {
+  const searchSec = document.getElementById('search-section');
+  const searchBtn = document.getElementById('nav-search-btn');
   const input = document.getElementById('search-input');
-  if (input) {
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setTimeout(() => input.focus(), 250);
+  if (!searchSec) return;
+
+  // Ensure menu view is active
+  if (APP_STATE.currentTab !== 'menu') {
+    navigateTo('menu');
+  }
+
+  const isHidden = searchSec.classList.contains('hidden');
+  if (isHidden) {
+    searchSec.classList.remove('hidden');
+    searchBtn?.classList.add('active');
+    setTimeout(() => input?.focus(), 100);
+  } else {
+    searchSec.classList.add('hidden');
+    searchBtn?.classList.remove('active');
+    clearSearch();
   }
 }
 
