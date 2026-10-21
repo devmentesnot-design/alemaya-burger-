@@ -395,6 +395,15 @@ const PRODUCTS=[
       {id:'strawberry',label:'Strawberry',priceAdd:0}]}]}
 ];
 
+// ══ CATEGORY IMAGES ══
+const CAT_IMAGES={
+  burgers:'burger_classic.jpg',pizza:'pizza_margherita.jpg',burritos:'burrito_bowl.jpg',
+  pasta:'pasta_carbonara.jpg',sandwiches:'chicken_sandwich.jpg',chicken:'chicken_sandwich.jpg',
+  breakfast:'smoothie_tropical.jpg',sides:'burger_classic.jpg',wraps:'chicken_sandwich.jpg',
+  protein:'milkshake_chocolate.jpg',superjuice:'smoothie_tropical.jpg',juice:'smoothie_tropical.jpg',
+  milkshakes:'milkshake_chocolate.jpg',desserts:'milkshake_chocolate.jpg'
+};
+
 // ══ STATE ══
 let ST={currentView:'welcome',activeCategory:'burgers',searchQuery:'',orderType:'Dine-In',
   cart:[],editingIndex:-1,sheet:{product:null,selections:{},qty:1,note:'',isEdit:false}};
@@ -416,25 +425,38 @@ function startOrder(){showView('menu');setTimeout(()=>selectCategory(ST.activeCa
 function showMenu(){showView('menu');updateCartBar();}
 function showCart(){showView('cart');renderCart();document.getElementById('cart-bar').classList.add('hidden');}
 
-// ══ PILLS ══
+// ══ CATEGORY GRID ══
 function buildCategoryPills(){
   const c=document.getElementById('cat-pills');
   CATEGORIES.forEach(cat=>{
     const b=document.createElement('button');
-    b.className='cpill'+(cat.id===ST.activeCategory?' active':'');
-    b.setAttribute('role','tab');b.id='pill-'+cat.id;
-    b.innerHTML='<span>'+cat.icon+'</span>'+cat.name;
+    b.className='cgitem'+(cat.id===ST.activeCategory?' active':'');
+    b.id='pill-'+cat.id;
+    b.innerHTML='<span class="cgitem-ic">'+cat.icon+'</span><span class="cgitem-nm">'+cat.name+'</span>';
     b.onclick=()=>selectCategory(cat.id);c.appendChild(b);
   });
 }
 function selectCategory(id){
   ST.activeCategory=id;
-  document.querySelectorAll('.cpill').forEach(p=>p.classList.remove('active'));
-  const p=document.getElementById('pill-'+id);
-  if(p){p.classList.add('active');p.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
+  document.querySelectorAll('.cgitem').forEach(p=>p.classList.remove('active'));
+  const p=document.getElementById('pill-'+id);if(p)p.classList.add('active');
   ST.searchQuery='';
   const si=document.getElementById('search-input');if(si)si.value='';
+  updateBanner(id);
   renderMenu();
+}
+function updateBanner(catId){
+  const img=document.getElementById('cat-banner-img');
+  const lbl=document.getElementById('cat-banner-label');
+  if(!img)return;
+  const cat=CATEGORIES.find(c=>c.id===catId);
+  img.style.opacity='0';
+  setTimeout(()=>{
+    img.src=CAT_IMAGES[catId]||'burger_classic.jpg';
+    img.onerror=()=>{img.src='logo.png';};
+    if(lbl&&cat)lbl.textContent=cat.icon+' '+cat.name;
+    img.style.opacity='1';
+  },220);
 }
 
 // ══ ORDER TYPE ══
