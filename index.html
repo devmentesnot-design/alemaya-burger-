@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Alemaya Grill'd Healthy Burgers - Fresh grilled food made for your cravings.">
-  <title>Alemaya Grill'd - Healthy Burgers</title>
+  <meta name="description" content="Alemaya Grill'd Healthy Burgers - Fresh grilled food made for your cravings with real-time kitchen & admin portals.">
+  <title>Alemaya Grill'd - Healthy Burgers & Kitchen Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261021_2">
+  <link rel="stylesheet" href="style.css?v=20261021_3">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -22,26 +22,47 @@
   </div>
 
   <!-- MAIN APP CONTAINER -->
-  <div id="app">
+  <div id="app" class="portal-customer">
     
-    <!-- TOP NAVBAR (LOGO ON LEFT, BLACK SEARCH ICON ON RIGHT) -->
+    <!-- TOP NAVBAR WITH BRAND LOGO, ROLE/PORTAL SWITCHER & SEARCH -->
     <header class="top-nav-bar">
       <div class="top-nav-inner">
-        <div class="nav-brand" onclick="navigateTo('menu')">
+        <!-- Brand Logo -->
+        <div class="nav-brand" onclick="switchPortal('customer')" title="Back to Customer Menu">
           <img src="logo.png" alt="Alemaya Grill'd" class="nav-logo">
         </div>
+
+        <!-- Portal / Role Switcher Pill -->
+        <nav class="portal-switcher" id="portal-switcher" aria-label="Portal Navigation">
+          <button class="portal-btn active" id="pbtn-customer" onclick="switchPortal('customer')" title="Customer Menu & Ordering">
+            <i data-lucide="utensils" class="lucide-icon"></i>
+            <span class="pbtn-label">Menu</span>
+          </button>
+          <button class="portal-btn" id="pbtn-chef" onclick="switchPortal('chef')" title="Kitchen Display System (KDS)">
+            <i data-lucide="flame" class="lucide-icon"></i>
+            <span class="pbtn-label">Kitchen</span>
+            <span class="portal-badge" id="chef-pending-badge" style="display:none">0</span>
+          </button>
+          <button class="portal-btn" id="pbtn-admin" onclick="switchPortal('admin')" title="Manager & Admin Analytics">
+            <i data-lucide="bar-chart-3" class="lucide-icon"></i>
+            <span class="pbtn-label">Admin</span>
+          </button>
+        </nav>
+
+        <!-- Navbar Actions (Search Icon for Menu view) -->
         <div class="nav-actions">
-          <!-- Search Icon Button (Lucide Search Icon, Black) -->
-          <button class="icon-btn" id="nav-search-btn" onclick="toggleSearch()" title="Search" aria-label="Search menu">
+          <button class="icon-btn" id="nav-search-btn" onclick="toggleSearch()" title="Search Menu" aria-label="Search menu">
             <i data-lucide="search" class="lucide-icon"></i>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- VIEW: MENU (MAIN VIEW) -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- VIEW 1: CUSTOMER MENU                                             -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
     <main id="view-menu" class="view active">
-      <!-- SEARCH BAR (HIDDEN BY DEFAULT, TOGGLED VIA NAVBAR SEARCH ICON) -->
+      <!-- SEARCH BAR (TOGGLED VIA NAVBAR SEARCH ICON) -->
       <div class="search-header hidden" id="search-section">
         <div class="search-box">
           <i data-lucide="search" class="search-icon lucide-icon"></i>
@@ -52,7 +73,7 @@
         </div>
       </div>
 
-      <!-- HERO BANNER (NO 'EXPLORE MENU' BUTTON, DARK FADE LIMITED TO ~40%) -->
+      <!-- HERO BANNER -->
       <section class="hero-banner" id="hero-banner">
         <div class="hero-text-side">
           <span class="hero-badge">BESTSELLER</span>
@@ -71,11 +92,11 @@
           <span class="category-status-note" id="cat-count-note">14 categories</span>
         </div>
         
-        <!-- 4-Column Category Grid with Professional Tabler Line-art Icons -->
+        <!-- 4-Column Category Grid -->
         <div class="cat-grid" id="cat-grid" role="tablist"></div>
       </section>
 
-      <!-- ORDER TYPE TABS (Dine-in / Takeaway only, Delivery removed) -->
+      <!-- ORDER TYPE TABS (Dine-in / Takeaway) -->
       <section class="order-type-section">
         <div class="order-type-pill" role="tablist">
           <button class="ot-tab active" id="ot-dinein" onclick="setOrderType('Dine-in')">Dine-in</button>
@@ -83,12 +104,12 @@
         </div>
       </section>
 
-      <!-- SEARCH RESULTS CONTAINER (shown only when searching, no search results text) -->
+      <!-- SEARCH RESULTS CONTAINER -->
       <section class="section-wrap hidden" id="search-results-section">
         <div class="vertical-items-list" id="search-results-list"></div>
       </section>
 
-      <!-- UNIFIED VERTICAL ITEMS LIST (NO DUPLICATION, NO TWO SECTIONS) -->
+      <!-- UNIFIED VERTICAL ITEMS LIST -->
       <section class="section-wrap" id="regular-menu-content">
         <div class="section-header-row">
           <h2 class="section-heading" id="active-category-title">Burgers</h2>
@@ -97,11 +118,12 @@
         <div class="vertical-items-list" id="unified-items-list"></div>
       </section>
 
-      <!-- GENEROUS SPACER SO CARDS ARE NEVER OVERLAPPED BY BOTTOM NAV -->
       <div class="scroll-bottom-spacer"></div>
     </main>
 
-    <!-- VIEW: ORDERS (CART + RECENT ORDERS) -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- VIEW 2: CUSTOMER ORDERS (CART & LIVE STATUS TRACKER)               -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
     <main id="view-orders" class="view">
       <header class="orders-header">
         <div class="orders-nav-row">
@@ -111,7 +133,7 @@
           </button>
         </div>
         <h1 class="orders-title">Your Orders</h1>
-        <p class="orders-subtitle">Review your cart & order history</p>
+        <p class="orders-subtitle">Review your cart & track live kitchen preparation</p>
         
         <!-- Segmented Toggle: Cart vs Past Orders -->
         <div class="orders-segment">
@@ -119,7 +141,7 @@
             Current Cart (<span id="cart-seg-count">0</span>)
           </button>
           <button class="seg-btn" id="seg-history" onclick="switchOrdersTab('history')">
-            Recent Orders (<span id="history-seg-count">0</span>)
+            Recent Orders & Status (<span id="history-seg-count">0</span>)
           </button>
         </div>
       </header>
@@ -152,11 +174,11 @@
             <span>Confirm & Place Order</span>
             <span id="btn-checkout-price">Br 0</span>
           </button>
-          <p class="checkout-guarantee">Prepared hot and fresh to order • 15–25 min</p>
+          <p class="checkout-guarantee">Fresh flame-grilled to order • Real-time kitchen tracking</p>
         </div>
       </div>
 
-      <!-- TAB 2: RECENT ORDERS HISTORY -->
+      <!-- TAB 2: RECENT ORDERS & LIVE STATUS TRACKER -->
       <div id="orders-tab-history" class="orders-tab-pane">
         <div id="history-items-wrap"></div>
       </div>
@@ -164,7 +186,271 @@
       <div class="scroll-bottom-spacer"></div>
     </main>
 
-    <!-- FLOATING CART BAR (WHEN ITEMS ARE IN CART, SIT RIGHT ABOVE BOTTOM NAV) -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- VIEW 3: CHEF KITCHEN DISPLAY SYSTEM (KDS)                         -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <main id="view-chef" class="view">
+      <!-- KDS Top Control Header -->
+      <section class="kds-header">
+        <div class="kds-header-top">
+          <div class="kds-title-group">
+            <div class="kds-badge-pill">
+              <span class="live-pulse-dot"></span>
+              <span>LIVE KITCHEN DISPLAY</span>
+            </div>
+            <h1 class="kds-title">Chef & Kitchen Operations</h1>
+            <p class="kds-subtitle">Active grill tickets, recipe specs, and real-time order status controller</p>
+          </div>
+          <div class="kds-quick-tools">
+            <div class="kds-clock-box">
+              <span class="kds-clock-icon"><i data-lucide="clock" class="lucide-icon"></i></span>
+              <span id="kds-live-clock" class="kds-live-clock">--:--:--</span>
+            </div>
+            <button class="kds-tool-btn" id="kds-sound-btn" onclick="toggleKitchenAudio()" title="Toggle Kitchen Alert Sound">
+              <i data-lucide="volume-2" class="lucide-icon" id="kds-sound-icon"></i>
+              <span id="kds-sound-text">Chime: ON</span>
+            </button>
+            <button class="kds-tool-btn primary" onclick="generateSimulatedOrder()" title="Send a simulated test order to test live workflow">
+              <i data-lucide="plus-circle" class="lucide-icon"></i>
+              <span>+ Test Order</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KDS Status Metric Strip & Filters -->
+        <div class="kds-filter-strip" role="tablist">
+          <button class="kds-filter-tab active" id="kds-flt-active" onclick="filterKdsOrders('active')">
+            <span class="kds-tab-name">All Active</span>
+            <span class="kds-tab-count" id="kds-cnt-active">0</span>
+          </button>
+          <button class="kds-filter-tab" id="kds-flt-received" onclick="filterKdsOrders('received')">
+            <span class="kds-tab-dot dot-received"></span>
+            <span class="kds-tab-name">Received</span>
+            <span class="kds-tab-count" id="kds-cnt-received">0</span>
+          </button>
+          <button class="kds-filter-tab" id="kds-flt-preparing" onclick="filterKdsOrders('preparing')">
+            <span class="kds-tab-dot dot-preparing"></span>
+            <span class="kds-tab-name">Grilling / Cooking</span>
+            <span class="kds-tab-count" id="kds-cnt-preparing">0</span>
+          </button>
+          <button class="kds-filter-tab" id="kds-flt-ready" onclick="filterKdsOrders('ready')">
+            <span class="kds-tab-dot dot-ready"></span>
+            <span class="kds-tab-name">Ready for Pickup</span>
+            <span class="kds-tab-count" id="kds-cnt-ready">0</span>
+          </button>
+          <button class="kds-filter-tab" id="kds-flt-completed" onclick="filterKdsOrders('completed')">
+            <span class="kds-tab-dot dot-completed"></span>
+            <span class="kds-tab-name">Completed Today</span>
+            <span class="kds-tab-count" id="kds-cnt-completed">0</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Active Orders Ticket Board -->
+      <section class="kds-board-section">
+        <div class="kds-tickets-grid" id="kds-tickets-container"></div>
+      </section>
+
+      <div class="scroll-bottom-spacer"></div>
+    </main>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- VIEW 4: ADMIN DASHBOARD & REVENUE REPORTING                       -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <main id="view-admin" class="view">
+      <!-- Admin Control Header -->
+      <section class="admin-header">
+        <div class="admin-header-row">
+          <div class="admin-title-group">
+            <div class="admin-badge-pill">
+              <i data-lucide="shield-check" class="lucide-icon"></i>
+              <span>MANAGEMENT & REVENUE CONSOLE</span>
+            </div>
+            <h1 class="admin-title">Sales, Orders & Daily Revenue</h1>
+            <p class="admin-subtitle">Comprehensive performance metrics, revenue audit, and kitchen inventory controls</p>
+          </div>
+          <div class="admin-actions-bar">
+            <!-- Time Window Selector -->
+            <div class="admin-time-select">
+              <label for="admin-date-filter" class="admin-time-label"><i data-lucide="calendar" class="lucide-icon"></i></label>
+              <select id="admin-date-filter" onchange="handleAdminDateFilter(this.value)">
+                <option value="today" selected>Today's Shift</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="week">Past 7 Days</option>
+                <option value="all">All Time History</option>
+              </select>
+            </div>
+            <button class="admin-btn-action" onclick="exportOrdersCsv()" title="Export CSV spreadsheet of orders">
+              <i data-lucide="download" class="lucide-icon"></i>
+              <span>Export CSV</span>
+            </button>
+            <button class="admin-btn-action" onclick="seedSampleData()" title="Load realistic test week data">
+              <i data-lucide="refresh-cw" class="lucide-icon"></i>
+              <span>Demo Data</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KEY PERFORMANCE INDICATOR (KPI) METRIC CARDS -->
+        <div class="admin-kpi-grid">
+          <!-- Card 1: Revenue -->
+          <div class="kpi-card revenue-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">TOTAL REVENUE</span>
+              <div class="kpi-icon-wrap icon-rev"><i data-lucide="banknote" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-revenue">Br 0</div>
+            <div class="kpi-subtext" id="kpi-revenue-sub">Filtered period sales</div>
+          </div>
+
+          <!-- Card 2: Orders Count -->
+          <div class="kpi-card orders-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">TOTAL ORDERS</span>
+              <div class="kpi-icon-wrap icon-orders"><i data-lucide="shopping-bag" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-orders-count">0</div>
+            <div class="kpi-subtext" id="kpi-orders-sub">Filtered period count</div>
+          </div>
+
+          <!-- Card 3: Average Order Value -->
+          <div class="kpi-card aov-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">AVERAGE BASKET (AOV)</span>
+              <div class="kpi-icon-wrap icon-aov"><i data-lucide="trending-up" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-aov">Br 0</div>
+            <div class="kpi-subtext">Average spend per customer</div>
+          </div>
+
+          <!-- Card 4: Active In Kitchen -->
+          <div class="kpi-card active-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">ACTIVE IN KITCHEN</span>
+              <div class="kpi-icon-wrap icon-kitchen"><i data-lucide="flame" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-kitchen-active">0</div>
+            <div class="kpi-subtext" id="kpi-kitchen-sub">Orders currently preparing</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISUAL ANALYTICS & CHARTS SECTION -->
+      <section class="admin-charts-section">
+        <div class="admin-charts-grid">
+          <!-- Chart 1: 7-Day Revenue Trend -->
+          <div class="admin-chart-box">
+            <div class="chart-box-header">
+              <div>
+                <h3 class="chart-box-title">Daily Revenue Trend</h3>
+                <p class="chart-box-sub">Daily revenue comparisons across the past 7 days</p>
+              </div>
+              <span class="chart-badge">7 Days</span>
+            </div>
+            <div class="chart-bars-wrap" id="admin-revenue-bars">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Chart 2: Category Breakdown & Channel Split -->
+          <div class="admin-chart-box">
+            <div class="chart-box-header">
+              <div>
+                <h3 class="chart-box-title">Category Sales & Channel Split</h3>
+                <p class="chart-box-sub">Revenue share by food category and order type</p>
+              </div>
+              <span class="chart-badge">Share</span>
+            </div>
+            <div class="category-breakdown-list" id="admin-category-breakdown">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Bestsellers Leaderboard -->
+        <div class="admin-bestsellers-box">
+          <div class="chart-box-header">
+            <div>
+              <h3 class="chart-box-title">Top-Selling Menu Items</h3>
+              <p class="chart-box-sub">Most ordered dishes ranked by volume and total earnings</p>
+            </div>
+            <span class="chart-badge">Top 5</span>
+          </div>
+          <div class="bestsellers-table-wrap" id="admin-bestsellers-wrap">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMIN ORDERS MANAGEMENT TABLE -->
+      <section class="admin-orders-section">
+        <div class="admin-section-header">
+          <div>
+            <h2 class="admin-sec-title">Order Ledger & Status Control</h2>
+            <p class="admin-sec-sub">Live audit trail with instant status override and customer breakdown</p>
+          </div>
+          <!-- Order Table Search & Status Filter -->
+          <div class="admin-orders-controls">
+            <div class="admin-search-input-wrap">
+              <i data-lucide="search" class="lucide-icon"></i>
+              <input type="text" id="admin-order-search" placeholder="Search order ID or item..." oninput="handleAdminOrderSearch(this.value)">
+            </div>
+            <select id="admin-status-filter" onchange="handleAdminStatusFilter(this.value)">
+              <option value="all">All Statuses</option>
+              <option value="received">Received</option>
+              <option value="preparing">Grilling / Cooking</option>
+              <option value="ready">Ready</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Time & Date</th>
+                <th>Type</th>
+                <th>Items Ordered</th>
+                <th>Total</th>
+                <th>Current Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MENU AVAILABILITY (86 STOCK MANAGER) -->
+      <section class="admin-stock-section">
+        <div class="admin-section-header">
+          <div>
+            <h2 class="admin-sec-title">Kitchen Stock & Menu Availability (86 Manager)</h2>
+            <p class="admin-sec-sub">Instantly mark ingredients or dishes as "In Stock" or "Sold Out" on the customer menu</p>
+          </div>
+          <div class="admin-search-input-wrap">
+            <i data-lucide="search" class="lucide-icon"></i>
+            <input type="text" id="admin-stock-search" placeholder="Filter dishes..." oninput="renderAdminStock(this.value)">
+          </div>
+        </div>
+
+        <div class="admin-stock-grid" id="admin-stock-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <div class="scroll-bottom-spacer"></div>
+    </main>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- FLOATING CART BAR (FOR CUSTOMER MENU VIEW)                        -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
     <div class="floating-cart-bar hidden" id="floating-cart-bar" onclick="navigateTo('orders')">
       <div class="cart-bar-inner">
         <div class="cart-bar-left">
@@ -178,27 +464,48 @@
       </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION (MENU & ORDERS TABS) -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- BOTTOM NAVIGATION (4 TABS: MENU, ORDERS, KITCHEN, ADMIN)          -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
     <nav class="bottom-nav" id="bottom-nav">
       <!-- Menu Tab -->
-      <button class="bnav-btn active" id="bnav-menu" onclick="navigateTo('menu')">
+      <button class="bnav-btn active" id="bnav-menu" onclick="switchPortal('customer'); navigateTo('menu')">
         <div class="bnav-icon-wrap">
           <i data-lucide="utensils" class="bnav-lucide"></i>
         </div>
         <span class="bnav-label">Menu</span>
       </button>
 
-      <!-- Orders Tab -->
-      <button class="bnav-btn" id="bnav-orders" onclick="navigateTo('orders')">
+      <!-- Customer Orders Tab -->
+      <button class="bnav-btn" id="bnav-orders" onclick="switchPortal('customer'); navigateTo('orders')">
         <div class="bnav-icon-wrap">
           <i data-lucide="clipboard-list" class="bnav-lucide"></i>
           <span class="bnav-badge" id="bnav-orders-badge" style="display:none">0</span>
         </div>
         <span class="bnav-label">Orders</span>
       </button>
+
+      <!-- Chef / Kitchen Tab -->
+      <button class="bnav-btn" id="bnav-chef" onclick="switchPortal('chef')">
+        <div class="bnav-icon-wrap">
+          <i data-lucide="flame" class="bnav-lucide"></i>
+          <span class="bnav-badge" id="bnav-chef-badge" style="display:none">0</span>
+        </div>
+        <span class="bnav-label">Kitchen</span>
+      </button>
+
+      <!-- Admin Tab -->
+      <button class="bnav-btn" id="bnav-admin" onclick="switchPortal('admin')">
+        <div class="bnav-icon-wrap">
+          <i data-lucide="bar-chart-3" class="bnav-lucide"></i>
+        </div>
+        <span class="bnav-label">Admin</span>
+      </button>
     </nav>
 
-    <!-- PRODUCT CUSTOMIZATION MODAL BOTTOM SHEET -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- PRODUCT CUSTOMIZATION MODAL BOTTOM SHEET                          -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
     <div class="modal-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
     <div class="bottom-sheet" id="product-sheet" role="dialog" aria-modal="true">
       <div class="sheet-pull-handle"></div>
@@ -208,11 +515,22 @@
       <div class="sheet-scroll-body" id="sheet-body"></div>
     </div>
 
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- ORDER TICKET DETAIL MODAL (FOR CHEF & ADMIN)                      -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="order-modal-overlay" onclick="closeOrderModal()"></div>
+    <div class="order-detail-modal" id="order-detail-modal" role="dialog" aria-modal="true">
+      <button class="modal-close-icon" onclick="closeOrderModal()" aria-label="Close dialog">
+        <i data-lucide="x" class="lucide-icon"></i>
+      </button>
+      <div id="order-modal-content"></div>
+    </div>
+
     <!-- TOAST NOTIFICATIONS -->
     <div class="toast-popup" id="toast"></div>
 
   </div>
 
-  <script src="app.js?v=20261021_2"></script>
+  <script src="app.js?v=20261021_3"></script>
 </body>
 </html>
