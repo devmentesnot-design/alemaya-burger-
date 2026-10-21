@@ -11,77 +11,91 @@ const CFG = {
   estimatedTime: '15-25 min'
 };
 
-// ══ PROFESSIONAL CATEGORY ICONS (OFFICIAL TABLER VECTOR ICONS 24x24) ══
+// ══ PROFESSIONAL LUCIDE REACT CATEGORY ICONS (BLACK STROKE) ══
 const CATEGORIES = [
   {
     id: 'burgers',
     name: 'Burgers',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16a1 1 0 0 1 1 1v1a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1z" /><path d="M4 9a8 8 0 0 1 16 0h-16z" /><path d="M4 18h16a2 2 0 0 1 2 2h-20a2 2 0 0 1 2 -2z" /><path d="M8 15h8" /></svg>`
+    icon: 'sandwich',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`
   },
   {
     id: 'pizza',
     name: 'Pizza',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5c-3.04 0 -5.952 -.7 -8.446 -1.944a1.5 1.5 0 0 1 -.554 -2.056l7.5 -13.5a1.5 1.5 0 0 1 2.6 0l7.5 13.5a1.5 1.5 0 0 1 -.554 2.056c-2.494 1.244 -5.406 1.944 -8.446 1.944z" /><circle cx="12" cy="11" r="1.2" fill="currentColor"/><circle cx="10" cy="16" r="1.2" fill="currentColor"/><circle cx="14" cy="16" r="1.2" fill="currentColor"/></svg>`
+    icon: 'pizza',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pizza"><path d="m12 2-8.5 18a2 2 0 0 0 2.2 2.7 26.3 26.3 0 0 0 12.6 0 2 2 0 0 0 2.2-2.7L12 2Z"/><path d="M10 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><circle cx="14" cy="9" r="1" fill="#000000"/></svg>`
   },
   {
     id: 'wraps',
     name: 'Wraps',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19l14 -14a3.5 3.5 0 0 1 5 5l-14 14a3.5 3.5 0 0 1 -5 -5z" /><path d="M7 13l4 4" /><path d="M10 10l4 4" /><path d="M13 7l4 4" /></svg>`
+    icon: 'salad',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-salad"><path d="M7 21h10"/><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M11.38 12a2.4 2.4 0 0 1-.4-1.2c0-1.3 1.1-2.4 2.4-2.4.6 0 1.2.2 1.6.6"/><path d="M13 12V8"/><path d="M16.5 12c0-1.4-1.1-2.5-2.5-2.5"/></svg>`
   },
   {
     id: 'sides',
     name: 'Sides',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.5 10h11l1.5 -10z" /><path d="M5 11h14" /><path d="M7 11v-6a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v6" /><path d="M11 11v-8a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v8" /><path d="M15 11v-5a1 1 0 0 1 1 -1h1a1 1 0 0 1 1 1v5" /></svg>`
+    icon: 'package',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m21 8-2 12H5L3 8"/><path d="M10 12v5"/><path d="M14 12v5"/><path d="M7 4h10l4 4H3l4-4Z"/></svg>`
   },
   {
     id: 'drinks',
     name: 'Drinks',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10l-1.5 12a2 2 0 0 1 -2 1.8h-3a2 2 0 0 1 -2 -1.8l-1.5 -12z" /><path d="M6 8h12" /><path d="M15 4l-3 4" /></svg>`
+    icon: 'cup-soda',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cup-soda"><path d="m6 8 1.75 12.28a2 2 0 0 0 2 1.72h4.5a2 2 0 0 0 2-1.72L18 8"/><path d="M5 8h14"/><path d="m7 15 10-4"/><path d="m12 2 1 6"/></svg>`
   },
   {
     id: 'pasta',
     name: 'Pasta',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1 -16 0z" /><path d="M12 3v4" /><path d="M8 4v3" /><path d="M16 4v3" /><path d="M7 19h10" /></svg>`
+    icon: 'soup',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M7 3v3"/><path d="M12 3v3"/><path d="M17 3v3"/></svg>`
   },
   {
     id: 'sandwiches',
     name: 'Sandwiches',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-16a1 1 0 0 0 -1 1v1a1 1 0 0 0 1 1z" /><path d="M4 9h16a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-16a1 1 0 0 0 -1 1v1a1 1 0 0 0 1 1z" /><path d="M5 12h14" /></svg>`
+    icon: 'sandwich',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`
   },
   {
     id: 'chicken',
     name: 'Chicken',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.62 3.97a6.5 6.5 0 0 1 7.23 7.23l-3.35 3.35a6.5 6.5 0 0 1 -7.23 -7.23l3.35 -3.35z" /><path d="M10.5 11l-5.5 5.5" /><circle cx="5" cy="18" r="1.5" /><circle cx="7" cy="20" r="1.5" /></svg>`
+    icon: 'drumstick',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-drumstick"><path d="m14 10 2.5-2.5a3.54 3.54 0 0 1 5 5L19 15"/><path d="M10 14A5.5 5.5 0 0 1 2 6.5C2 3.5 4.5 1 7.5 1A5.5 5.5 0 0 1 15 8.5"/><path d="m14 10-4 4"/><circle cx="19" cy="19" r="2"/><circle cx="21" cy="15" r="2"/></svg>`
   },
   {
     id: 'breakfast',
     name: 'Breakfast',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4.418 0 -8 4.03 -8 9c0 4.97 3.582 9 8 9s8 -4.03 8 -9c0 -4.97 -3.582 -9 -8 -9z" /><circle cx="12" cy="12" r="3" /></svg>`
+    icon: 'egg-fried',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg-fried"><circle cx="11.5" cy="12.5" r="3.5"/><path d="M3 8c0-3.5 2.5-6 6.5-6 5 0 6 3 8.5 3 3.5 0 4 2 4 6 0 4-2 8-6 8-2.5 0-3 2-6.5 2-4.5 0-6.5-3.5-6.5-7 0-2 0-4 0-6Z"/></svg>`
   },
   {
     id: 'protein',
     name: 'Protein',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h1" /><path d="M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2" /><path d="M6 7v10" /><path d="M9 9v6" /><path d="M6 12h12" /><path d="M15 9v6" /><path d="M18 7v10" /><path d="M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2" /><path d="M21 12h1" /></svg>`
+    icon: 'dumbbell',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dumbbell"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>`
   },
   {
     id: 'superjuice',
     name: 'Smoothies',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8" /><path d="M12 15v6" /><path d="M17 3l1 7c0 3.012 -2.686 5 -6 5s-6 -1.988 -6 -5l1 -7h10z" /><path d="M6 7h12" /><circle cx="12" cy="11" r="2" /></svg>`
+    icon: 'glass-water',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-glass-water"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg>`
   },
   {
     id: 'juice',
     name: 'Juice',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10l-1.5 12a2 2 0 0 1 -2 1.8h-3a2 2 0 0 1 -2 -1.8l-1.5 -12z" /><path d="M6 8h12" /><circle cx="12" cy="14" r="2.5" /><path d="M15 4l-3 4" /></svg>`
+    icon: 'citrus',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-citrus"><path d="M21.66 10.44a10 10 0 1 0-8.1 11.22 10.05 10.05 0 0 0 8.1-11.22Z"/><path d="M12 12 8.5 7.5"/><path d="M12 12v6"/><path d="m12 12 5.5-2.5"/></svg>`
   },
   {
     id: 'milkshakes',
     name: 'Shakes',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 10l-1.5 10a2 2 0 0 1 -2 1.8h-3a2 2 0 0 1 -2 -1.8l-1.5 -10z" /><path d="M7 10a5 5 0 0 1 10 0z" /><path d="M12 5v-3" /><circle cx="12" cy="5" r="1.5" /></svg>`
+    icon: 'ice-cream-2',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-2"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6Zm0 0v5"/><path d="M4 11a8 8 0 1 1 16 0"/></svg>`
   },
   {
     id: 'desserts',
     name: 'Desserts',
-    svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z" /><path d="M3 14.8c.3 .1 .6 .2 1 .2a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1c.4 0 .7 -.1 1 -.2" /><circle cx="12" cy="5" r="2" /></svg>`
+    icon: 'cake-slice',
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cake-slice"><circle cx="9" cy="7" r="2"/><path d="M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6"/><path d="M16 13H3"/><path d="M16 17H3"/></svg>`
   }
 ];
 
@@ -537,6 +551,17 @@ let APP_STATE = {
   }
 };
 
+// ══ LUCIDE ICONS HELPER ══
+function refreshLucideIcons() {
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('Lucide icon render error:', e);
+    }
+  }
+}
+
 // ══ DOM READY INITIALIZATION ══
 document.addEventListener('DOMContentLoaded', () => {
   // Splash hide after smooth logo display
@@ -553,9 +578,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderMenu();
   updateCartUI();
   renderHistory();
+  refreshLucideIcons();
 });
 
-// ══ CATEGORY GRID (4-COLUMN SQUIRCLE CARDS WITH TABLER VECTOR ICONS) ══
+// ══ CATEGORY GRID (4-COLUMN SQUIRCLE CARDS WITH LUCIDE REACT ICONS) ══
 function buildCategoryGrid() {
   const container = document.getElementById('cat-grid');
   if (!container) return;
@@ -570,11 +596,12 @@ function buildCategoryGrid() {
     card.onclick = () => selectCategory(cat.id);
 
     card.innerHTML = `
-      <div class="cat-icon-wrap">${cat.svg}</div>
+      <div class="cat-icon-wrap"><i data-lucide="${cat.icon}">${cat.svg}</i></div>
       <span class="cat-name">${cat.name}</span>
     `;
     container.appendChild(card);
   });
+  refreshLucideIcons();
 }
 
 function selectCategory(catId) {
@@ -681,6 +708,7 @@ function renderSearchResults() {
   matches.forEach(product => {
     list.appendChild(createVerticalCard(product));
   });
+  refreshLucideIcons();
 }
 
 // ══ UNIFIED VERTICAL ITEMS LISTING (NO TWO SECTIONS, NO SPLIT CLASSIFICATION) ══
@@ -713,6 +741,7 @@ function renderMenu() {
   prods.forEach(product => {
     list.appendChild(createVerticalCard(product));
   });
+  refreshLucideIcons();
 }
 
 // ══ CARD GENERATOR (HIGH QUALITY VERTICAL LIST CARD) ══
@@ -737,7 +766,9 @@ function createVerticalCard(p) {
       <span class="vert-price">${formatMoney(p.basePrice)}</span>
     </div>
     <div class="vert-action">
-      <button class="btn-round-add" onclick="event.stopPropagation(); openProduct('${p.id}')" aria-label="Add to order">+</button>
+      <button class="btn-round-add" onclick="event.stopPropagation(); openProduct('${p.id}')" aria-label="Add to order">
+        <i data-lucide="plus"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></i>
+      </button>
     </div>
   `;
   return card;
@@ -919,9 +950,13 @@ function renderSheetContent() {
 
     <div class="sheet-sticky-footer">
       <div class="sheet-qty-stepper">
-        <button class="sheet-qty-btn" onclick="changeSheetQty(-1)">−</button>
+        <button class="sheet-qty-btn" onclick="changeSheetQty(-1)" aria-label="Decrease quantity">
+          <i data-lucide="minus"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg></i>
+        </button>
         <span class="sheet-qty-num" id="sheet-qty-val">${APP_STATE.sheet.qty}</span>
-        <button class="sheet-qty-btn" onclick="changeSheetQty(1)">+</button>
+        <button class="sheet-qty-btn" onclick="changeSheetQty(1)" aria-label="Increase quantity">
+          <i data-lucide="plus"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></i>
+        </button>
       </div>
       <button class="btn-sheet-submit" onclick="submitSheetToCart()">
         <span>${buttonActionLabel}</span>
@@ -929,6 +964,7 @@ function renderSheetContent() {
       </button>
     </div>
   `;
+  refreshLucideIcons();
 }
 
 function toggleOption(groupId, optionId, isMulti) {
@@ -1188,15 +1224,16 @@ function renderCart() {
             <span class="cart-item-price">${formatMoney(item.total)}</span>
             <div style="display: flex; align-items: center;">
               <div class="cart-qty-ctrl">
-                <button class="cart-qty-btn" onclick="updateCartItemQty(${index}, -1)">−</button>
+                <button class="cart-qty-btn" onclick="updateCartItemQty(${index}, -1)" aria-label="Decrease quantity">
+                  <i data-lucide="minus"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><line x1="5" y1="12" x2="19" y2="12"></line></svg></i>
+                </button>
                 <span class="cart-qty-val">${item.qty}</span>
-                <button class="cart-qty-btn" onclick="updateCartItemQty(${index}, 1)">+</button>
+                <button class="cart-qty-btn" onclick="updateCartItemQty(${index}, 1)" aria-label="Increase quantity">
+                  <i data-lucide="plus"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></i>
+                </button>
               </div>
-              <button class="cart-del-btn" onclick="removeCartItem(${index})" title="Remove item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
-                </svg>
+              <button class="cart-del-btn" onclick="removeCartItem(${index})" title="Remove item" aria-label="Remove item">
+                <i data-lucide="trash-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></i>
               </button>
             </div>
           </div>
@@ -1206,6 +1243,7 @@ function renderCart() {
   });
 
   wrap.innerHTML = itemsHtml;
+  refreshLucideIcons();
 
   // Bill summary breakdown
   if (summary) {

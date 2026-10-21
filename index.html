@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261021">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <!-- SPLASH SCREEN -->
@@ -23,19 +24,16 @@
   <!-- MAIN APP CONTAINER -->
   <div id="app">
     
-    <!-- TOP NAVBAR (LOGO ON LEFT, SEARCH & CART ICONS ON RIGHT) -->
+    <!-- TOP NAVBAR (LOGO ON LEFT, BLACK SEARCH ICON ON RIGHT) -->
     <header class="top-nav-bar">
       <div class="top-nav-inner">
         <div class="nav-brand" onclick="navigateTo('menu')">
           <img src="logo.png" alt="Alemaya Grill'd" class="nav-logo">
         </div>
         <div class="nav-actions">
-          <!-- Search Icon Button -->
+          <!-- Search Icon Button (Lucide Search Icon, Black) -->
           <button class="icon-btn" id="nav-search-btn" onclick="toggleSearch()" title="Search" aria-label="Search menu">
-            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <i data-lucide="search" class="lucide-icon"></i>
           </button>
         </div>
       </div>
@@ -46,12 +44,11 @@
       <!-- SEARCH BAR (HIDDEN BY DEFAULT, TOGGLED VIA NAVBAR SEARCH ICON) -->
       <div class="search-header hidden" id="search-section">
         <div class="search-box">
-          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
+          <i data-lucide="search" class="search-icon lucide-icon"></i>
           <input type="text" id="search-input" placeholder="What are you craving?" oninput="handleSearch(this.value)" autocomplete="off">
-          <button id="search-clear-btn" class="search-clear hidden" onclick="clearSearch()" aria-label="Clear search">&times;</button>
+          <button id="search-clear-btn" class="search-clear hidden" onclick="clearSearch()" aria-label="Clear search">
+            <i data-lucide="x" class="lucide-icon"></i>
+          </button>
         </div>
       </div>
 
@@ -110,10 +107,7 @@
       <header class="orders-header">
         <div class="orders-nav-row">
           <button class="back-to-menu-btn" onclick="navigateTo('menu')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
+            <i data-lucide="arrow-left" class="lucide-icon"></i>
             <span>Back to Menu</span>
           </button>
         </div>
@@ -180,9 +174,7 @@
         </div>
         <div class="cart-bar-right">
           <span class="cart-bar-total" id="bar-items-total">Br 0</span>
-          <svg class="cart-bar-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
+          <i data-lucide="chevron-right" class="cart-bar-arrow"></i>
         </div>
       </div>
     </div>
@@ -192,11 +184,7 @@
       <!-- Menu Tab -->
       <button class="bnav-btn active" id="bnav-menu" onclick="navigateTo('menu')">
         <div class="bnav-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 12h16a1 1 0 0 1 1 1v1a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1z" />
-            <path d="M4 9a8 8 0 0 1 16 0h-16z" />
-            <path d="M4 18h16a2 2 0 0 1 2 2h-20a2 2 0 0 1 2 -2z" />
-          </svg>
+          <i data-lucide="utensils" class="bnav-lucide"></i>
         </div>
         <span class="bnav-label">Menu</span>
       </button>
@@ -204,13 +192,7 @@
       <!-- Orders Tab -->
       <button class="bnav-btn" id="bnav-orders" onclick="navigateTo('orders')">
         <div class="bnav-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-            <path d="m9 16 2 2 4-4"></path>
-          </svg>
+          <i data-lucide="clipboard-list" class="bnav-lucide"></i>
           <span class="bnav-badge" id="bnav-orders-badge" style="display:none">0</span>
         </div>
         <span class="bnav-label">Orders</span>
@@ -221,7 +203,9 @@
     <div class="modal-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
     <div class="bottom-sheet" id="product-sheet" role="dialog" aria-modal="true">
       <div class="sheet-pull-handle"></div>
-      <button class="sheet-close-btn" onclick="closeSheet()" aria-label="Close modal">&times;</button>
+      <button class="sheet-close-btn" onclick="closeSheet()" aria-label="Close modal">
+        <i data-lucide="x" class="sheet-close-icon"></i>
+      </button>
       <div class="sheet-scroll-body" id="sheet-body"></div>
     </div>
 
@@ -230,6 +214,6 @@
 
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20261021"></script>
 </body>
 </html>
