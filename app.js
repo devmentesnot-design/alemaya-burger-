@@ -743,7 +743,7 @@ function createVerticalCard(p) {
   return card;
 }
 
-// ══ NAVIGATION (TOP NAVBAR MENU & ORDERS TABS) ══
+// ══ NAVIGATION (BOTTOM NAV: MENU & ORDERS TABS) ══
 function navigateTo(tab) {
   APP_STATE.currentTab = tab;
 
@@ -752,9 +752,9 @@ function navigateTo(tab) {
   const targetView = document.getElementById('view-' + tab);
   if (targetView) targetView.classList.add('active');
 
-  // Top nav tabs active state
-  document.getElementById('ntab-menu')?.classList.toggle('active', tab === 'menu');
-  document.getElementById('ntab-orders')?.classList.toggle('active', tab === 'orders');
+  // Bottom navigation tabs active state
+  document.querySelectorAll('.bnav-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('bnav-' + tab)?.classList.add('active');
 
   // Floating Cart Bar (only show on Menu view when cart > 0)
   updateCartUI();
@@ -765,6 +765,15 @@ function navigateTo(tab) {
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function focusSearch() {
+  navigateTo('menu');
+  const input = document.getElementById('search-input');
+  if (input) {
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => input.focus(), 250);
+  }
 }
 
 function switchOrdersTab(subTab) {
@@ -1078,14 +1087,25 @@ function updateCartUI() {
     }
   }
 
-  // Top Nav Orders Badge
-  const navBadge = document.getElementById('nav-cart-badge');
-  if (navBadge) {
+  // Top Navbar Cart Badge
+  const topBadge = document.getElementById('top-cart-badge');
+  if (topBadge) {
     if (count > 0) {
-      navBadge.style.display = 'flex';
-      navBadge.textContent = count;
+      topBadge.style.display = 'flex';
+      topBadge.textContent = count;
     } else {
-      navBadge.style.display = 'none';
+      topBadge.style.display = 'none';
+    }
+  }
+
+  // Bottom Nav Orders Badge
+  const bnavBadge = document.getElementById('bnav-orders-badge');
+  if (bnavBadge) {
+    if (count > 0) {
+      bnavBadge.style.display = 'flex';
+      bnavBadge.textContent = count;
+    } else {
+      bnavBadge.style.display = 'none';
     }
   }
 
