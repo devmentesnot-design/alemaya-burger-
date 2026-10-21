@@ -1,4 +1,4 @@
-﻿// ══ CONFIG ══
+// ══ CONFIG ══
 const CFG={currencySymbol:'Br',serviceCharge:0.10,estimatedTime:'15-25 min'};
 const CATEGORIES=[
   {id:'burgers',name:'Burgers',icon:'🍔'},{id:'pizza',name:'Pizza',icon:'🍕'},
@@ -717,24 +717,13 @@ function renderCart(){
 // ══ PLACE ORDER ══
 function placeOrder(){
   if(ST.cart.length===0){toast('Your cart is empty');return;}
-  const{sub,svc,total}=getTotals();
-  const cnt=ST.cart.reduce((s,i)=>s+i.qty,0);
-  document.getElementById('conf-det').innerHTML=
-    '<div class="cdr"><span>Items ordered</span><span>'+cnt+'</span></div>'
-    +'<div class="cdr"><span>Order type</span><span>'+ST.orderType+'</span></div>'
-    +'<div class="cdr"><span>Subtotal</span><span>'+fmt(sub)+'</span></div>'
-    +'<div class="cdr"><span>Service charge</span><span>'+fmt(svc)+'</span></div>'
-    +'<div class="cdr"><span>Total</span><span>'+fmt(total)+'</span></div>'
-    +'<div class="cdr"><span>Est. time</span><span>'+CFG.estimatedTime+'</span></div>';
   ST.cart=[];saveCart();updateCartUI();
   document.getElementById('cart-bar').classList.add('hidden');
-  showView('confirm');
-}
-function newOrder(){
-  ST.cart=[];ST.activeCategory='burgers';saveCart();updateCartUI();
   showView('menu');renderMenu();
+  ST.activeCategory='burgers';
   document.querySelectorAll('.cpill').forEach(p=>p.classList.remove('active'));
   const p=document.getElementById('pill-burgers');if(p)p.classList.add('active');
+  setTimeout(()=>toast('Order placed! Ready in '+CFG.estimatedTime+' ✓',3500),300);
 }
 
 // ══ STORAGE ══
