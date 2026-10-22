@@ -24,6 +24,12 @@ if (fs.existsSync(envPath)) {
 }
 
 const DB_FILE = path.join(__dirname, 'database.json');
+let bundledDb = null;
+try {
+  bundledDb = require('./database.json');
+} catch (e) {
+  bundledDb = { categories: [], products: [], orders: [], extras: [] };
+}
 
 function getSupabaseConfig() {
   let url = (process.env.SUPABASE_URL || 'https://lbxyproolnnvpggsowym.supabase.co').trim();
@@ -35,10 +41,16 @@ function getSupabaseConfig() {
 
 function readLocalDb() {
   try {
-    if (!fs.existsSync(DB_FILE)) return { categories: [], products: [], orders: [] };
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+    if (fs.existsSync(DB_FILE)) {
+      return JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+    }
+    const altPath = path.join(process.cwd(), 'database.json');
+    if (fs.existsSync(altPath)) {
+      return JSON.parse(fs.readFileSync(altPath, 'utf-8'));
+    }
+    return bundledDb || { categories: [], products: [], orders: [], extras: [] };
   } catch (err) {
-    return { categories: [], products: [], orders: [] };
+    return bundledDb || { categories: [], products: [], orders: [], extras: [] };
   }
 }
 

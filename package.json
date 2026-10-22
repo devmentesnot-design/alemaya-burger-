@@ -4,7 +4,8 @@
   "description": "Alemaya Grill'd Healthy Burgers with Live Kitchen KDS and Admin Management",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "echo 'Static build ready'"
   },
   "engines": {
     "node": ">=18.0.0"
