@@ -52,22 +52,47 @@ function parseJsonBody(req) {
     if (typeof req.body === 'string') {
       try { return resolve(JSON.parse(req.body)); } catch (e) { return resolve({}); }
     }
+    if (req.readableEnded) {
+      return resolve({});
+    }
     let body = '';
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        resolve({});
+      }
+    }, 4000);
+
     req.on('data', chunk => {
       body += chunk.toString();
       if (body.length > 15 * 1024 * 1024) { // 15MB limit for images
-        reject(new Error('Payload too large'));
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          reject(new Error('Payload too large'));
+        }
       }
     });
     req.on('end', () => {
-      if (!body) return resolve({});
-      try {
-        resolve(JSON.parse(body));
-      } catch (e) {
-        reject(new Error('Invalid JSON'));
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        if (!body) return resolve({});
+        try {
+          resolve(JSON.parse(body));
+        } catch (e) {
+          reject(new Error('Invalid JSON'));
+        }
       }
     });
-    req.on('error', reject);
+    req.on('error', err => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        reject(err);
+      }
+    });
   });
 }
 
@@ -99,8 +124,25 @@ async function handleRequest(req, res) {
   // ═════════════════════════════════════════════════════════════════
   // REST API ROUTES (/api/*)
   // ═════════════════════════════════════════════════════════════════
-  if (pathname.startsWith('/api/')) {
+  if (pathname === '/api' || pathname.startsWith('/api/')) {
     try {
+      if (pathname === '/api' || pathname === '/api/') {
+        return sendJson(res, 200, {
+          success: true,
+          name: "Alemaya Grill'd Live API",
+          status: "online",
+          database: "supabase",
+          endpoints: [
+            "/api/categories",
+            "/api/products",
+            "/api/orders",
+            "/api/extras",
+            "/api/stats",
+            "/api/cloudinary-config"
+          ]
+        });
+      }
+
       // ── 1. CATEGORIES CRUD (SUPABASE LIVE + LOCAL SYNC) ──
       if (pathname === '/api/categories') {
         if (req.method === 'GET') {
@@ -431,38 +473,44 @@ async function handleRequest(req, res) {
   // ═════════════════════════════════════════════════════════════════
   // STATIC ASSET SERVING
   // ═════════════════════════════════════════════════════════════════
-  let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
-  if (safePath === '/' || safePath === '\\' || safePath === '/kitchen' || safePath === '\\kitchen' || safePath === '/admin' || safePath === '\\admin') {
-    safePath = '/index.html';
-  }
-
-  const filePath = path.join(__dirname, safePath);
-
-  fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
-      // Fallback to index.html for client-side routing
-      const indexPath = path.join(__dirname, 'index.html');
-      fs.readFile(indexPath, (err2, content) => {
-        if (err2) {
-          res.writeHead(404, { 'Content-Type': 'text/plain' });
-          return res.end('404 Not Found');
-        }
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(content);
-      });
-      return;
+  return new Promise(resolve => {
+    let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
+    if (safePath === '/' || safePath === '\\' || safePath === '/kitchen' || safePath === '\\kitchen' || safePath === '/admin' || safePath === '\\admin' || safePath === '/orders' || safePath === '\\orders') {
+      safePath = '/index.html';
     }
 
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    const filePath = path.join(__dirname, safePath);
 
-    fs.readFile(filePath, (readErr, content) => {
-      if (readErr) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        return res.end('500 Internal Server Error');
+    fs.stat(filePath, (err, stats) => {
+      if (err || !stats.isFile()) {
+        // Fallback to index.html for client-side routing
+        const indexPath = path.join(__dirname, 'index.html');
+        fs.readFile(indexPath, (err2, content) => {
+          if (err2) {
+            res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end('404 Not Found');
+            return resolve();
+          }
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.end(content);
+          return resolve();
+        });
+        return;
       }
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content);
+
+      const ext = path.extname(filePath).toLowerCase();
+      const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+
+      fs.readFile(filePath, (readErr, content) => {
+        if (readErr) {
+          res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+          res.end('500 Internal Server Error');
+          return resolve();
+        }
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(content);
+        return resolve();
+      });
     });
   });
 }

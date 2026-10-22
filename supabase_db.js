@@ -26,8 +26,10 @@ if (fs.existsSync(envPath)) {
 const DB_FILE = path.join(__dirname, 'database.json');
 
 function getSupabaseConfig() {
-  const url = process.env.SUPABASE_URL || 'https://lbxyproolnnvpggsowym.supabase.co';
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+  let url = (process.env.SUPABASE_URL || 'https://lbxyproolnnvpggsowym.supabase.co').trim();
+  url = url.replace(/^["']|["']$/g, '').replace(/\/+$/, '');
+  let key = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
+  key = key.replace(/^["']|["']$/g, '');
   return { url, key };
 }
 
