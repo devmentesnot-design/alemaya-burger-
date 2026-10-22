@@ -1,20 +1,19 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/kitchen", "destination": "/index.html" },
-    { "source": "/admin", "destination": "/index.html" },
-    { "source": "/orders", "destination": "/index.html" }
-  ],
-  "headers": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
-      ]
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["database.json", "server.js", "supabase_db.js"]
+      }
     }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/kitchen", "dest": "/index.html" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/orders", "dest": "/index.html" }
   ]
 }
