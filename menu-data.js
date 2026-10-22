@@ -1,4 +1,4 @@
-﻿const MENU_DATA = {
+const MENU_DATA = {
   restaurant: {
     name: "Alemaya Grill'd",
     tagline: "Healthy Burgers",
@@ -13,21 +13,1645 @@
     address: "Alemaya, Ethiopia"
   },
   categories: [
-    { id: "burgers",    name: "Burgers",              icon: "burger",   order: 1 },
-    { id: "pizza",      name: "Pizza",                icon: "pizza",    order: 2 },
-    { id: "burritos",   name: "Burritos & Plates",    icon: "burrito",  order: 3 },
-    { id: "pasta",      name: "Pasta",                icon: "pasta",    order: 4 },
-    { id: "sandwiches", name: "Sandwiches",           icon: "sandwich", order: 5 },
-    { id: "chicken",    name: "Chicken & Bowls",      icon: "chicken",  order: 6 },
-    { id: "breakfast",  name: "Breakfast",            icon: "egg",      order: 7 },
-    { id: "sides",      name: "Sides & Extras",       icon: "fries",    order: 8 },
-    { id: "wraps",      name: "Special Wraps",        icon: "wrap",     order: 9 },
-    { id: "protein",    name: "Protein Drinks",       icon: "dumbbell", order: 10 },
-    { id: "superjuice", name: "Superjuice & Smoothies",icon: "leaf",   order: 11 },
-    { id: "juice",      name: "Juice",                icon: "juice",    order: 12 },
-    { id: "milkshakes", name: "Milkshakes",           icon: "shake",    order: 13 },
-    { id: "desserts",   name: "Desserts",             icon: "cake",     order: 14 }
-  ],
-  products: []
+  {
+    "id": "burger",
+    "name": "Burger",
+    "icon": "burger",
+    "order": 1
+  },
+  {
+    "id": "pizza",
+    "name": "Pizza",
+    "icon": "pizza",
+    "order": 2
+  },
+  {
+    "id": "spaghetti",
+    "name": "Spaghetti",
+    "icon": "soup",
+    "order": 3
+  },
+  {
+    "id": "sandwich",
+    "name": "Sandwich",
+    "icon": "sandwich",
+    "order": 4
+  },
+  {
+    "id": "burrito",
+    "name": "Burrito",
+    "icon": "wrap",
+    "order": 5
+  },
+  {
+    "id": "special-wrap",
+    "name": "Special Wrap",
+    "icon": "wrap",
+    "order": 6
+  },
+  {
+    "id": "rice",
+    "name": "Rice",
+    "icon": "soup",
+    "order": 7
+  },
+  {
+    "id": "chicken",
+    "name": "Chicken",
+    "icon": "package",
+    "order": 8
+  },
+  {
+    "id": "breakfast",
+    "name": "Breakfast",
+    "icon": "soup",
+    "order": 9
+  },
+  {
+    "id": "dessert",
+    "name": "Dessert",
+    "icon": "cake-slice",
+    "order": 10
+  },
+  {
+    "id": "extra",
+    "name": "Extra",
+    "icon": "package",
+    "order": 11
+  },
+  {
+    "id": "protein",
+    "name": "Protein",
+    "icon": "cup-soda",
+    "order": 12
+  },
+  {
+    "id": "superjuice",
+    "name": "Superjuice",
+    "icon": "citrus",
+    "order": 13
+  },
+  {
+    "id": "smoothies",
+    "name": "Smoothies",
+    "icon": "cup-soda",
+    "order": 14
+  },
+  {
+    "id": "milkshakes",
+    "name": "Milkshakes",
+    "icon": "ice-cream-2",
+    "order": 15
+  },
+  {
+    "id": "juice",
+    "name": "Juice",
+    "icon": "citrus",
+    "order": 16
+  }
+],
+  products: [
+  {
+    "id": "item_1",
+    "categoryId": "burger",
+    "name": "Grilled Special Burger",
+    "badge": "CHEF'S SPECIAL",
+    "rating": 4.9,
+    "reviewsCount": 227,
+    "description": "Fresh, grilled-to-order grilled special burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Special Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_2",
+    "categoryId": "burger",
+    "name": "Chicken Burger",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 248,
+    "description": "Fresh, grilled-to-order chicken burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 809,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_3",
+    "categoryId": "burger",
+    "name": "Cheese Burger",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 207,
+    "description": "Fresh, grilled-to-order cheese burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Cheese Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 569,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_4",
+    "categoryId": "burger",
+    "name": "Beef Burger",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 119,
+    "description": "Fresh, grilled-to-order beef burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 369,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_5",
+    "categoryId": "burger",
+    "name": "BBQ Burger",
+    "badge": "SMOKY",
+    "rating": 4.8,
+    "reviewsCount": 205,
+    "description": "Fresh, grilled-to-order bbq burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "BBQ Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 499,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_6",
+    "categoryId": "pizza",
+    "name": "Grilled Special Pizza",
+    "badge": "CHEF'S CHOICE",
+    "rating": 4.9,
+    "reviewsCount": 137,
+    "description": "Fresh, grilled-to-order grilled special pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Special Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 899,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_7",
+    "categoryId": "pizza",
+    "name": "Margarita Pizza",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 198,
+    "description": "Fresh, grilled-to-order margarita pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Margarita Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 699,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_8",
+    "categoryId": "pizza",
+    "name": "Pepperoni Pizza",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 189,
+    "description": "Fresh, grilled-to-order pepperoni pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Pepperoni Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_9",
+    "categoryId": "pizza",
+    "name": "Chicken Pizza",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 168,
+    "description": "Fresh, grilled-to-order chicken pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 869,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_10",
+    "categoryId": "pizza",
+    "name": "Pizza al Tuna",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 127,
+    "description": "Fresh, grilled-to-order pizza al tuna prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Pizza al Tuna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 689,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_11",
+    "categoryId": "pizza",
+    "name": "Veggie Pizza",
+    "badge": "VEGETARIAN",
+    "rating": 4.8,
+    "reviewsCount": 240,
+    "description": "Fresh, grilled-to-order veggie pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Veggie Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 599,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_12",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti with Chicken Vegetables",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 249,
+    "description": "Fresh, grilled-to-order spaghetti with chicken vegetables prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti with Chicken Vegetables",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 649,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_13",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 146,
+    "description": "Fresh, grilled-to-order spaghetti prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 419,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_14",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti with Bologna",
+    "badge": "FAVORITE",
+    "rating": 4.8,
+    "reviewsCount": 185,
+    "description": "Fresh, grilled-to-order spaghetti with bologna prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti with Bologna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 469,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_15",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti Bologna with Cheese",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 133,
+    "description": "Fresh, grilled-to-order spaghetti bologna with cheese prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti Bologna with Cheese",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 469,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_16",
+    "categoryId": "sandwich",
+    "name": "Egg Sandwich",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 137,
+    "description": "Fresh, grilled-to-order egg sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Egg Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 449,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_17",
+    "categoryId": "sandwich",
+    "name": "Club Sandwich",
+    "badge": "SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 118,
+    "description": "Fresh, grilled-to-order club sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Club Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_18",
+    "categoryId": "sandwich",
+    "name": "Veg Club Sandwich",
+    "badge": "VEGGIE",
+    "rating": 4.7,
+    "reviewsCount": 164,
+    "description": "Fresh, grilled-to-order veg club sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Veg Club Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 309,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_19",
+    "categoryId": "sandwich",
+    "name": "Cheese Sandwich",
+    "badge": null,
+    "rating": 4.6,
+    "reviewsCount": 154,
+    "description": "Fresh, grilled-to-order cheese sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Cheese Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 409,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_20",
+    "categoryId": "sandwich",
+    "name": "Tuna Sandwich",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 274,
+    "description": "Fresh, grilled-to-order tuna sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Tuna Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 709,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_21",
+    "categoryId": "burrito",
+    "name": "Chicken Burrito",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "description": "Fresh, grilled-to-order chicken burrito prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Burrito",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 1066,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_22",
+    "categoryId": "burrito",
+    "name": "Beef Burrito",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 103,
+    "description": "Fresh, grilled-to-order beef burrito prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef Burrito",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 966,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_23",
+    "categoryId": "burrito",
+    "name": "Chicken Shawarma",
+    "badge": "HOUSE SPECIAL",
+    "rating": 4.9,
+    "reviewsCount": 107,
+    "description": "Fresh, grilled-to-order chicken shawarma prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Shawarma",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 899,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_24",
+    "categoryId": "burrito",
+    "name": "Chicken Breast Plate",
+    "badge": "HIGH PROTEIN",
+    "rating": 4.9,
+    "reviewsCount": 245,
+    "description": "Fresh, grilled-to-order chicken breast plate prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Breast Plate",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 1099,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_25",
+    "categoryId": "burrito",
+    "name": "Veggie Burrito",
+    "badge": "VEGGIE",
+    "rating": 4.7,
+    "reviewsCount": 263,
+    "description": "Fresh, grilled-to-order veggie burrito prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Veggie Burrito",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 566,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_26",
+    "categoryId": "special-wrap",
+    "name": "Beef with Cheese Wrap",
+    "badge": "BESTSELLER",
+    "rating": 4.8,
+    "reviewsCount": 138,
+    "description": "Fresh, grilled-to-order beef with cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef with Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 569,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_27",
+    "categoryId": "special-wrap",
+    "name": "Chicken with Cheese Wrap",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 230,
+    "description": "Fresh, grilled-to-order chicken with cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken with Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 659,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_28",
+    "categoryId": "special-wrap",
+    "name": "Tuna with Cheese Wrap",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 175,
+    "description": "Fresh, grilled-to-order tuna with cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Tuna with Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 500,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_29",
+    "categoryId": "special-wrap",
+    "name": "Beef Chicken & Cheese Wrap",
+    "badge": "SUPER MIX",
+    "rating": 4.9,
+    "reviewsCount": 266,
+    "description": "Fresh, grilled-to-order beef chicken & cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef Chicken & Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 579,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_30",
+    "categoryId": "special-wrap",
+    "name": "Fasting Tuna Wrap",
+    "badge": "FASTING",
+    "rating": 4.7,
+    "reviewsCount": 217,
+    "description": "Fresh, grilled-to-order fasting tuna wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Fasting Tuna Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 449,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_31",
+    "categoryId": "rice",
+    "name": "Rice",
+    "badge": null,
+    "rating": 4.6,
+    "reviewsCount": 253,
+    "description": "Fresh, grilled-to-order rice prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Rice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_32",
+    "categoryId": "rice",
+    "name": "Rice with Bologna",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 138,
+    "description": "Fresh, grilled-to-order rice with bologna prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Rice with Bologna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 329,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_33",
+    "categoryId": "rice",
+    "name": "Rice Bologna with Cheese",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 242,
+    "description": "Fresh, grilled-to-order rice bologna with cheese prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Rice Bologna with Cheese",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 379,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_34",
+    "categoryId": "chicken",
+    "name": "Grilled Chicken",
+    "badge": "CHEF'S SPECIAL",
+    "rating": 4.9,
+    "reviewsCount": 164,
+    "description": "Fresh, grilled-to-order grilled chicken prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Chicken",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 1379,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_35",
+    "categoryId": "chicken",
+    "name": "Grilled Chicken Bowl",
+    "badge": "HEALTHY",
+    "rating": 4.9,
+    "reviewsCount": 152,
+    "description": "Fresh, grilled-to-order grilled chicken bowl prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Chicken Bowl",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 999,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_36",
+    "categoryId": "chicken",
+    "name": "Grilled Beef Bowl",
+    "badge": "PROTEIN BOWL",
+    "rating": 4.8,
+    "reviewsCount": 281,
+    "description": "Tender grilled spiced beef served with fresh garden greens and savory house garnish.",
+    "ingredients": [
+      "Grilled Beef Bowl",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 789,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_37",
+    "categoryId": "breakfast",
+    "name": "Special Fetira",
+    "badge": "TRADITIONAL",
+    "rating": 4.9,
+    "reviewsCount": 216,
+    "description": "Crispy layered pastry served warm with eggs and sweet natural honey.",
+    "ingredients": [
+      "Special Fetira",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 439,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_38",
+    "categoryId": "breakfast",
+    "name": "Normal Fetira",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 236,
+    "description": "Crispy freshly fried traditional fetira pastry.",
+    "ingredients": [
+      "Normal Fetira",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 309,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_39",
+    "categoryId": "breakfast",
+    "name": "Special Chechebsa",
+    "badge": "POPULAR",
+    "rating": 4.9,
+    "reviewsCount": 247,
+    "description": "Torn flatbread pan-fried with spiced clarified butter, berbere, honey, and yogurt.",
+    "ingredients": [
+      "Torn flatbread pan-fried with spiced clarified butter",
+      "berbere",
+      "honey",
+      "and yogurt"
+    ],
+    "basePrice": 469,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_40",
+    "categoryId": "breakfast",
+    "name": "Normal Chechebsa",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 217,
+    "description": "Traditional Ethiopian breakfast shredded flatbread tossed with aromatic spiced butter.",
+    "ingredients": [
+      "Normal Chechebsa",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 369,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_41",
+    "categoryId": "breakfast",
+    "name": "Tikur Teff Chechebsa",
+    "badge": "HEALTHY TEFF",
+    "rating": 4.9,
+    "reviewsCount": 230,
+    "description": "Nutritious whole black teff chechebsa with Ethiopian spiced butter.",
+    "ingredients": [
+      "Tikur Teff Chechebsa",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 399,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_42",
+    "categoryId": "breakfast",
+    "name": "Scrambled Egg",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 175,
+    "description": "Farm fresh eggs scrambled with tomatoes, onions, and jalapeño peppers.",
+    "ingredients": [
+      "Farm fresh eggs scrambled with tomatoes",
+      "onions",
+      "and jalapeño peppers"
+    ],
+    "basePrice": 369,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_43",
+    "categoryId": "breakfast",
+    "name": "Plain Omelette",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 179,
+    "description": "Fluffy 3-egg skillet omelette cooked with fresh herbs.",
+    "ingredients": [
+      "Plain Omelette",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 399,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_44",
+    "categoryId": "breakfast",
+    "name": "Cheese Omelette",
+    "badge": "BESTSELLER",
+    "rating": 4.8,
+    "reviewsCount": 226,
+    "description": "Folded golden omelette stuffed with gooey melted mozzarella and cheddar.",
+    "ingredients": [
+      "Cheese Omelette",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 449,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_45",
+    "categoryId": "breakfast",
+    "name": "Lasagna",
+    "badge": "OVEN BAKED",
+    "rating": 4.8,
+    "reviewsCount": 149,
+    "description": "Rich layers of pasta sheets, savory minced meat sauce, creamy bechamel, and melted cheese.",
+    "ingredients": [
+      "Rich layers of pasta sheets",
+      "savory minced meat sauce",
+      "creamy bechamel",
+      "and melted cheese"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_46",
+    "categoryId": "dessert",
+    "name": "Pan Cake",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 195,
+    "description": "Fluffy golden pancake stack drizzled with pure honey and whipped butter.",
+    "ingredients": [
+      "Pan Cake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 249,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_47",
+    "categoryId": "dessert",
+    "name": "Waffle & Teff Waffle",
+    "badge": "SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 174,
+    "description": "Crisp Belgian waffle made with teff flour, served with maple drizzle and fresh fruit.",
+    "ingredients": [
+      "Crisp Belgian waffle made with teff flour",
+      "served with maple drizzle and fresh fruit"
+    ],
+    "basePrice": 299,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_48",
+    "categoryId": "dessert",
+    "name": "French Toast",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 103,
+    "description": "Golden pan-fried brioche soaked in vanilla custard and cinnamon sugar.",
+    "ingredients": [
+      "French Toast",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_49",
+    "categoryId": "extra",
+    "name": "Cheese",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 266,
+    "description": "Extra melted cheddar or mozzarella slice.",
+    "ingredients": [
+      "Cheese",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 149,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_50",
+    "categoryId": "extra",
+    "name": "Chicken",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 219,
+    "description": "Extra portion of flame grilled chicken breast.",
+    "ingredients": [
+      "Chicken",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 169,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_51",
+    "categoryId": "extra",
+    "name": "Egg",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 168,
+    "description": "One fried or boiled farm egg.",
+    "ingredients": [
+      "Egg",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 45,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_52",
+    "categoryId": "extra",
+    "name": "Tuna",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 147,
+    "description": "Extra portion of premium flaked tuna.",
+    "ingredients": [
+      "Tuna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 269,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_53",
+    "categoryId": "extra",
+    "name": "Mayonnaise",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 178,
+    "description": "Side cup of creamy garlic mayonnaise.",
+    "ingredients": [
+      "Mayonnaise",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 79,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_54",
+    "categoryId": "extra",
+    "name": "Honey",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 209,
+    "description": "Pure local organic natural honey.",
+    "ingredients": [
+      "Honey",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 59,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_55",
+    "categoryId": "extra",
+    "name": "Beef",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 179,
+    "description": "Extra flame grilled 100% pure beef patty.",
+    "ingredients": [
+      "Beef",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 149,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_56",
+    "categoryId": "protein",
+    "name": "Alemaya Special",
+    "badge": "SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 114,
+    "description": "Orange, apple, avocado, mango, banana and honey.",
+    "ingredients": [
+      "Orange",
+      "apple",
+      "avocado",
+      "mango",
+      "banana and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_57",
+    "categoryId": "protein",
+    "name": "Body Building",
+    "badge": "FITNESS",
+    "rating": 4.9,
+    "reviewsCount": 258,
+    "description": "Avocado, mango, papaya, peanut, banana, flax and honey.",
+    "ingredients": [
+      "Avocado",
+      "mango",
+      "papaya",
+      "peanut",
+      "banana",
+      "flax and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_58",
+    "categoryId": "protein",
+    "name": "Muscle Building",
+    "badge": "POWER",
+    "rating": 4.9,
+    "reviewsCount": 266,
+    "description": "Avocado, papaya, banana, peanut and honey.",
+    "ingredients": [
+      "Avocado",
+      "papaya",
+      "banana",
+      "peanut and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_59",
+    "categoryId": "protein",
+    "name": "Vegitable Special",
+    "badge": "WELLNESS",
+    "rating": 4.8,
+    "reviewsCount": 224,
+    "description": "Avocado, mango, papaya, flax, cucumber and honey.",
+    "ingredients": [
+      "Avocado",
+      "mango",
+      "papaya",
+      "flax",
+      "cucumber and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_60",
+    "categoryId": "superjuice",
+    "name": "Energy Booster",
+    "badge": "REVITALIZE",
+    "rating": 4.8,
+    "reviewsCount": 263,
+    "description": "Carrot, beetroot, apple and ginger.",
+    "ingredients": [
+      "Carrot",
+      "beetroot",
+      "apple and ginger"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_61",
+    "categoryId": "superjuice",
+    "name": "Cool Refresh",
+    "badge": "HYDRATING",
+    "rating": 4.8,
+    "reviewsCount": 227,
+    "description": "Watermelon, mint and lemon.",
+    "ingredients": [
+      "Watermelon",
+      "mint and lemon"
+    ],
+    "basePrice": 219,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_62",
+    "categoryId": "superjuice",
+    "name": "Immunity Shoot",
+    "badge": "IMMUNITY",
+    "rating": 4.9,
+    "reviewsCount": 139,
+    "description": "Lemon, ginger, mint and honey.",
+    "ingredients": [
+      "Lemon",
+      "ginger",
+      "mint and honey"
+    ],
+    "basePrice": 219,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_63",
+    "categoryId": "superjuice",
+    "name": "Avocado Smoothie",
+    "badge": "CREAMY",
+    "rating": 4.9,
+    "reviewsCount": 212,
+    "description": "Avocado, banana, milk and honey.",
+    "ingredients": [
+      "Avocado",
+      "banana",
+      "milk and honey"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_64",
+    "categoryId": "superjuice",
+    "name": "Cooling Factor",
+    "badge": "SUMMER",
+    "rating": 4.8,
+    "reviewsCount": 246,
+    "description": "Mango, papaya, strawberry and honey.",
+    "ingredients": [
+      "Mango",
+      "papaya",
+      "strawberry and honey"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_65",
+    "categoryId": "superjuice",
+    "name": "Immunity Boost",
+    "badge": "VITAMIN C",
+    "rating": 4.9,
+    "reviewsCount": 143,
+    "description": "Carrot, orange, apple and honey.",
+    "ingredients": [
+      "Carrot",
+      "orange",
+      "apple and honey"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_66",
+    "categoryId": "smoothies",
+    "name": "Apple Burst",
+    "badge": "FRUITY",
+    "rating": 4.8,
+    "reviewsCount": 175,
+    "description": "Strawberry, apple, pineapple, orange, mint and honey.",
+    "ingredients": [
+      "Strawberry",
+      "apple",
+      "pineapple",
+      "orange",
+      "mint and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_67",
+    "categoryId": "smoothies",
+    "name": "Weight Loss",
+    "badge": "DETOX",
+    "rating": 4.8,
+    "reviewsCount": 217,
+    "description": "Mango, carrot and orange.",
+    "ingredients": [
+      "Mango",
+      "carrot and orange"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_68",
+    "categoryId": "smoothies",
+    "name": "Mango Lassie",
+    "badge": "FAVORITE",
+    "rating": 4.9,
+    "reviewsCount": 251,
+    "description": "Mango, chilled yogurt, cardamom, and honey.",
+    "ingredients": [
+      "Mango",
+      "chilled yogurt",
+      "cardamom",
+      "and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_69",
+    "categoryId": "smoothies",
+    "name": "Apple Mix",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 262,
+    "description": "Apple, pineapple, mango and honey.",
+    "ingredients": [
+      "Apple",
+      "pineapple",
+      "mango and honey"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_70",
+    "categoryId": "smoothies",
+    "name": "Strawberry Mix",
+    "badge": "BERRY",
+    "rating": 4.9,
+    "reviewsCount": 130,
+    "description": "Strawberry, mango, avocado and honey.",
+    "ingredients": [
+      "Strawberry",
+      "mango",
+      "avocado and honey"
+    ],
+    "basePrice": 269,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_71",
+    "categoryId": "smoothies",
+    "name": "Fruit Punch",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 109,
+    "description": "Chef's daily blend of freshly sliced seasonal fruits.",
+    "ingredients": [
+      "Fruit Punch",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_72",
+    "categoryId": "milkshakes",
+    "name": "Avocado Shake",
+    "badge": "CREAMY",
+    "rating": 4.9,
+    "reviewsCount": 208,
+    "description": "Fresh ripe avocado blended with chilled milk and honey.",
+    "ingredients": [
+      "Avocado Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_73",
+    "categoryId": "milkshakes",
+    "name": "Mango Shake",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 114,
+    "description": "Luscious mango chunks blended with creamy milk and honey.",
+    "ingredients": [
+      "Mango Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_74",
+    "categoryId": "milkshakes",
+    "name": "Strawberry Shake",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 175,
+    "description": "Fresh strawberries blended with rich milk and sweet honey.",
+    "ingredients": [
+      "Strawberry Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_75",
+    "categoryId": "milkshakes",
+    "name": "Papaya Shake",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 183,
+    "description": "Sweet tropical papaya whipped with rich milk and honey.",
+    "ingredients": [
+      "Papaya Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_76",
+    "categoryId": "milkshakes",
+    "name": "Banana Shake",
+    "badge": null,
+    "rating": 4.8,
+    "reviewsCount": 238,
+    "description": "Ripe bananas blended with thick cold milk and honey.",
+    "ingredients": [
+      "Banana Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_77",
+    "categoryId": "juice",
+    "name": "Avocado Juice",
+    "badge": "THICK",
+    "rating": 4.9,
+    "reviewsCount": 104,
+    "description": "Pure fresh avocado layers with a hint of lime and honey.",
+    "ingredients": [
+      "Avocado Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_78",
+    "categoryId": "juice",
+    "name": "Mango Juice",
+    "badge": "SWEET",
+    "rating": 4.8,
+    "reviewsCount": 114,
+    "description": "100% freshly pressed ripe Ethiopian mango.",
+    "ingredients": [
+      "Mango Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_79",
+    "categoryId": "juice",
+    "name": "Papaya Juice",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 164,
+    "description": "Pure freshly pressed sweet golden papaya.",
+    "ingredients": [
+      "Papaya Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_80",
+    "categoryId": "juice",
+    "name": "Pineapple Juice",
+    "badge": "TANGY",
+    "rating": 4.8,
+    "reviewsCount": 129,
+    "description": "Zesty freshly extracted tropical pineapple juice.",
+    "ingredients": [
+      "Pineapple Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 249,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_81",
+    "categoryId": "juice",
+    "name": "Carrot Juice",
+    "badge": null,
+    "rating": 4.7,
+    "reviewsCount": 256,
+    "description": "Freshly cold-pressed sweet highland carrots.",
+    "ingredients": [
+      "Carrot Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_82",
+    "categoryId": "juice",
+    "name": "Strawberry Juice",
+    "badge": "FRESH",
+    "rating": 4.8,
+    "reviewsCount": 205,
+    "description": "Cold-pressed fresh handpicked sweet strawberries.",
+    "ingredients": [
+      "Strawberry Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_83",
+    "categoryId": "juice",
+    "name": "Water Melon Juice",
+    "badge": "COOL",
+    "rating": 4.8,
+    "reviewsCount": 252,
+    "description": "Crisp and thirst-quenching cold fresh watermelon.",
+    "ingredients": [
+      "Water Melon Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_84",
+    "categoryId": "juice",
+    "name": "Orange Juice",
+    "badge": "CITRUS",
+    "rating": 4.9,
+    "reviewsCount": 171,
+    "description": "Freshly squeezed sweet highland oranges.",
+    "ingredients": [
+      "Orange Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 269,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_85",
+    "categoryId": "juice",
+    "name": "Mixed Juice",
+    "badge": "SPRIS SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 156,
+    "description": "Traditional Ethiopian layered Spris juice (Avocado, Mango, Papaya, and Guava).",
+    "ingredients": [
+      "Traditional Ethiopian layered Spris juice (Avocado",
+      "Mango",
+      "Papaya",
+      "and Guava)"
+    ],
+    "basePrice": 279,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  }
+]
 };
 window.MENU_DATA = MENU_DATA;

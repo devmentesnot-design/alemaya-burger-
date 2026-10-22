@@ -7,532 +7,1689 @@
 const CFG = {
   restaurantName: "Alemaya Grill'd",
   currencySymbol: 'Br',
-  serviceCharge: 0.10,
+  serviceCharge: 0.00,
   estimatedTime: '15-25 min'
 };
 
 // ══ PROFESSIONAL LUCIDE REACT CATEGORY ICONS (BLACK STROKE) ══
-const CATEGORIES = [
+let CATEGORIES = [
   {
-    id: 'burgers',
-    name: 'Burgers',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 15h16"/><path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"/><path d="M7 13c1 0 1.5.8 2.5.8s1.5-.8 2.5-.8 1.5.8 2.5.8 1.5-.8 2.5-.8"/></svg>`
+    "id": "burger",
+    "name": "Burger",
+    "icon": "burger",
+    "order": 1
   },
   {
-    id: 'pizza',
-    name: 'Pizza',
-    icon: 'pizza',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pizza"><path d="m12 2-8.5 18a2 2 0 0 0 2.2 2.7 26.3 26.3 0 0 0 12.6 0 2 2 0 0 0 2.2-2.7L12 2Z"/><path d="M10 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><circle cx="14" cy="9" r="1" fill="#000000"/></svg>`
+    "id": "pizza",
+    "name": "Pizza",
+    "icon": "pizza",
+    "order": 2
   },
   {
-    id: 'wraps',
-    name: 'Wraps',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`
+    "id": "spaghetti",
+    "name": "Spaghetti",
+    "icon": "soup",
+    "order": 3
   },
   {
-    id: 'sides',
-    name: 'Sides',
-    icon: 'package',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m21 8-2 12H5L3 8"/><path d="M10 12v5"/><path d="M14 12v5"/><path d="M7 4h10l4 4H3l4-4Z"/></svg>`
+    "id": "sandwich",
+    "name": "Sandwich",
+    "icon": "sandwich",
+    "order": 4
   },
   {
-    id: 'drinks',
-    name: 'Drinks',
-    icon: 'cup-soda',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cup-soda"><path d="m6 8 1.75 12.28a2 2 0 0 0 2 1.72h4.5a2 2 0 0 0 2-1.72L18 8"/><path d="M5 8h14"/><path d="m7 15 10-4"/><path d="m12 2 1 6"/></svg>`
+    "id": "burrito",
+    "name": "Burrito",
+    "icon": "wrap",
+    "order": 5
   },
   {
-    id: 'pasta',
-    name: 'Pasta',
-    icon: 'soup',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M7 3v3"/><path d="M12 3v3"/><path d="M17 3v3"/></svg>`
+    "id": "special-wrap",
+    "name": "Special Wrap",
+    "icon": "wrap",
+    "order": 6
   },
   {
-    id: 'sandwiches',
-    name: 'Sandwiches',
-    icon: 'sandwich',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`
+    "id": "rice",
+    "name": "Rice",
+    "icon": "soup",
+    "order": 7
   },
   {
-    id: 'chicken',
-    name: 'Chicken',
-    icon: 'drumstick',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-drumstick"><path d="m14 10 2.5-2.5a3.54 3.54 0 0 1 5 5L19 15"/><path d="M10 14A5.5 5.5 0 0 1 2 6.5C2 3.5 4.5 1 7.5 1A5.5 5.5 0 0 1 15 8.5"/><path d="m14 10-4 4"/><circle cx="19" cy="19" r="2"/><circle cx="21" cy="15" r="2"/></svg>`
+    "id": "chicken",
+    "name": "Chicken",
+    "icon": "package",
+    "order": 8
   },
   {
-    id: 'breakfast',
-    name: 'Breakfast',
-    icon: 'egg-fried',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg-fried"><circle cx="11.5" cy="12.5" r="3.5"/><path d="M3 8c0-3.5 2.5-6 6.5-6 5 0 6 3 8.5 3 3.5 0 4 2 4 6 0 4-2 8-6 8-2.5 0-3 2-6.5 2-4.5 0-6.5-3.5-6.5-7 0-2 0-4 0-6Z"/></svg>`
+    "id": "breakfast",
+    "name": "Breakfast",
+    "icon": "soup",
+    "order": 9
   },
   {
-    id: 'protein',
-    name: 'Protein',
-    icon: 'dumbbell',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dumbbell"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>`
+    "id": "dessert",
+    "name": "Dessert",
+    "icon": "cake-slice",
+    "order": 10
   },
   {
-    id: 'superjuice',
-    name: 'Smoothies',
-    icon: 'glass-water',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-glass-water"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg>`
+    "id": "extra",
+    "name": "Extra",
+    "icon": "package",
+    "order": 11
   },
   {
-    id: 'juice',
-    name: 'Juice',
-    icon: 'citrus',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-citrus"><path d="M21.66 10.44a10 10 0 1 0-8.1 11.22 10.05 10.05 0 0 0 8.1-11.22Z"/><path d="M12 12 8.5 7.5"/><path d="M12 12v6"/><path d="m12 12 5.5-2.5"/></svg>`
+    "id": "protein",
+    "name": "Protein",
+    "icon": "cup-soda",
+    "order": 12
   },
   {
-    id: 'milkshakes',
-    name: 'Shakes',
-    icon: 'ice-cream-2',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-2"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6Zm0 0v5"/><path d="M4 11a8 8 0 1 1 16 0"/></svg>`
+    "id": "superjuice",
+    "name": "Superjuice",
+    "icon": "citrus",
+    "order": 13
   },
   {
-    id: 'desserts',
-    name: 'Desserts',
-    icon: 'cake-slice',
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cake-slice"><circle cx="9" cy="7" r="2"/><path d="M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6"/><path d="M16 13H3"/><path d="M16 17H3"/></svg>`
+    "id": "smoothies",
+    "name": "Smoothies",
+    "icon": "cup-soda",
+    "order": 14
+  },
+  {
+    "id": "milkshakes",
+    "name": "Milkshakes",
+    "icon": "ice-cream-2",
+    "order": 15
+  },
+  {
+    "id": "juice",
+    "name": "Juice",
+    "icon": "citrus",
+    "order": 16
   }
 ];
 
 // ══ CATEGORY IMAGES (FOR HEADER BANNER) ══
 const CAT_IMAGES = {
-  burgers: 'burger_classic.jpg',
-  pizza: 'pizza_margherita.jpg',
-  wraps: 'chicken_sandwich.jpg',
-  sides: 'burger_classic.jpg',
-  drinks: 'smoothie_tropical.jpg',
-  pasta: 'pasta_carbonara.jpg',
-  sandwiches: 'chicken_sandwich.jpg',
-  chicken: 'chicken_sandwich.jpg',
-  breakfast: 'smoothie_tropical.jpg',
-  protein: 'milkshake_chocolate.jpg',
-  superjuice: 'smoothie_tropical.jpg',
-  juice: 'smoothie_tropical.jpg',
-  milkshakes: 'milkshake_chocolate.jpg',
-  desserts: 'milkshake_chocolate.jpg'
+  "burger": "burger_classic.jpg",
+  "pizza": "pizza_margherita.jpg",
+  "spaghetti": "pasta_carbonara.jpg",
+  "sandwich": "chicken_sandwich.jpg",
+  "burrito": "burrito_bowl.jpg",
+  "special-wrap": "chicken_sandwich.jpg",
+  "rice": "burrito_bowl.jpg",
+  "chicken": "chicken_sandwich.jpg",
+  "breakfast": "burrito_bowl.jpg",
+  "dessert": "milkshake_chocolate.jpg",
+  "extra": "burger_classic.jpg",
+  "protein": "smoothie_tropical.jpg",
+  "superjuice": "smoothie_tropical.jpg",
+  "smoothies": "smoothie_tropical.jpg",
+  "milkshakes": "milkshake_chocolate.jpg",
+  "juice": "smoothie_tropical.jpg"
 };
 
 // ══ ALL MENU PRODUCTS ══
-const PRODUCTS = [
-  // BURGERS
+let PRODUCTS = [
   {
-    id: 'b001',
-    categoryId: 'burgers',
-    name: 'Classic Smash',
-    badge: 'BESTSELLER',
-    rating: 4.8,
-    reviewsCount: 342,
-    description: 'Fresh smashed double beef patty with melted cheddar, crisp lettuce, pickles, and our house smash sauce on a toasted potato bun.',
-    ingredients: ['2x Beef patty', 'Cheddar cheese', 'Pickles', 'Lettuce', 'Smash sauce', 'Potato bun'],
-    basePrice: 180,
-    image: 'burger_classic.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'cooking',
-        name: 'Cooked your way',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'medium', label: 'Medium', priceAdd: 0, default: true },
-          { id: 'medwell', label: 'Medium well', priceAdd: 0 },
-          { id: 'well', label: 'Well done', priceAdd: 0 }
-        ]
-      },
-      {
-        id: 'bun',
-        name: 'Choose bun',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'potato', label: 'Potato bun', priceAdd: 0, default: true },
-          { id: 'brioche', label: 'Brioche bun', priceAdd: 10 },
-          { id: 'wholegrain', label: 'Wholegrain', priceAdd: 15 }
-        ]
-      },
-      {
-        id: 'extras',
-        name: 'Extra toppings',
-        required: false,
-        multiSelect: true,
-        options: [
-          { id: 'extracheddar', label: 'Extra cheddar', priceAdd: 25 },
-          { id: 'avocado', label: 'Fresh avocado', priceAdd: 40 },
-          { id: 'egg', label: 'Fried sunny egg', priceAdd: 20 },
-          { id: 'bacon', label: 'Crispy beef bacon', priceAdd: 35 }
-        ]
-      }
-    ]
+    "id": "item_57",
+    "categoryId": "protein",
+    "name": "Body Building",
+    "badge": "FITNESS",
+    "rating": 4.9,
+    "reviewsCount": 258,
+    "description": "Avocado, mango, papaya, peanut, banana, flax and honey.",
+    "ingredients": [
+      "Avocado",
+      "mango",
+      "papaya",
+      "peanut",
+      "banana",
+      "flax and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 'b002',
-    categoryId: 'burgers',
-    name: 'Crispy Chicken',
-    badge: 'POPULAR',
-    rating: 4.7,
-    reviewsCount: 281,
-    description: 'Golden crispy fried chicken breast fillet with homemade coleslaw, pickles, and zesty sriracha honey mayo.',
-    ingredients: ['Chicken breast', 'Coleslaw', 'Pickles', 'Sriracha mayo', 'Sesame bun'],
-    basePrice: 175,
-    image: 'chicken_sandwich.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'heat',
-        name: 'Spice level',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'mild', label: 'Mild & Sweet', priceAdd: 0, default: true },
-          { id: 'spicy', label: 'Fire Grilled Spicy', priceAdd: 0 }
-        ]
-      },
-      {
-        id: 'extras',
-        name: 'Add extras',
-        required: false,
-        multiSelect: true,
-        options: [
-          { id: 'extracheddar', label: 'Melted cheddar', priceAdd: 25 },
-          { id: 'avocado', label: 'Avocado slices', priceAdd: 40 }
-        ]
-      }
-    ]
+    "id": "item_58",
+    "categoryId": "protein",
+    "name": "Muscle Building",
+    "badge": "POWER",
+    "rating": 4.9,
+    "reviewsCount": 266,
+    "description": "Avocado, papaya, banana, peanut and honey.",
+    "ingredients": [
+      "Avocado",
+      "papaya",
+      "banana",
+      "peanut and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 'b003',
-    categoryId: 'burgers',
-    name: 'Veggie Stack Burger',
-    badge: 'VEGETARIAN',
-    rating: 4.6,
-    reviewsCount: 194,
-    description: 'Grilled vegetable patty, fresh lettuce, tomato, red onion, portobello mushroom, and our house roasted herb sauce.',
-    ingredients: ['Veggie patty', 'Portobello', 'Lettuce', 'Tomato', 'Red onion', 'Herb mayo'],
-    basePrice: 160,
-    image: 'burger_classic.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'bun',
-        name: 'Bun selection',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'wholegrain', label: 'Wholegrain bun', priceAdd: 0, default: true },
-          { id: 'brioche', label: 'Brioche bun', priceAdd: 10 }
-        ]
-      },
-      {
-        id: 'extras',
-        name: 'Extras',
-        required: false,
-        multiSelect: true,
-        options: [
-          { id: 'vegancheese', label: 'Plant-based cheese', priceAdd: 30 },
-          { id: 'avocado', label: 'Avocado', priceAdd: 35 }
-        ]
-      }
-    ]
+    "id": "item_59",
+    "categoryId": "protein",
+    "name": "Vegitable Special",
+    "badge": "WELLNESS",
+    "rating": 4.8,
+    "reviewsCount": 224,
+    "description": "Avocado, mango, papaya, flax, cucumber and honey.",
+    "ingredients": [
+      "Avocado",
+      "mango",
+      "papaya",
+      "flax",
+      "cucumber and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 'b004',
-    categoryId: 'burgers',
-    name: 'Alemaya BBQ Bacon',
-    badge: 'SIGNATURE',
-    rating: 4.9,
-    reviewsCount: 410,
-    description: 'Char-grilled prime beef patty topped with smoky BBQ glaze, crisp beef bacon, caramelized onion rings, and aged cheddar.',
-    ingredients: ['Beef patty', 'BBQ glaze', 'Beef bacon', 'Cheddar', 'Crispy onions'],
-    basePrice: 210,
-    image: 'burger_classic.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'cooking',
-        name: 'Doneness',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'medium', label: 'Medium', priceAdd: 0, default: true },
-          { id: 'well', label: 'Well done', priceAdd: 0 }
-        ]
-      }
-    ]
-  },
-
-  // PIZZA
-  {
-    id: 'p001',
-    categoryId: 'pizza',
-    name: 'Margherita Pizza',
-    badge: 'VEGETARIAN',
-    rating: 4.7,
-    reviewsCount: 220,
-    description: 'Stone-baked thin crust with rich San Marzano tomato sauce, fresh creamy mozzarella, and fragrant fresh garden basil.',
-    ingredients: ['Tomato sauce', 'Fior di latte mozzarella', 'Fresh basil', 'Virgin olive oil'],
-    basePrice: 220,
-    image: 'pizza_margherita.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'size',
-        name: 'Size',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'small', label: 'Regular 10"', priceAdd: 0, default: true },
-          { id: 'large', label: 'Large 14"', priceAdd: 80 }
-        ]
-      },
-      {
-        id: 'crust',
-        name: 'Crust style',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'thin', label: 'Crispy Thin Crust', priceAdd: 0, default: true },
-          { id: 'stuffed', label: 'Cheese Stuffed Crust', priceAdd: 40 }
-        ]
-      }
-    ]
+    "id": "item_60",
+    "categoryId": "superjuice",
+    "name": "Energy Booster",
+    "badge": "REVITALIZE",
+    "rating": 4.8,
+    "reviewsCount": 263,
+    "description": "Carrot, beetroot, apple and ginger.",
+    "ingredients": [
+      "Carrot",
+      "beetroot",
+      "apple and ginger"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 'p002',
-    categoryId: 'pizza',
-    name: 'Chicken BBQ Pizza',
-    badge: 'POPULAR',
-    rating: 4.8,
-    reviewsCount: 185,
-    description: 'Grilled sliced chicken fillet, red onions, smoked BBQ sauce, mozzarella, and chopped fresh cilantro.',
-    ingredients: ['Grilled chicken', 'Red onion', 'Mozzarella', 'BBQ sauce', 'Cilantro'],
-    basePrice: 260,
-    image: 'pizza_margherita.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'size',
-        name: 'Size',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'small', label: 'Regular 10"', priceAdd: 0, default: true },
-          { id: 'large', label: 'Large 14"', priceAdd: 80 }
-        ]
-      }
-    ]
-  },
-
-  // WRAPS
-  {
-    id: 'w001',
-    categoryId: 'wraps',
-    name: 'Grilled Chicken Wrap',
-    badge: 'FRESH',
-    rating: 4.7,
-    reviewsCount: 165,
-    description: 'Tender grilled chicken strips rolled in a warm tortilla with romaine lettuce, diced ripe tomatoes, cucumber, and garlic yogurt sauce.',
-    ingredients: ['Tortilla', 'Grilled chicken', 'Garlic sauce', 'Lettuce', 'Tomato'],
-    basePrice: 155,
-    image: 'chicken_sandwich.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'sauce',
-        name: 'Sauce',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'garlic', label: 'Garlic Yogurt Sauce', priceAdd: 0, default: true },
-          { id: 'spicy', label: 'Spicy Tahini', priceAdd: 0 }
-        ]
-      }
-    ]
+    "id": "item_61",
+    "categoryId": "superjuice",
+    "name": "Cool Refresh",
+    "badge": "HYDRATING",
+    "rating": 4.8,
+    "reviewsCount": 227,
+    "description": "Watermelon, mint and lemon.",
+    "ingredients": [
+      "Watermelon",
+      "mint and lemon"
+    ],
+    "basePrice": 219,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 'w002',
-    categoryId: 'wraps',
-    name: 'Beef Shawarma Wrap',
-    badge: 'MUST TRY',
-    rating: 4.8,
-    reviewsCount: 230,
-    description: 'Slow-grilled spiced beef shavings with pickled turnips, fresh parsley, sumac onions, and rich tahini inside toasted Lebanese flatbread.',
-    ingredients: ['Spiced beef', 'Pickles', 'Sumac onions', 'Tahini', 'Toasted flatbread'],
-    basePrice: 170,
-    image: 'chicken_sandwich.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'extras',
-        name: 'Extras',
-        required: false,
-        multiSelect: true,
-        options: [
-          { id: 'extra_meat', label: 'Extra beef', priceAdd: 45 },
-          { id: 'fries_inside', label: 'Add fries inside', priceAdd: 20 }
-        ]
-      }
-    ]
-  },
-
-  // SIDES
-  {
-    id: 's001',
-    categoryId: 'sides',
-    name: 'Golden Crispy Fries',
-    badge: 'CLASSIC',
-    rating: 4.8,
-    reviewsCount: 512,
-    description: 'Hand-cut skin-on Russet potatoes double-fried to golden perfection, seasoned with rosemary sea salt.',
-    ingredients: ['Russet potatoes', 'Rosemary sea salt', 'House dip'],
-    basePrice: 75,
-    image: 'burger_classic.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'dip',
-        name: 'Choose dipping sauce',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'smash', label: 'Smash Special Sauce', priceAdd: 0, default: true },
-          { id: 'garlic', label: 'Garlic Herb Mayo', priceAdd: 0 },
-          { id: 'bbq', label: 'Smoky BBQ Dip', priceAdd: 0 }
-        ]
-      }
-    ]
+    "id": "item_62",
+    "categoryId": "superjuice",
+    "name": "Immunity Shoot",
+    "badge": "IMMUNITY",
+    "rating": 4.9,
+    "reviewsCount": 139,
+    "description": "Lemon, ginger, mint and honey.",
+    "ingredients": [
+      "Lemon",
+      "ginger",
+      "mint and honey"
+    ],
+    "basePrice": 219,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 's002',
-    categoryId: 'sides',
-    name: 'Cheesy Loaded Fries',
-    badge: 'INDULGENT',
-    rating: 4.9,
-    reviewsCount: 304,
-    description: 'Golden fries smothered with melted warm cheddar sauce, crispy bacon bits, jalapeño rings, and fresh spring onions.',
-    ingredients: ['Fries', 'Cheddar cheese sauce', 'Beef bacon bits', 'Jalapeños'],
-    basePrice: 125,
-    image: 'burger_classic.jpg',
-    available: true,
-    customizations: []
-  },
-
-  // DRINKS & SMOOTHIES
-  {
-    id: 'd001',
-    categoryId: 'drinks',
-    name: 'Fresh Mint Limeade',
-    badge: 'CHILLED',
-    rating: 4.9,
-    reviewsCount: 178,
-    description: 'Fresh squeezed local limes muddled with wild garden mint, cane sugar syrup, and crushed ice.',
-    ingredients: ['Fresh lime', 'Mint leaves', 'Cane syrup', 'Sparkling water'],
-    basePrice: 65,
-    image: 'smoothie_tropical.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'sweet',
-        name: 'Sweetness',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'regular', label: 'Regular Sweet', priceAdd: 0, default: true },
-          { id: 'less', label: 'Less Sweet', priceAdd: 0 },
-          { id: 'none', label: 'No Added Sugar', priceAdd: 0 }
-        ]
-      }
-    ]
+    "id": "item_63",
+    "categoryId": "superjuice",
+    "name": "Avocado Smoothie",
+    "badge": "CREAMY",
+    "rating": 4.9,
+    "reviewsCount": 212,
+    "description": "Avocado, banana, milk and honey.",
+    "ingredients": [
+      "Avocado",
+      "banana",
+      "milk and honey"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
   {
-    id: 'd002',
-    categoryId: 'drinks',
-    name: 'Tropical Mango Passion',
-    badge: 'HEALTHY',
-    rating: 4.8,
-    reviewsCount: 142,
-    description: 'Ripe Harar mango blended with passionfruit puree, coconut water, and a touch of honey.',
-    ingredients: ['Fresh mango', 'Passionfruit', 'Coconut water', 'Raw honey'],
-    basePrice: 85,
-    image: 'smoothie_tropical.jpg',
-    available: true,
-    customizations: []
+    "id": "item_64",
+    "categoryId": "superjuice",
+    "name": "Cooling Factor",
+    "badge": "SUMMER",
+    "rating": 4.8,
+    "reviewsCount": 246,
+    "description": "Mango, papaya, strawberry and honey.",
+    "ingredients": [
+      "Mango",
+      "papaya",
+      "strawberry and honey"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
-
-  // PASTA
   {
-    id: 'pas001',
-    categoryId: 'pasta',
-    name: 'Creamy Tagliatelle Carbonara',
-    badge: 'CHEF PICK',
-    rating: 4.8,
-    reviewsCount: 160,
-    description: 'Fresh egg tagliatelle tossed in rich egg yolk emulsion, parmesan cheese, crispy beef pancetta, and black pepper.',
-    ingredients: ['Tagliatelle', 'Egg yolks', 'Parmesan', 'Beef bacon', 'Black pepper'],
-    basePrice: 195,
-    image: 'pasta_carbonara.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'cheese',
-        name: 'Extra parmesan',
-        required: false,
-        multiSelect: false,
-        options: [
-          { id: 'extra', label: 'Extra Aged Parmesan', priceAdd: 25 }
-        ]
-      }
-    ]
+    "id": "item_65",
+    "categoryId": "superjuice",
+    "name": "Immunity Boost",
+    "badge": "VITAMIN C",
+    "rating": 4.9,
+    "reviewsCount": 143,
+    "description": "Carrot, orange, apple and honey.",
+    "ingredients": [
+      "Carrot",
+      "orange",
+      "apple and honey"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
-
-  // SANDWICHES
   {
-    id: 'san001',
-    categoryId: 'sandwiches',
-    name: 'Alemaya Club Sandwich',
-    badge: 'POPULAR',
-    rating: 4.7,
-    reviewsCount: 189,
-    description: 'Triple-decker toasted sourdough sandwich layered with sliced grilled chicken, cheddar, egg, tomato, lettuce, and herb mustard.',
-    ingredients: ['Toasted sourdough', 'Grilled chicken', 'Egg', 'Cheddar', 'Tomato', 'Lettuce'],
-    basePrice: 165,
-    image: 'chicken_sandwich.jpg',
-    available: true,
-    customizations: []
+    "id": "item_66",
+    "categoryId": "smoothies",
+    "name": "Apple Burst",
+    "badge": "FRUITY",
+    "rating": 4.8,
+    "reviewsCount": 175,
+    "description": "Strawberry, apple, pineapple, orange, mint and honey.",
+    "ingredients": [
+      "Strawberry",
+      "apple",
+      "pineapple",
+      "orange",
+      "mint and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   },
-
-  // SHAKES & DESSERTS
   {
-    id: 'm001',
-    categoryId: 'milkshakes',
-    name: 'Belgian Chocolate Shake',
-    badge: 'FAVORITE',
-    rating: 4.9,
-    reviewsCount: 390,
-    description: 'Thick creamy milkshake whipped with whole milk, Dutch cocoa, premium chocolate ice cream, and whipped cream swirl.',
-    ingredients: ['Whole milk', 'Chocolate ice cream', 'Whipped cream', 'Chocolate shavings'],
-    basePrice: 110,
-    image: 'milkshake_chocolate.jpg',
-    available: true,
-    customizations: [
-      {
-        id: 'size',
-        name: 'Size',
-        required: true,
-        multiSelect: false,
-        options: [
-          { id: 'reg', label: 'Regular 14oz', priceAdd: 0, default: true },
-          { id: 'large', label: 'Large 18oz', priceAdd: 30 }
-        ]
-      }
-    ]
+    "id": "item_67",
+    "categoryId": "smoothies",
+    "name": "Weight Loss",
+    "badge": "DETOX",
+    "rating": 4.8,
+    "reviewsCount": 217,
+    "description": "Mango, carrot and orange.",
+    "ingredients": [
+      "Mango",
+      "carrot and orange"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_68",
+    "categoryId": "smoothies",
+    "name": "Mango Lassie",
+    "badge": "FAVORITE",
+    "rating": 4.9,
+    "reviewsCount": 251,
+    "description": "Mango, chilled yogurt, cardamom, and honey.",
+    "ingredients": [
+      "Mango",
+      "chilled yogurt",
+      "cardamom",
+      "and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_69",
+    "categoryId": "smoothies",
+    "name": "Apple Mix",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 262,
+    "description": "Apple, pineapple, mango and honey.",
+    "ingredients": [
+      "Apple",
+      "pineapple",
+      "mango and honey"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_70",
+    "categoryId": "smoothies",
+    "name": "Strawberry Mix",
+    "badge": "BERRY",
+    "rating": 4.9,
+    "reviewsCount": 130,
+    "description": "Strawberry, mango, avocado and honey.",
+    "ingredients": [
+      "Strawberry",
+      "mango",
+      "avocado and honey"
+    ],
+    "basePrice": 269,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_71",
+    "categoryId": "smoothies",
+    "name": "Fruit Punch",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 109,
+    "description": "Chef's daily blend of freshly sliced seasonal fruits.",
+    "ingredients": [
+      "Fruit Punch",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_72",
+    "categoryId": "milkshakes",
+    "name": "Avocado Shake",
+    "badge": "CREAMY",
+    "rating": 4.9,
+    "reviewsCount": 208,
+    "description": "Fresh ripe avocado blended with chilled milk and honey.",
+    "ingredients": [
+      "Avocado Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_73",
+    "categoryId": "milkshakes",
+    "name": "Mango Shake",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 114,
+    "description": "Luscious mango chunks blended with creamy milk and honey.",
+    "ingredients": [
+      "Mango Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_74",
+    "categoryId": "milkshakes",
+    "name": "Strawberry Shake",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 175,
+    "description": "Fresh strawberries blended with rich milk and sweet honey.",
+    "ingredients": [
+      "Strawberry Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_75",
+    "categoryId": "milkshakes",
+    "name": "Papaya Shake",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 183,
+    "description": "Sweet tropical papaya whipped with rich milk and honey.",
+    "ingredients": [
+      "Papaya Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_76",
+    "categoryId": "milkshakes",
+    "name": "Banana Shake",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 238,
+    "description": "Ripe bananas blended with thick cold milk and honey.",
+    "ingredients": [
+      "Banana Shake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_77",
+    "categoryId": "juice",
+    "name": "Avocado Juice",
+    "badge": "THICK",
+    "rating": 4.9,
+    "reviewsCount": 104,
+    "description": "Pure fresh avocado layers with a hint of lime and honey.",
+    "ingredients": [
+      "Avocado Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_78",
+    "categoryId": "juice",
+    "name": "Mango Juice",
+    "badge": "SWEET",
+    "rating": 4.8,
+    "reviewsCount": 114,
+    "description": "100% freshly pressed ripe Ethiopian mango.",
+    "ingredients": [
+      "Mango Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_79",
+    "categoryId": "juice",
+    "name": "Papaya Juice",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 164,
+    "description": "Pure freshly pressed sweet golden papaya.",
+    "ingredients": [
+      "Papaya Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_80",
+    "categoryId": "juice",
+    "name": "Pineapple Juice",
+    "badge": "TANGY",
+    "rating": 4.8,
+    "reviewsCount": 129,
+    "description": "Zesty freshly extracted tropical pineapple juice.",
+    "ingredients": [
+      "Pineapple Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 249,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_81",
+    "categoryId": "juice",
+    "name": "Carrot Juice",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 256,
+    "description": "Freshly cold-pressed sweet highland carrots.",
+    "ingredients": [
+      "Carrot Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_82",
+    "categoryId": "juice",
+    "name": "Strawberry Juice",
+    "badge": "FRESH",
+    "rating": 4.8,
+    "reviewsCount": 205,
+    "description": "Cold-pressed fresh handpicked sweet strawberries.",
+    "ingredients": [
+      "Strawberry Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 239,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_83",
+    "categoryId": "juice",
+    "name": "Water Melon Juice",
+    "badge": "COOL",
+    "rating": 4.8,
+    "reviewsCount": 252,
+    "description": "Crisp and thirst-quenching cold fresh watermelon.",
+    "ingredients": [
+      "Water Melon Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_1",
+    "categoryId": "burger",
+    "name": "Grilled Special Burger",
+    "badge": "CHEF'S SPECIAL",
+    "rating": 4.9,
+    "reviewsCount": 227,
+    "description": "Fresh, grilled-to-order grilled special burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Special Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_2",
+    "categoryId": "burger",
+    "name": "Chicken Burger",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 248,
+    "description": "Fresh, grilled-to-order chicken burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 809,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_3",
+    "categoryId": "burger",
+    "name": "Cheese Burger",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 207,
+    "description": "Fresh, grilled-to-order cheese burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Cheese Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 569,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_4",
+    "categoryId": "burger",
+    "name": "Beef Burger",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 119,
+    "description": "Fresh, grilled-to-order beef burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 369,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_5",
+    "categoryId": "burger",
+    "name": "BBQ Burger",
+    "badge": "SMOKY",
+    "rating": 4.8,
+    "reviewsCount": 205,
+    "description": "Fresh, grilled-to-order bbq burger prepared daily with quality local ingredients.",
+    "ingredients": [
+      "BBQ Burger",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 499,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_6",
+    "categoryId": "pizza",
+    "name": "Grilled Special Pizza",
+    "badge": "CHEF'S CHOICE",
+    "rating": 4.9,
+    "reviewsCount": 137,
+    "description": "Fresh, grilled-to-order grilled special pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Special Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 899,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_7",
+    "categoryId": "pizza",
+    "name": "Margarita Pizza",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 198,
+    "description": "Fresh, grilled-to-order margarita pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Margarita Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 699,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_8",
+    "categoryId": "pizza",
+    "name": "Pepperoni Pizza",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 189,
+    "description": "Fresh, grilled-to-order pepperoni pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Pepperoni Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_9",
+    "categoryId": "pizza",
+    "name": "Chicken Pizza",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 168,
+    "description": "Fresh, grilled-to-order chicken pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 869,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_10",
+    "categoryId": "pizza",
+    "name": "Pizza al Tuna",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 127,
+    "description": "Fresh, grilled-to-order pizza al tuna prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Pizza al Tuna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 689,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_11",
+    "categoryId": "pizza",
+    "name": "Veggie Pizza",
+    "badge": "VEGETARIAN",
+    "rating": 4.8,
+    "reviewsCount": 240,
+    "description": "Fresh, grilled-to-order veggie pizza prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Veggie Pizza",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 599,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_12",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti with Chicken Vegetables",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 249,
+    "description": "Fresh, grilled-to-order spaghetti with chicken vegetables prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti with Chicken Vegetables",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 649,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_13",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 146,
+    "description": "Fresh, grilled-to-order spaghetti prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 419,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_14",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti with Bologna",
+    "badge": "FAVORITE",
+    "rating": 4.8,
+    "reviewsCount": 185,
+    "description": "Fresh, grilled-to-order spaghetti with bologna prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti with Bologna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 469,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_15",
+    "categoryId": "spaghetti",
+    "name": "Spaghetti Bologna with Cheese",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 133,
+    "description": "Fresh, grilled-to-order spaghetti bologna with cheese prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Spaghetti Bologna with Cheese",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 469,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_16",
+    "categoryId": "sandwich",
+    "name": "Egg Sandwich",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 137,
+    "description": "Fresh, grilled-to-order egg sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Egg Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 449,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_17",
+    "categoryId": "sandwich",
+    "name": "Club Sandwich",
+    "badge": "SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 118,
+    "description": "Fresh, grilled-to-order club sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Club Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_18",
+    "categoryId": "sandwich",
+    "name": "Veg Club Sandwich",
+    "badge": "VEGGIE",
+    "rating": 4.7,
+    "reviewsCount": 164,
+    "description": "Fresh, grilled-to-order veg club sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Veg Club Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 309,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_19",
+    "categoryId": "sandwich",
+    "name": "Cheese Sandwich",
+    "badge": "",
+    "rating": 4.6,
+    "reviewsCount": 154,
+    "description": "Fresh, grilled-to-order cheese sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Cheese Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 409,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_20",
+    "categoryId": "sandwich",
+    "name": "Tuna Sandwich",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 274,
+    "description": "Fresh, grilled-to-order tuna sandwich prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Tuna Sandwich",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 709,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_21",
+    "categoryId": "burrito",
+    "name": "Chicken Burrito",
+    "badge": "BESTSELLER",
+    "rating": 4.9,
+    "reviewsCount": 120,
+    "description": "Fresh, grilled-to-order chicken burrito prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Burrito",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 1066,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_22",
+    "categoryId": "burrito",
+    "name": "Beef Burrito",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 103,
+    "description": "Fresh, grilled-to-order beef burrito prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef Burrito",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 966,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_23",
+    "categoryId": "burrito",
+    "name": "Chicken Shawarma",
+    "badge": "HOUSE SPECIAL",
+    "rating": 4.9,
+    "reviewsCount": 107,
+    "description": "Fresh, grilled-to-order chicken shawarma prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Shawarma",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 899,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_24",
+    "categoryId": "burrito",
+    "name": "Chicken Breast Plate",
+    "badge": "HIGH PROTEIN",
+    "rating": 4.9,
+    "reviewsCount": 245,
+    "description": "Fresh, grilled-to-order chicken breast plate prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken Breast Plate",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 1099,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_25",
+    "categoryId": "burrito",
+    "name": "Veggie Burrito",
+    "badge": "VEGGIE",
+    "rating": 4.7,
+    "reviewsCount": 263,
+    "description": "Fresh, grilled-to-order veggie burrito prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Veggie Burrito",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 566,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_26",
+    "categoryId": "special-wrap",
+    "name": "Beef with Cheese Wrap",
+    "badge": "BESTSELLER",
+    "rating": 4.8,
+    "reviewsCount": 138,
+    "description": "Fresh, grilled-to-order beef with cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef with Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 569,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_27",
+    "categoryId": "special-wrap",
+    "name": "Chicken with Cheese Wrap",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 230,
+    "description": "Fresh, grilled-to-order chicken with cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Chicken with Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 659,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_28",
+    "categoryId": "special-wrap",
+    "name": "Tuna with Cheese Wrap",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 175,
+    "description": "Fresh, grilled-to-order tuna with cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Tuna with Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 500,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_29",
+    "categoryId": "special-wrap",
+    "name": "Beef Chicken & Cheese Wrap",
+    "badge": "SUPER MIX",
+    "rating": 4.9,
+    "reviewsCount": 266,
+    "description": "Fresh, grilled-to-order beef chicken & cheese wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Beef Chicken & Cheese Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 579,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_30",
+    "categoryId": "special-wrap",
+    "name": "Fasting Tuna Wrap",
+    "badge": "FASTING",
+    "rating": 4.7,
+    "reviewsCount": 217,
+    "description": "Fresh, grilled-to-order fasting tuna wrap prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Fasting Tuna Wrap",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 449,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_31",
+    "categoryId": "rice",
+    "name": "Rice",
+    "badge": "",
+    "rating": 4.6,
+    "reviewsCount": 253,
+    "description": "Fresh, grilled-to-order rice prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Rice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 229,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_32",
+    "categoryId": "rice",
+    "name": "Rice with Bologna",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 138,
+    "description": "Fresh, grilled-to-order rice with bologna prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Rice with Bologna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 329,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_33",
+    "categoryId": "rice",
+    "name": "Rice Bologna with Cheese",
+    "badge": "POPULAR",
+    "rating": 4.8,
+    "reviewsCount": 242,
+    "description": "Fresh, grilled-to-order rice bologna with cheese prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Rice Bologna with Cheese",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 379,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_34",
+    "categoryId": "chicken",
+    "name": "Grilled Chicken",
+    "badge": "CHEF'S SPECIAL",
+    "rating": 4.9,
+    "reviewsCount": 164,
+    "description": "Fresh, grilled-to-order grilled chicken prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Chicken",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 1379,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_35",
+    "categoryId": "chicken",
+    "name": "Grilled Chicken Bowl",
+    "badge": "HEALTHY",
+    "rating": 4.9,
+    "reviewsCount": 152,
+    "description": "Fresh, grilled-to-order grilled chicken bowl prepared daily with quality local ingredients.",
+    "ingredients": [
+      "Grilled Chicken Bowl",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 999,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_36",
+    "categoryId": "chicken",
+    "name": "Grilled Beef Bowl",
+    "badge": "PROTEIN BOWL",
+    "rating": 4.8,
+    "reviewsCount": 281,
+    "description": "Tender grilled spiced beef served with fresh garden greens and savory house garnish.",
+    "ingredients": [
+      "Grilled Beef Bowl",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 789,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_37",
+    "categoryId": "breakfast",
+    "name": "Special Fetira",
+    "badge": "TRADITIONAL",
+    "rating": 4.9,
+    "reviewsCount": 216,
+    "description": "Crispy layered pastry served warm with eggs and sweet natural honey.",
+    "ingredients": [
+      "Special Fetira",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 439,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_38",
+    "categoryId": "breakfast",
+    "name": "Normal Fetira",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 236,
+    "description": "Crispy freshly fried traditional fetira pastry.",
+    "ingredients": [
+      "Normal Fetira",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 309,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_39",
+    "categoryId": "breakfast",
+    "name": "Special Chechebsa",
+    "badge": "POPULAR",
+    "rating": 4.9,
+    "reviewsCount": 247,
+    "description": "Torn flatbread pan-fried with spiced clarified butter, berbere, honey, and yogurt.",
+    "ingredients": [
+      "Torn flatbread pan-fried with spiced clarified butter",
+      "berbere",
+      "honey",
+      "and yogurt"
+    ],
+    "basePrice": 469,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_40",
+    "categoryId": "breakfast",
+    "name": "Normal Chechebsa",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 217,
+    "description": "Traditional Ethiopian breakfast shredded flatbread tossed with aromatic spiced butter.",
+    "ingredients": [
+      "Normal Chechebsa",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 369,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_41",
+    "categoryId": "breakfast",
+    "name": "Tikur Teff Chechebsa",
+    "badge": "HEALTHY TEFF",
+    "rating": 4.9,
+    "reviewsCount": 230,
+    "description": "Nutritious whole black teff chechebsa with Ethiopian spiced butter.",
+    "ingredients": [
+      "Tikur Teff Chechebsa",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 399,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_42",
+    "categoryId": "breakfast",
+    "name": "Scrambled Egg",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 175,
+    "description": "Farm fresh eggs scrambled with tomatoes, onions, and jalapeño peppers.",
+    "ingredients": [
+      "Farm fresh eggs scrambled with tomatoes",
+      "onions",
+      "and jalapeño peppers"
+    ],
+    "basePrice": 369,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_43",
+    "categoryId": "breakfast",
+    "name": "Plain Omelette",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 179,
+    "description": "Fluffy 3-egg skillet omelette cooked with fresh herbs.",
+    "ingredients": [
+      "Plain Omelette",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 399,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_44",
+    "categoryId": "breakfast",
+    "name": "Cheese Omelette",
+    "badge": "BESTSELLER",
+    "rating": 4.8,
+    "reviewsCount": 226,
+    "description": "Folded golden omelette stuffed with gooey melted mozzarella and cheddar.",
+    "ingredients": [
+      "Cheese Omelette",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 449,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_45",
+    "categoryId": "breakfast",
+    "name": "Lasagna",
+    "badge": "OVEN BAKED",
+    "rating": 4.8,
+    "reviewsCount": 149,
+    "description": "Rich layers of pasta sheets, savory minced meat sauce, creamy bechamel, and melted cheese.",
+    "ingredients": [
+      "Rich layers of pasta sheets",
+      "savory minced meat sauce",
+      "creamy bechamel",
+      "and melted cheese"
+    ],
+    "basePrice": 799,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_46",
+    "categoryId": "dessert",
+    "name": "Pan Cake",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 195,
+    "description": "Fluffy golden pancake stack drizzled with pure honey and whipped butter.",
+    "ingredients": [
+      "Pan Cake",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 249,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_47",
+    "categoryId": "dessert",
+    "name": "Waffle & Teff Waffle",
+    "badge": "SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 174,
+    "description": "Crisp Belgian waffle made with teff flour, served with maple drizzle and fresh fruit.",
+    "ingredients": [
+      "Crisp Belgian waffle made with teff flour",
+      "served with maple drizzle and fresh fruit"
+    ],
+    "basePrice": 299,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_48",
+    "categoryId": "dessert",
+    "name": "French Toast",
+    "badge": "",
+    "rating": 4.7,
+    "reviewsCount": 103,
+    "description": "Golden pan-fried brioche soaked in vanilla custard and cinnamon sugar.",
+    "ingredients": [
+      "French Toast",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 199,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_49",
+    "categoryId": "extra",
+    "name": "Cheese",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 266,
+    "description": "Extra melted cheddar or mozzarella slice.",
+    "ingredients": [
+      "Cheese",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 149,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_50",
+    "categoryId": "extra",
+    "name": "Chicken",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 219,
+    "description": "Extra portion of flame grilled chicken breast.",
+    "ingredients": [
+      "Chicken",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 169,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_51",
+    "categoryId": "extra",
+    "name": "Egg",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 168,
+    "description": "One fried or boiled farm egg.",
+    "ingredients": [
+      "Egg",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 45,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_52",
+    "categoryId": "extra",
+    "name": "Tuna",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 147,
+    "description": "Extra portion of premium flaked tuna.",
+    "ingredients": [
+      "Tuna",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 269,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_53",
+    "categoryId": "extra",
+    "name": "Mayonnaise",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 178,
+    "description": "Side cup of creamy garlic mayonnaise.",
+    "ingredients": [
+      "Mayonnaise",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 79,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_54",
+    "categoryId": "extra",
+    "name": "Honey",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 209,
+    "description": "Pure local organic natural honey.",
+    "ingredients": [
+      "Honey",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 59,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_55",
+    "categoryId": "extra",
+    "name": "Beef",
+    "badge": "",
+    "rating": 4.8,
+    "reviewsCount": 179,
+    "description": "Extra flame grilled 100% pure beef patty.",
+    "ingredients": [
+      "Beef",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 149,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_56",
+    "categoryId": "protein",
+    "name": "Alemaya Special",
+    "badge": "SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 114,
+    "description": "Orange, apple, avocado, mango, banana and honey.",
+    "ingredients": [
+      "Orange",
+      "apple",
+      "avocado",
+      "mango",
+      "banana and honey"
+    ],
+    "basePrice": 259,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_84",
+    "categoryId": "juice",
+    "name": "Orange Juice",
+    "badge": "CITRUS",
+    "rating": 4.9,
+    "reviewsCount": 171,
+    "description": "Freshly squeezed sweet highland oranges.",
+    "ingredients": [
+      "Orange Juice",
+      "House Seasoning",
+      "Fresh Ingredients"
+    ],
+    "basePrice": 269,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
+  },
+  {
+    "id": "item_85",
+    "categoryId": "juice",
+    "name": "Mixed Juice",
+    "badge": "SPRIS SIGNATURE",
+    "rating": 4.9,
+    "reviewsCount": 156,
+    "description": "Traditional Ethiopian layered Spris juice (Avocado, Mango, Papaya, and Guava).",
+    "ingredients": [
+      "Traditional Ethiopian layered Spris juice (Avocado",
+      "Mango",
+      "Papaya",
+      "and Guava)"
+    ],
+    "basePrice": 279,
+    "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+    "available": true,
+    "customizations": []
   }
 ];
 
 // ══ APPLICATION STATE & MASTER STORES ══
 let MASTER_ORDERS = [];
+let EXTRAS = [
+  { id: 'ext_cheese', name: 'Extra Melted Cheese', price: 149, categories: ['burger', 'sandwich', 'pizza', 'spaghetti', 'burrito', 'special-wrap'], available: true },
+  { id: 'ext_beef', name: 'Extra Flame Grilled Beef Patty', price: 169, categories: ['burger', 'sandwich', 'burrito', 'rice'], available: true },
+  { id: 'ext_chicken', name: 'Extra Flame Grilled Chicken', price: 169, categories: ['burger', 'sandwich', 'burrito', 'special-wrap', 'rice', 'chicken'], available: true },
+  { id: 'ext_egg', name: 'Extra Farm Egg', price: 45, categories: ['burger', 'sandwich', 'breakfast', 'rice'], available: true },
+  { id: 'ext_tuna', name: 'Extra Premium Tuna', price: 269, categories: ['sandwich', 'special-wrap', 'rice'], available: true },
+  { id: 'ext_mayo', name: 'Creamy Mayonnaise', price: 79, categories: ['burger', 'sandwich', 'special-wrap', 'chicken'], available: true },
+  { id: 'ext_honey', name: 'Organic Pure Honey', price: 59, categories: ['smoothies', 'juice', 'milkshakes', 'superjuice', 'dessert', 'breakfast'], available: true },
+  { id: 'ext_protein', name: 'Whey Protein Scoop', price: 199, categories: ['protein', 'smoothies', 'milkshakes'], available: true },
+  { id: 'ext_icecream', name: 'Vanilla Ice Cream Scoop', price: 89, categories: ['dessert', 'milkshakes'], available: true },
+  { id: 'ext_jalapeno', name: 'Spicy Pickled Jalapeños', price: 65, categories: ['burger', 'pizza', 'sandwich', 'burrito', 'special-wrap'], available: true }
+];
 let KITCHEN_AUDIO_CTX = null;
 let SYNC_CHANNEL = null;
 
@@ -540,7 +1697,8 @@ let APP_STATE = {
   portal: 'customer',           // 'customer', 'chef', 'admin'
   currentTab: 'menu',           // 'menu', 'orders', 'chef', 'admin'
   ordersSubTab: 'cart',         // 'cart' or 'history'
-  activeCategory: 'burgers',
+  adminSubTab: 'overview',      // 'overview', 'items', 'categories', 'orders'
+  activeCategory: 'burger',
   searchQuery: '',
   orderType: 'Dine-in',         // 'Dine-in' or 'Takeaway'
   cart: [],
@@ -560,26 +1718,302 @@ let APP_STATE = {
   }
 };
 
+
+// ══ CATEGORY ICON SVG MAPPINGS (LUCIDE BLACK STROKE) ══
+const ICON_SVGS = {
+  'burger': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 15h16"/><path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"/><path d="M7 13c1 0 1.5.8 2.5.8s1.5-.8 2.5-.8 1.5.8 2.5.8 1.5-.8 2.5-.8"/></svg>`,
+  'pizza': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pizza"><path d="m12 2-8.5 18a2 2 0 0 0 2.2 2.7 26.3 26.3 0 0 0 12.6 0 2 2 0 0 0 2.2-2.7L12 2Z"/><path d="M10 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><circle cx="14" cy="9" r="1" fill="#000000"/></svg>`,
+  'spaghetti': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M7 3v3"/><path d="M12 3v3"/><path d="M17 3v3"/></svg>`,
+  'sandwich': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`,
+  'burrito': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`,
+  'special-wrap': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`,
+  'rice': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M7 3v3"/><path d="M12 3v3"/><path d="M17 3v3"/></svg>`,
+  'chicken': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-drumstick"><path d="m14 10 2.5-2.5a3.54 3.54 0 0 1 5 5L19 15"/><path d="M10 14A5.5 5.5 0 0 1 2 6.5C2 3.5 4.5 1 7.5 1A5.5 5.5 0 0 1 15 8.5"/><path d="m14 10-4 4"/><circle cx="19" cy="19" r="2"/><circle cx="21" cy="15" r="2"/></svg>`,
+  'breakfast': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg-fried"><circle cx="11.5" cy="12.5" r="3.5"/><path d="M3 8c0-3.5 2.5-6 6.5-6 5 0 6 3 8.5 3 3.5 0 4 2 4 6 0 4-2 8-6 8-2.5 0-3 2-6.5 2-4.5 0-6.5-3.5-6.5-7 0-2 0-4 0-6Z"/></svg>`,
+  'dessert': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cake-slice"><circle cx="9" cy="7" r="2"/><path d="M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6"/><path d="M16 13H3"/><path d="M16 17H3"/></svg>`,
+  'extra': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m21 8-2 12H5L3 8"/><path d="M10 12v5"/><path d="M14 12v5"/><path d="M7 4h10l4 4H3l4-4Z"/></svg>`,
+  'protein': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dumbbell"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>`,
+  'superjuice': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-glass-water"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg>`,
+  'smoothies': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cup-soda"><path d="m6 8 1.75 12.28a2 2 0 0 0 2 1.72h4.5a2 2 0 0 0 2-1.72L18 8"/><path d="M5 8h14"/><path d="m7 15 10-4"/><path d="m12 2 1 6"/></svg>`,
+  'milkshakes': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-2"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6Zm0 0v5"/><path d="M4 11a8 8 0 1 1 16 0"/></svg>`,
+  'juice': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-citrus"><path d="M21.66 10.44a10 10 0 1 0-8.1 11.22 10.05 10.05 0 0 0 8.1-11.22Z"/><path d="M12 12 8.5 7.5"/><path d="M12 12v6"/><path d="m12 12 5.5-2.5"/></svg>`,
+  burger: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 15h16"/><path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"/><path d="M7 13c1 0 1.5.8 2.5.8s1.5-.8 2.5-.8 1.5.8 2.5.8 1.5-.8 2.5-.8"/></svg>`,
+  burgers: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 16 0H4z"/><path d="M4 15h16"/><path d="M5 19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1H5v1z"/><path d="M7 13c1 0 1.5.8 2.5.8s1.5-.8 2.5-.8 1.5.8 2.5.8 1.5-.8 2.5-.8"/></svg>`,
+  pizza: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pizza"><path d="m12 2-8.5 18a2 2 0 0 0 2.2 2.7 26.3 26.3 0 0 0 12.6 0 2 2 0 0 0 2.2-2.7L12 2Z"/><path d="M10 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><circle cx="14" cy="9" r="1" fill="#000000"/></svg>`,
+  wrap: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`,
+  wraps: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5-8.5 8.5a4.2 4.2 0 0 1-6-6L13 3l6 2z"/><path d="m5 13 6 6a4.2 4.2 0 0 0 6-6l-2-2"/><path d="m9 9 4 4"/><path d="m12 6 4 4"/></svg>`,
+  sides: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m21 8-2 12H5L3 8"/><path d="M10 12v5"/><path d="M14 12v5"/><path d="M7 4h10l4 4H3l4-4Z"/></svg>`,
+  package: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package"><path d="m21 8-2 12H5L3 8"/><path d="M10 12v5"/><path d="M14 12v5"/><path d="M7 4h10l4 4H3l4-4Z"/></svg>`,
+  drinks: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cup-soda"><path d="m6 8 1.75 12.28a2 2 0 0 0 2 1.72h4.5a2 2 0 0 0 2-1.72L18 8"/><path d="M5 8h14"/><path d="m7 15 10-4"/><path d="m12 2 1 6"/></svg>`,
+  'cup-soda': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cup-soda"><path d="m6 8 1.75 12.28a2 2 0 0 0 2 1.72h4.5a2 2 0 0 0 2-1.72L18 8"/><path d="M5 8h14"/><path d="m7 15 10-4"/><path d="m12 2 1 6"/></svg>`,
+  pasta: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M7 3v3"/><path d="M12 3v3"/><path d="M17 3v3"/></svg>`,
+  soup: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soup"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M7 21h10"/><path d="M19.5 12 22 6"/><path d="M7 3v3"/><path d="M12 3v3"/><path d="M17 3v3"/></svg>`,
+  sandwiches: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`,
+  sandwich: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sandwich"><path d="m2.37 11.22 7.84-8.08a2.5 2.5 0 0 1 3.56 0l7.86 8.08a1.5 1.5 0 0 1-1.07 2.54H3.44a1.5 1.5 0 0 1-1.07-2.54Z"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/><path d="M3 14h18"/><path d="M12 14v6"/></svg>`,
+  chicken: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-drumstick"><path d="m14 10 2.5-2.5a3.54 3.54 0 0 1 5 5L19 15"/><path d="M10 14A5.5 5.5 0 0 1 2 6.5C2 3.5 4.5 1 7.5 1A5.5 5.5 0 0 1 15 8.5"/><path d="m14 10-4 4"/><circle cx="19" cy="19" r="2"/><circle cx="21" cy="15" r="2"/></svg>`,
+  drumstick: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-drumstick"><path d="m14 10 2.5-2.5a3.54 3.54 0 0 1 5 5L19 15"/><path d="M10 14A5.5 5.5 0 0 1 2 6.5C2 3.5 4.5 1 7.5 1A5.5 5.5 0 0 1 15 8.5"/><path d="m14 10-4 4"/><circle cx="19" cy="19" r="2"/><circle cx="21" cy="15" r="2"/></svg>`,
+  breakfast: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg-fried"><circle cx="11.5" cy="12.5" r="3.5"/><path d="M3 8c0-3.5 2.5-6 6.5-6 5 0 6 3 8.5 3 3.5 0 4 2 4 6 0 4-2 8-6 8-2.5 0-3 2-6.5 2-4.5 0-6.5-3.5-6.5-7 0-2 0-4 0-6Z"/></svg>`,
+  'egg-fried': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg-fried"><circle cx="11.5" cy="12.5" r="3.5"/><path d="M3 8c0-3.5 2.5-6 6.5-6 5 0 6 3 8.5 3 3.5 0 4 2 4 6 0 4-2 8-6 8-2.5 0-3 2-6.5 2-4.5 0-6.5-3.5-6.5-7 0-2 0-4 0-6Z"/></svg>`,
+  protein: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dumbbell"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>`,
+  dumbbell: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dumbbell"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>`,
+  superjuice: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-glass-water"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg>`,
+  'glass-water': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-glass-water"><path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z"/><path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0"/></svg>`,
+  juice: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-citrus"><path d="M21.66 10.44a10 10 0 1 0-8.1 11.22 10.05 10.05 0 0 0 8.1-11.22Z"/><path d="M12 12 8.5 7.5"/><path d="M12 12v6"/><path d="m12 12 5.5-2.5"/></svg>`,
+  citrus: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-citrus"><path d="M21.66 10.44a10 10 0 1 0-8.1 11.22 10.05 10.05 0 0 0 8.1-11.22Z"/><path d="M12 12 8.5 7.5"/><path d="M12 12v6"/><path d="m12 12 5.5-2.5"/></svg>`,
+  milkshakes: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-2"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6Zm0 0v5"/><path d="M4 11a8 8 0 1 1 16 0"/></svg>`,
+  'ice-cream-2': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ice-cream-2"><path d="M12 17c5 0 8-2.69 8-6H4c0 3.31 3 6 8 6Zm0 0v5"/><path d="M4 11a8 8 0 1 1 16 0"/></svg>`,
+  desserts: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cake-slice"><circle cx="9" cy="7" r="2"/><path d="M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6"/><path d="M16 13H3"/><path d="M16 17H3"/></svg>`,
+  'cake-slice': `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cake-slice"><circle cx="9" cy="7" r="2"/><path d="M7.2 7.9 3 11v9c0 .6.4 1 1 1h16c.6 0 1-.4 1-1v-9c0-2-3-6-7-8l-3.6 2.6"/><path d="M16 13H3"/><path d="M16 17H3"/></svg>`,
+  utensils: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M5 2v4a3 3 0 0 0 3 3v13"/><path d="M9 2v4"/></svg>`
+};
+
+function getCategorySvg(cat) {
+  if (cat && cat.svg) return cat.svg;
+  const key = (cat && (cat.icon || cat.id)) || 'utensils';
+  return ICON_SVGS[key] || ICON_SVGS.utensils;
+}
+
+// ══ POPULATE ADMIN CATEGORY DROPDOWNS ══
+function populateAdminCategoryDropdowns() {
+  const filterSelect = document.getElementById('admin-crud-cat-filter');
+  const modalSelect = document.getElementById('crud-item-category');
+
+  if (filterSelect) {
+    const currentVal = filterSelect.value || 'all';
+    let optionsHtml = '<option value="all">All Categories</option>';
+    CATEGORIES.forEach(c => {
+      optionsHtml += `<option value="${c.id}">${escapeHtml(c.name)}</option>`;
+    });
+    filterSelect.innerHTML = optionsHtml;
+    filterSelect.value = currentVal;
+  }
+
+  if (modalSelect) {
+    let optionsHtml = '';
+    CATEGORIES.forEach(c => {
+      optionsHtml += `<option value="${c.id}">${escapeHtml(c.name)}</option>`;
+    });
+    modalSelect.innerHTML = optionsHtml;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REST API CLIENT — talks to server.js on port 3000
+// ═══════════════════════════════════════════════════════════════
+const API = (() => {
+  const BASE = '/api';
+
+  async function req(method, path, body) {
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' }
+    };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    const res = await fetch(`${BASE}${path}`, opts);
+    return res.json();
+  }
+
+  return {
+    // ── Categories ──
+    async getCategories() {
+      try {
+        const r = await req('GET', '/categories');
+        return r.data || [];
+      } catch { return []; }
+    },
+
+    async saveCategory(catPayload, isEdit = false) {
+      try {
+        if (isEdit) {
+          return await req('PUT', `/categories/${encodeURIComponent(catPayload.id)}`, catPayload);
+        } else {
+          return await req('POST', '/categories', catPayload);
+        }
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    async deleteCategory(id) {
+      try {
+        return await req('DELETE', `/categories/${encodeURIComponent(id)}`);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    // ── Products ──
+    async getProducts() {
+      try {
+        const r = await req('GET', '/products');
+        return r.data || [];
+      } catch { return []; }
+    },
+
+    async saveProduct(prodPayload, isEdit = false) {
+      try {
+        if (isEdit) {
+          return await req('PUT', `/products/${encodeURIComponent(prodPayload.id)}`, prodPayload);
+        } else {
+          return await req('POST', '/products', prodPayload);
+        }
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    async deleteProduct(id) {
+      try {
+        return await req('DELETE', `/products/${encodeURIComponent(id)}`);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    async patchProductStock(id, available) {
+      try {
+        return await req('PATCH', `/products/${encodeURIComponent(id)}`, { available });
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    // ── Orders ──
+    async getOrders() {
+      try {
+        const r = await req('GET', '/orders');
+        return r.data || [];
+      } catch { return []; }
+    },
+
+    async createOrder(orderData) {
+      try {
+        return await req('POST', '/orders', orderData);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    async updateOrderStatus(id, status, statusLabel) {
+      try {
+        return await req('PATCH', `/orders/${encodeURIComponent(id)}`, { status, statusLabel });
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    // ── Stats ──
+    // ── Extras & Add-ons CRUD ──
+    async getExtras() {
+      try {
+        const r = await req('GET', '/extras');
+        return r.data || [];
+      } catch { return []; }
+    },
+    async createExtra(extraPayload) {
+      try {
+        return await req('POST', '/extras', extraPayload);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async updateExtra(extraPayload) {
+      try {
+        return await req('PUT', `/extras/${encodeURIComponent(extraPayload.id)}`, extraPayload);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async patchExtraStock(id, available) {
+      try {
+        return await req('PATCH', `/extras/${encodeURIComponent(id)}`, { available });
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async deleteExtra(id) {
+      try {
+        return await req('DELETE', `/extras/${encodeURIComponent(id)}`);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async getStats() {
+      try {
+        const r = await req('GET', '/stats');
+        return r.data || {};
+      } catch { return {}; }
+    },
+
+    // ── Image & Cloudinary Upload ──
+    async uploadImage(fileData) {
+      try {
+        const r = await req('POST', '/upload-image', { file: fileData });
+        return r;
+      } catch (e) { return { success: false, error: e.message }; }
+    }
+  };
+})();
+
+// ══ SYNC LIVE DATA FROM REAL DATABASE ══
+async function syncDataFromBackend(showToast = false) {
+  try {
+    const [cats, prods, orders, extrasData] = await Promise.all([
+      API.getCategories(),
+      API.getProducts(),
+      API.getOrders(),
+      API.getExtras()
+    ]);
+
+    if (cats && cats.length > 0) {
+      CATEGORIES = cats.filter(c => c.id !== 'extra').map(c => ({
+        ...c,
+        svg: c.svg || getCategorySvg(c)
+      }));
+    }
+    if (prods && prods.length > 0) {
+      PRODUCTS = prods;
+    }
+    if (orders && orders.length > 0) {
+      MASTER_ORDERS = orders;
+    }
+    if (extrasData && extrasData.length > 0) {
+      EXTRAS = extrasData;
+    }
+
+    populateAdminCategoryDropdowns();
+    buildCategoryGrid();
+    renderMenu();
+    updateCartUI();
+    renderHistory();
+    updateKitchenCounters();
+    if (APP_STATE.portal === 'chef') renderKdsTickets();
+    if (APP_STATE.portal === 'admin') {
+      renderAdminDashboard();
+      renderAdminItemsCrud();
+      renderAdminCatsCrud();
+      renderAdminOrdersSubpane();
+    }
+    refreshLucideIcons();
+
+    if (showToast) toast('Synced live data from real database!');
+  } catch (err) {
+    console.warn('syncDataFromBackend warning:', err);
+  }
+}
+
 // ══ BROADCAST CHANNEL & STORAGE SYNC ACROSS TABS ══
 try {
   if (typeof BroadcastChannel !== 'undefined') {
     SYNC_CHANNEL = new BroadcastChannel('alemaya_kitchen_channel');
     SYNC_CHANNEL.onmessage = (event) => {
       const data = event.data || {};
-      if (data.type === 'NEW_ORDER' || data.type === 'STATUS_UPDATE' || data.type === 'STOCK_UPDATE') {
-        restoreFromStorage();
-        refreshAllViews();
-        if (data.type === 'NEW_ORDER' && APP_STATE.portal === 'chef') {
-          playKitchenChime('new_order');
-          toast(`🔔 New Kitchen Order #${data.orderId}!`, 3500);
+      if (data.type === 'NEW_ORDER' || data.type === 'STATUS_UPDATE' || data.type === 'STOCK_UPDATE' || data.type === 'DB_CHANGE') {
+        if (data.type === 'NEW_ORDER' && data.order) {
+          if (!MASTER_ORDERS.some(o => o.id === data.order.id)) {
+            MASTER_ORDERS.unshift(data.order);
+            saveToStorage();
+          }
+          if (APP_STATE.portal === 'chef') {
+            updateKitchenCounters();
+            renderKdsTickets();
+            playKitchenChime('new_order');
+            toast(`🔔 New Kitchen Order #${data.orderId}!`, 3500);
+          }
         } else if (data.type === 'STATUS_UPDATE') {
+          const ord = MASTER_ORDERS.find(o => o.id === data.orderId);
+          if (ord) ord.status = data.status;
           if (data.status === 'ready') {
             playKitchenChime('ready');
             toast(`🎉 Order #${data.orderId} is READY for pickup!`, 4000);
           } else {
             toast(`Order #${data.orderId} status: ${data.status}`);
           }
+          if (APP_STATE.portal === 'chef') renderKdsTickets();
+          if (APP_STATE.currentTab === 'orders') {
+            renderCurrentOrders();
+            renderHistory();
+          }
         }
+        syncDataFromBackend(false);
       }
     };
   }
@@ -606,7 +2040,7 @@ function refreshLucideIcons() {
 }
 
 // ══ DOM READY INITIALIZATION ══
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Splash hide after smooth logo display
   setTimeout(() => {
     const splash = document.getElementById('splash');
@@ -616,15 +2050,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Restore saved cart, stock, and orders from localStorage
   restoreFromStorage();
 
-  // Seed sample week of orders if master store is fresh
-  if (!MASTER_ORDERS || MASTER_ORDERS.length === 0) {
-    seedInitialDemoOrders();
-  }
-
-  // Build UI Components
+  // Populate dropdowns and build initial UI
+  populateAdminCategoryDropdowns();
   buildCategoryGrid();
   renderMenu();
   updateCartUI();
+  renderCurrentOrders();
   renderHistory();
   updateKitchenCounters();
   refreshLucideIcons();
@@ -632,21 +2063,127 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start live digital clock & ticket timer intervals
   initLiveClocks();
 
-  // Check URL hash for direct routing (#chef, #admin, #orders)
+  // Sync fresh live data from database.json via REST API
+  await syncDataFromBackend(false);
+
+  // Route check from window.location.hash (#kitchen, #chef, #admin, #orders, #menu)
   handleHashRouting();
   window.addEventListener('hashchange', handleHashRouting);
+
+  // Fast auto-refresh orders every 3s for live kitchen and order tracking
+  setInterval(() => {
+    if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.currentTab === 'orders') {
+      API.getOrders().then(orders => {
+        if (orders && orders.length > 0) {
+          MASTER_ORDERS = orders;
+          updateKitchenCounters();
+          if (APP_STATE.portal === 'chef') renderKdsTickets();
+          if (APP_STATE.portal === 'admin' && APP_STATE.adminSubTab === 'overview') renderAdminDashboard();
+          if (APP_STATE.portal === 'admin' && APP_STATE.adminSubTab === 'orders') renderAdminOrdersSubpane();
+          if (APP_STATE.currentTab === 'orders') {
+            renderCurrentOrders();
+            renderHistory();
+          }
+        }
+      });
+    }
+  }, 3000);
 });
 
 function handleHashRouting() {
   const hash = (window.location.hash || '').replace('#', '').toLowerCase();
-  if (hash === 'chef') {
-    switchPortal('chef');
-  } else if (hash === 'admin') {
-    switchPortal('admin');
+  const path = (window.location.pathname || '').toLowerCase();
+
+  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || path === '/kitchen';
+  const isAdminRoute = hash === 'admin' || path === '/admin';
+
+  if (isKitchenRoute) {
+    const isAuthed = sessionStorage.getItem('staff_auth_kitchen') === '1';
+    if (isAuthed) {
+      switchPortal('chef');
+    } else {
+      promptStaffPassword('kitchen');
+    }
+  } else if (isAdminRoute) {
+    const isAuthed = sessionStorage.getItem('staff_auth_admin') === '1';
+    if (isAuthed) {
+      switchPortal('admin');
+    } else {
+      promptStaffPassword('admin');
+    }
   } else if (hash === 'orders') {
-    switchPortal('customer');
     navigateTo('orders');
+  } else {
+    navigateTo('menu');
   }
+}
+
+
+// ══ STAFF AUTHENTICATION & SECURE ROUTES (/kitchen & /admin) ══
+let PENDING_STAFF_PORTAL = null;
+
+function promptStaffPassword(portal) {
+  PENDING_STAFF_PORTAL = portal;
+  const overlay = document.getElementById('staff-auth-overlay');
+  const modal = document.getElementById('staff-auth-modal');
+  const title = document.getElementById('staff-auth-title');
+  const desc = document.getElementById('staff-auth-desc');
+  const input = document.getElementById('staff-auth-input');
+  const err = document.getElementById('staff-auth-error');
+
+  if (!modal) return;
+
+  const isKitchen = portal === 'kitchen' || portal === 'chef';
+  title.textContent = isKitchen ? 'Kitchen Terminal Access' : 'Admin Management Access';
+  desc.textContent = isKitchen
+    ? 'Enter kitchen staff passcode to open KDS grill terminal.'
+    : 'Enter manager passcode to access revenue & orders.';
+  
+  if (err) err.style.display = 'none';
+  if (input) {
+    input.value = '';
+    setTimeout(() => input.focus(), 100);
+  }
+
+  overlay?.classList.add('open');
+  modal?.classList.add('open');
+}
+
+function handleStaffAuthSubmit(event) {
+  event.preventDefault();
+  const input = document.getElementById('staff-auth-input');
+  const err = document.getElementById('staff-auth-error');
+  const entered = (input?.value || '').trim();
+
+  const isKitchen = PENDING_STAFF_PORTAL === 'kitchen' || PENDING_STAFF_PORTAL === 'chef';
+  const validPasscodes = isKitchen
+    ? ['kitchen', 'kitchen123', 'alemaya123', '1234']
+    : ['admin', 'admin123', 'alemaya123', '1234'];
+
+  if (validPasscodes.includes(entered.toLowerCase())) {
+    sessionStorage.setItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'), '1');
+    closeStaffAuthModal();
+    const target = isKitchen ? 'chef' : 'admin';
+    switchPortal(target);
+    toast(`Authenticated: ${isKitchen ? 'Kitchen' : 'Admin'} unlocked`, 2500);
+  } else {
+    if (err) {
+      err.style.display = 'block';
+      err.textContent = 'Incorrect passcode. Access denied.';
+    }
+    input?.select();
+  }
+}
+
+function cancelStaffAuth() {
+  closeStaffAuthModal();
+  PENDING_STAFF_PORTAL = null;
+  navigateTo('menu');
+}
+
+function closeStaffAuthModal() {
+  document.getElementById('staff-auth-overlay')?.classList.remove('open');
+  document.getElementById('staff-auth-modal')?.classList.remove('open');
 }
 
 // ══ CATEGORY GRID (4-COLUMN SQUIRCLE CARDS WITH LUCIDE REACT ICONS) ══
@@ -655,7 +2192,9 @@ function buildCategoryGrid() {
   if (!container) return;
   container.innerHTML = '';
 
-  CATEGORIES.forEach(cat => {
+  const visibleCategories = CATEGORIES.filter(c => c.id !== 'extra');
+
+  visibleCategories.forEach(cat => {
     const card = document.createElement('button');
     card.className = 'cat-card' + (cat.id === APP_STATE.activeCategory ? ' active' : '');
     card.id = 'cat-card-' + cat.id;
@@ -663,12 +2202,17 @@ function buildCategoryGrid() {
     card.setAttribute('aria-selected', cat.id === APP_STATE.activeCategory ? 'true' : 'false');
     card.onclick = () => selectCategory(cat.id);
 
+    const svgIcon = getCategorySvg(cat);
+
     card.innerHTML = `
-      <div class="cat-icon-wrap">${cat.svg}</div>
-      <span class="cat-name">${cat.name}</span>
+      <div class="cat-icon-wrap">${svgIcon}</div>
+      <span class="cat-name">${escapeHtml(cat.name)}</span>
     `;
     container.appendChild(card);
   });
+
+  const catNote = document.getElementById('cat-count-note');
+  if (catNote) catNote.textContent = `${visibleCategories.length} categories`;
 }
 
 function selectCategory(catId) {
@@ -853,6 +2397,8 @@ function createVerticalCard(p) {
 
 // ══ NAVIGATION (BOTTOM NAV: MENU & ORDERS TABS) ══
 function navigateTo(tab) {
+  const customerTopNav = document.getElementById('customer-top-nav');
+  if (customerTopNav) customerTopNav.style.display = 'block';
   APP_STATE.currentTab = tab;
   APP_STATE.portal = 'customer';
 
@@ -862,16 +2408,17 @@ function navigateTo(tab) {
     appEl.classList.add('portal-customer');
   }
 
-  // Update top portal switcher pills
-  document.querySelectorAll('.portal-btn').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('pbtn-customer')?.classList.add('active');
+  // Update hash safely without triggering loop
+  if (window.location.hash !== '#' + tab) {
+    history.replaceState(null, '', '#' + tab);
+  }
 
   // View visibility
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const targetView = document.getElementById('view-' + tab);
   if (targetView) targetView.classList.add('active');
 
-  // Bottom navigation tabs active state
+  // Bottom navigation tabs active state (Menu & Orders only)
   document.querySelectorAll('.bnav-btn').forEach(btn => btn.classList.remove('active'));
   document.getElementById('bnav-' + tab)?.classList.add('active');
 
@@ -884,6 +2431,7 @@ function navigateTo(tab) {
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  refreshLucideIcons();
 }
 
 function toggleSearch() {
@@ -910,14 +2458,15 @@ function toggleSearch() {
 }
 
 function switchOrdersTab(subTab) {
+  if (subTab !== 'history') subTab = 'current';
   APP_STATE.ordersSubTab = subTab;
-  document.getElementById('seg-cart')?.classList.toggle('active', subTab === 'cart');
+  document.getElementById('seg-current')?.classList.toggle('active', subTab === 'current');
   document.getElementById('seg-history')?.classList.toggle('active', subTab === 'history');
 
-  document.getElementById('orders-tab-cart')?.classList.toggle('active', subTab === 'cart');
+  document.getElementById('orders-tab-current')?.classList.toggle('active', subTab === 'current');
   document.getElementById('orders-tab-history')?.classList.toggle('active', subTab === 'history');
 
-  if (subTab === 'cart') renderCart();
+  if (subTab === 'current') renderCurrentOrders();
   else renderHistory();
 }
 
@@ -973,6 +2522,37 @@ function closeSheet() {
   APP_STATE.sheet.editCartIndex = -1;
 }
 
+
+// ══ DYNAMIC CATEGORY-SCOPED EXTRAS ══
+function getApplicableExtrasForProduct(product) {
+  if (!product) return [];
+  const catId = product.categoryId;
+  return (EXTRAS || []).filter(e => {
+    if (e.available === false) return false;
+    if (!e.categories || e.categories.length === 0 || e.categories.includes('all')) return true;
+    return e.categories.includes(catId);
+  });
+}
+
+function getActiveGroupsForProduct(product) {
+  if (!product) return [];
+  const groups = [...(product.customizations || [])];
+  const applicable = getApplicableExtrasForProduct(product);
+  if (applicable.length > 0) {
+    groups.push({
+      id: 'extras_addons',
+      name: 'Add Extras & Add-ons (Optional)',
+      required: false,
+      multiSelect: true,
+      options: applicable.map(e => ({
+        id: e.id,
+        label: e.name,
+        priceAdd: Number(e.price) || 0
+      }))
+    });
+  }
+  return groups;
+}
 function renderSheetContent() {
   const p = APP_STATE.sheet.product;
   const body = document.getElementById('sheet-body');
@@ -983,7 +2563,9 @@ function renderSheetContent() {
     : '';
 
   let groupsHtml = '';
-  (p.customizations || []).forEach(group => {
+  const allCustomizations = getActiveGroupsForProduct(p);
+  allCustomizations.forEach(group => {
+    const isExtrasPop = group.id === 'extras_addons';
     const isReq = group.required;
     const badge = isReq
       ? `<span class="cust-badge-req">Required</span>`
@@ -1012,7 +2594,7 @@ function renderSheetContent() {
     });
 
     groupsHtml += `
-      <div class="cust-group" id="cgroup-${group.id}">
+      <div class="cust-group ${isExtrasPop ? 'cust-group-extras-pop' : ''}" id="cgroup-${group.id}">
         <div class="cust-group-head">
           <span class="cust-group-title">${escapeHtml(group.name)}</span>
           ${badge}
@@ -1087,30 +2669,32 @@ function calculateUnitItemPrice() {
   const p = APP_STATE.sheet.product;
   if (!p) return 0;
   let extras = 0;
-  (p.customizations || []).forEach(g => {
+  const activeGroups = getActiveGroupsForProduct(p);
+  activeGroups.forEach(g => {
     const sel = APP_STATE.sheet.selections[g.id];
     if (g.multiSelect && Array.isArray(sel)) {
       sel.forEach(oid => {
         const opt = (g.options || []).find(o => o.id === oid);
-        if (opt) extras += opt.priceAdd;
+        if (opt) extras += (Number(opt.priceAdd) || 0);
       });
     } else if (!g.multiSelect && sel) {
       const opt = (g.options || []).find(o => o.id === sel);
-      if (opt) extras += opt.priceAdd;
+      if (opt) extras += (Number(opt.priceAdd) || 0);
     }
   });
-  return p.basePrice + extras;
+  return (Number(p.basePrice) || 0) + extras;
 }
 
 function calculateSheetTotal() {
-  return calculateUnitItemPrice() * APP_STATE.sheet.qty;
+  return calculateUnitItemPrice() * (Number(APP_STATE.sheet.qty) || 1);
 }
 
 function updateSheetPricingUI() {
   const p = APP_STATE.sheet.product;
   if (!p) return;
 
-  (p.customizations || []).forEach(group => {
+  const activeGroups = getActiveGroupsForProduct(p);
+  activeGroups.forEach(group => {
     const container = document.getElementById('cgroup-' + group.id);
     if (!container) return;
     const rows = container.querySelectorAll('.cust-opt-row');
@@ -1135,13 +2719,65 @@ function updateSheetPricingUI() {
   if (totalPriceEl) totalPriceEl.textContent = formatMoney(calculateSheetTotal());
 }
 
+// ══ EXTRACT HUMAN-READABLE CUSTOMIZATIONS & EXTRAS ══
+function getItemCustomizationsSummary(item) {
+  const result = [];
+  if (!item) return result;
+
+  // 1. Check item.extras array (saved during submit)
+  if (Array.isArray(item.extras) && item.extras.length > 0) {
+    item.extras.forEach(e => {
+      const name = typeof e === 'string' ? e : (e.name || e.label || e.id);
+      if (name) result.push(name);
+    });
+  } 
+  // 2. Check item.selections.extras_addons
+  else if (item.selections && item.selections.extras_addons) {
+    const rawIds = Array.isArray(item.selections.extras_addons)
+      ? item.selections.extras_addons
+      : [item.selections.extras_addons];
+    rawIds.forEach(oid => {
+      const opt = EXTRAS_CUSTOMIZATION_GROUP.options.find(o => o.id === oid);
+      result.push(opt ? opt.label : oid);
+    });
+  }
+
+  // 3. Check item.customizations array
+  if (Array.isArray(item.customizations) && item.customizations.length > 0) {
+    item.customizations.forEach(c => {
+      const label = c.option || c.name || (typeof c === 'string' ? c : '');
+      if (label) result.push(label);
+    });
+  } else if (item.selections) {
+    const prod = PRODUCTS.find(p => p.id === item.productId);
+    if (prod && Array.isArray(prod.customizations)) {
+      prod.customizations.forEach(g => {
+        if (g.id === 'extras_addons') return;
+        const sel = item.selections[g.id];
+        if (g.multiSelect && Array.isArray(sel)) {
+          sel.forEach(oid => {
+            const opt = (g.options || []).find(o => o.id === oid);
+            if (opt) result.push(opt.label);
+          });
+        } else if (!g.multiSelect && sel) {
+          const opt = (g.options || []).find(o => o.id === sel);
+          if (opt) result.push(opt.label);
+        }
+      });
+    }
+  }
+
+  return result;
+}
+
 // ══ SUBMIT TO CART ══
 function submitSheetToCart() {
   const p = APP_STATE.sheet.product;
   if (!p) return;
 
   // Validation
-  for (const group of (p.customizations || [])) {
+  const activeGroups = getActiveGroupsForProduct(p);
+  for (const group of activeGroups) {
     if (group.required) {
       const sel = APP_STATE.sheet.selections[group.id];
       if (group.multiSelect) {
@@ -1158,16 +2794,47 @@ function submitSheetToCart() {
     }
   }
 
+  // Collect structured extras and customizations for clear visibility everywhere
+  const selectedExtrasList = [];
+  const selectedCustomizations = [];
+
+  activeGroups.forEach(g => {
+    const sel = APP_STATE.sheet.selections[g.id];
+    if (g.multiSelect && Array.isArray(sel)) {
+      sel.forEach(oid => {
+        const opt = (g.options || []).find(o => o.id === oid);
+        if (opt) {
+          if (g.id === 'extras_addons') {
+            selectedExtrasList.push({ id: opt.id, name: opt.label, price: Number(opt.priceAdd) || 0 });
+          } else {
+            selectedCustomizations.push({ group: g.name, option: opt.label, price: Number(opt.priceAdd) || 0 });
+          }
+        }
+      });
+    } else if (!g.multiSelect && sel) {
+      const opt = (g.options || []).find(o => o.id === sel);
+      if (opt) {
+        selectedCustomizations.push({ group: g.name, option: opt.label, price: Number(opt.priceAdd) || 0 });
+      }
+    }
+  });
+
+  const uPrice = calculateUnitItemPrice();
+  const q = Number(APP_STATE.sheet.qty) || 1;
+  const itemTotal = calculateSheetTotal() || (uPrice * q);
+
   const cartItem = {
     productId: p.id,
     name: p.name,
     image: p.image,
-    basePrice: p.basePrice,
-    unitPrice: calculateUnitItemPrice(),
-    qty: APP_STATE.sheet.qty,
+    basePrice: Number(p.basePrice) || 0,
+    unitPrice: uPrice,
+    qty: q,
     selections: JSON.parse(JSON.stringify(APP_STATE.sheet.selections)),
-    note: APP_STATE.sheet.note,
-    total: calculateSheetTotal()
+    extras: selectedExtrasList,
+    customizations: selectedCustomizations,
+    note: (APP_STATE.sheet.note || '').trim(),
+    total: itemTotal
   };
 
   if (APP_STATE.sheet.editCartIndex >= 0) {
@@ -1192,8 +2859,9 @@ function updateCartItemQty(index, delta) {
   const item = APP_STATE.cart[index];
   if (!item) return;
 
-  item.qty = Math.max(1, Math.min(20, item.qty + delta));
-  item.total = item.unitPrice * item.qty;
+  item.qty = Math.max(1, Math.min(20, (Number(item.qty) || 1) + delta));
+  const uPrice = Number(item.unitPrice) || Number(item.basePrice) || 0;
+  item.total = uPrice * item.qty;
 
   saveToStorage();
   updateCartUI();
@@ -1209,10 +2877,17 @@ function removeCartItem(index) {
 }
 
 function getCartCalculations() {
-  const subtotal = APP_STATE.cart.reduce((sum, item) => sum + item.total, 0);
-  const service = Math.round(subtotal * CFG.serviceCharge);
+  let subtotal = 0;
+  let count = 0;
+  (APP_STATE.cart || []).forEach(item => {
+    const q = Number(item.qty) || 1;
+    const u = Number(item.unitPrice) || Number(item.basePrice) || 0;
+    const t = Number(item.total) || (u * q);
+    subtotal += t;
+    count += q;
+  });
+  const service = 0; // No service fee
   const total = subtotal + service;
-  const count = APP_STATE.cart.reduce((sum, item) => sum + item.qty, 0);
   return { subtotal, service, total, count };
 }
 
@@ -1244,23 +2919,36 @@ function updateCartUI() {
     }
   }
 
+  // Count active current orders vs completed orders
+  const activeOrdersCount = (APP_STATE.orderHistory || []).filter(o => {
+    const s = (o.status || '').toLowerCase();
+    return s !== 'completed' && s !== 'cancelled';
+  }).length;
+
+  const completedOrdersCount = (APP_STATE.orderHistory || []).filter(o => {
+    return (o.status || '').toLowerCase() === 'completed';
+  }).length;
+
   // Bottom Nav Orders Badge
   const bnavBadge = document.getElementById('bnav-orders-badge');
   if (bnavBadge) {
-    if (count > 0) {
+    if (activeOrdersCount > 0) {
       bnavBadge.style.display = 'flex';
-      bnavBadge.textContent = count;
+      bnavBadge.textContent = activeOrdersCount;
     } else {
       bnavBadge.style.display = 'none';
     }
   }
 
-  // Segment Tab Badge in Orders View
+  // Segment Tab Badges in Orders View
   const cartSegCount = document.getElementById('cart-seg-count');
   if (cartSegCount) cartSegCount.textContent = count;
 
+  const currentSegCount = document.getElementById('current-orders-seg-count');
+  if (currentSegCount) currentSegCount.textContent = activeOrdersCount;
+
   const histSegCount = document.getElementById('history-seg-count');
-  if (histSegCount) histSegCount.textContent = APP_STATE.orderHistory.length;
+  if (histSegCount) histSegCount.textContent = completedOrdersCount;
 }
 
 // ══ RENDER CART VIEW ══
@@ -1288,26 +2976,10 @@ function renderCart() {
 
   let itemsHtml = '';
   APP_STATE.cart.forEach((item, index) => {
-    const product = PRODUCTS.find(p => p.id === item.productId);
-    
-    let optionLabels = [];
-    if (product) {
-      (product.customizations || []).forEach(g => {
-        const sel = item.selections[g.id];
-        if (g.multiSelect && Array.isArray(sel) && sel.length > 0) {
-          sel.forEach(oid => {
-            const opt = (g.options || []).find(o => o.id === oid);
-            if (opt) optionLabels.push(opt.label);
-          });
-        } else if (!g.multiSelect && sel) {
-          const opt = (g.options || []).find(o => o.id === sel);
-          if (opt) optionLabels.push(opt.label);
-        }
-      });
-    }
-
-    const optionsStr = optionLabels.join(' • ');
+    const extrasList = getItemCustomizationsSummary(item);
+    const optionsStr = extrasList.join(' • ');
     const noteStr = item.note ? `<div class="cart-item-kitchen-note">“${escapeHtml(item.note)}”</div>` : '';
+    const itemTotal = Number(item.total) || ((Number(item.unitPrice) || Number(item.basePrice) || 0) * (Number(item.qty) || 1));
 
     itemsHtml += `
       <div class="cart-item-card">
@@ -1317,7 +2989,7 @@ function renderCart() {
           ${optionsStr ? `<div class="cart-item-options">${escapeHtml(optionsStr)}</div>` : ''}
           ${noteStr}
           <div class="cart-item-bottom">
-            <span class="cart-item-price">${formatMoney(item.total)}</span>
+            <span class="cart-item-price">${formatMoney(itemTotal)}</span>
             <div style="display: flex; align-items: center;">
               <div class="cart-qty-ctrl">
                 <button class="cart-qty-btn" onclick="updateCartItemQty(${index}, -1)" aria-label="Decrease quantity">
@@ -1345,7 +3017,6 @@ function renderCart() {
   if (summary) {
     summary.classList.remove('hidden');
     document.getElementById('sum-subtotal').textContent = formatMoney(subtotal);
-    document.getElementById('sum-service').textContent = formatMoney(service);
     document.getElementById('sum-total').textContent = formatMoney(total);
     document.getElementById('sum-ordertype-label').textContent = APP_STATE.orderType;
   }
@@ -1357,9 +3028,8 @@ function renderCart() {
   }
 }
 
-// ══ PLACE ORDER ══
 // ══ PLACE ORDER (CUSTOMER ORDER CREATION) ══
-function placeOrder() {
+async function placeOrder() {
   if (APP_STATE.cart.length === 0) {
     toast('Your cart is empty');
     return;
@@ -1381,8 +3051,8 @@ function placeOrder() {
     subtotal: subtotal,
     service: service,
     total: total,
-    status: 'received',         // 'received' -> 'preparing' -> 'ready' -> 'completed' -> 'cancelled'
-    statusLabel: 'Order Received',
+    status: 'orders',         // 'orders' (placed) -> 'cooking' -> 'ready' -> 'completed'
+    statusLabel: 'Order Placed',
     estimatedTime: CFG.estimatedTime
   };
 
@@ -1398,6 +3068,13 @@ function placeOrder() {
   updateCartUI();
   updateKitchenCounters();
 
+  // Persist directly to real database (database.json) via REST API
+  try {
+    await API.createOrder(newOrder);
+  } catch (e) {
+    console.warn('Order sync to database error:', e);
+  }
+
   // Play audio chime if enabled
   playKitchenChime('new_order');
 
@@ -1412,17 +3089,28 @@ function placeOrder() {
     } catch (e) {}
   }
 
-  // Switch to history tab to track preparation
+  // Switch to current orders tab to track preparation live
   toast(`Order #${orderId} placed! Live kitchen tracking started`, 3800);
-  switchOrdersTab('history');
+  switchOrdersTab('current');
 }
 
-// ══ RENDER ORDER HISTORY & LIVE 4-STEP TRACKER (CUSTOMER VIEW) ══
-function renderHistory() {
-  const wrap = document.getElementById('history-items-wrap');
+// ══ RENDER CURRENT ORDERS (PENDING CART + ACTIVE LIVE TRACKING) ══
+function renderCurrentOrders() {
+  const wrap = document.getElementById('current-orders-items-wrap');
+  const pendingSection = document.getElementById('pending-cart-section');
+
+  // Always update pending cart rendering
+  renderCart();
+
+  if (APP_STATE.cart.length > 0) {
+    if (pendingSection) pendingSection.style.display = 'block';
+  } else {
+    if (pendingSection) pendingSection.style.display = 'none';
+  }
+
   if (!wrap) return;
 
-  // Refresh customer orders from master orders to guarantee live sync
+  // Sync customer history with MASTER_ORDERS from DB
   if (MASTER_ORDERS.length > 0 && APP_STATE.orderHistory.length > 0) {
     APP_STATE.orderHistory = APP_STATE.orderHistory.map(ord => {
       const match = MASTER_ORDERS.find(m => m.id === ord.id);
@@ -1430,12 +3118,145 @@ function renderHistory() {
     });
   }
 
-  if (APP_STATE.orderHistory.length === 0) {
+  // Active in-progress orders (placed, cooking, ready)
+  const activeOrders = APP_STATE.orderHistory.filter(o => {
+    const s = (o.status || '').toLowerCase();
+    return s !== 'completed' && s !== 'cancelled';
+  });
+
+  const currentCountEl = document.getElementById('current-orders-seg-count');
+  if (currentCountEl) currentCountEl.textContent = activeOrders.length + (APP_STATE.cart.length > 0 ? 1 : 0);
+
+  if (activeOrders.length === 0) {
+    if (APP_STATE.cart.length === 0) {
+      wrap.innerHTML = `
+        <div class="empty-results" style="padding: 36px 16px;">
+          <div class="empty-icon">🍳</div>
+          <p class="empty-text">No active orders right now</p>
+          <p class="empty-sub">Add delicious flame-grilled items to your order and confirm checkout to begin live kitchen tracking.</p>
+          <button class="nav-pill-btn active" style="margin: 16px auto 0;" onclick="navigateTo('menu')">Browse menu &rarr;</button>
+        </div>
+      `;
+    } else {
+      wrap.innerHTML = '';
+    }
+    return;
+  }
+
+  let html = '';
+  activeOrders.forEach(ord => {
+    const rawStatus = (ord.status || 'orders').toLowerCase();
+    let stepNum = 1;
+    let statusLabel = 'Order Placed';
+    let statusPillClass = 'chip-orders';
+    let statusDesc = 'Order received by the kitchen queue.';
+
+    if (rawStatus === 'cooking' || rawStatus === 'preparing') {
+      stepNum = 2;
+      statusLabel = 'Cooking';
+      statusPillClass = 'chip-cooking';
+      statusDesc = 'Chef is grilling and assembling your order hot.';
+    } else if (rawStatus === 'ready') {
+      stepNum = 3;
+      statusLabel = 'Ready for Pickup';
+      statusPillClass = 'chip-ready';
+      statusDesc = 'Fresh off the grill! Hot and ready for you.';
+    }
+
+    let itemsHtml = '';
+    (ord.items || []).forEach(item => {
+      const extrasList = getItemCustomizationsSummary(item);
+      const extrasNote = extrasList.length > 0 
+        ? `<div class="kds-extras-wrap">${extrasList.map(e => `<span class="kds-extra-tag">✨ ${escapeHtml(e)}</span>`).join('')}</div>` 
+        : '';
+      const noteHtml = item.note ? `<div class="kds-note-tag">“${escapeHtml(item.note)}”</div>` : '';
+      const itemPrice = Number(item.total) || ((Number(item.unitPrice) || Number(item.basePrice) || 0) * (Number(item.qty) || 1));
+
+      itemsHtml += `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:8px 0; border-bottom:1px solid #F1F5F9; font-size:0.86rem;">
+          <div>
+            <strong>${item.qty}× ${escapeHtml(item.name)}</strong>
+            ${extrasNote}
+            ${noteHtml}
+          </div>
+          <span style="font-weight:700; color:#0F172A;">${formatMoney(itemPrice)}</span>
+        </div>
+      `;
+    });
+
+    const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
+
+    html += `
+      <div class="customer-tracking-card ${stepNum === 3 ? 'ready-alert' : ''}" style="margin-bottom:16px;">
+        <div class="track-card-head">
+          <div>
+            <span class="track-order-id">#${ord.id}</span>
+            <div style="font-size:0.75rem; color:#64748B; margin-top:2px;">
+              ${escapeHtml(ord.orderType || 'Dine-in')} • ${ord.timestamp || ''}
+            </div>
+          </div>
+          <span class="status-chip ${statusPillClass}">${statusLabel}</span>
+        </div>
+
+        <!-- 3-Step Stepper (Orders -> Cooking -> Ready) -->
+        <div class="track-stepper-3">
+          <div class="track-step-item ${stepNum >= 1 ? (stepNum === 1 ? 'active' : 'completed') : ''}">
+            <div class="track-step-circle">${stepNum > 1 ? '✓' : '1'}</div>
+            <div class="track-step-text">Orders</div>
+          </div>
+          <div class="track-step-item ${stepNum >= 2 ? (stepNum === 2 ? 'active' : 'completed') : ''}">
+            <div class="track-step-circle">${stepNum > 2 ? '✓' : '2'}</div>
+            <div class="track-step-text">Cooking</div>
+          </div>
+          <div class="track-step-item ${stepNum >= 3 ? 'active completed' : ''}">
+            <div class="track-step-circle">${stepNum === 3 ? '✓' : '3'}</div>
+            <div class="track-step-text">Ready</div>
+          </div>
+        </div>
+
+        <div style="font-size:0.8rem; color:#475569; margin:10px 0 8px;">
+          ${statusDesc}
+        </div>
+
+        <div style="margin:8px 0;">
+          ${itemsHtml}
+        </div>
+
+        <div style="font-size:0.94rem; color:#0F172A; font-weight:700; padding:10px 0 2px; display:flex; justify-content:space-between; border-top:1.5px dashed #E2E8F0;">
+          <span>Total Amount</span>
+          <span style="color:#B45309; font-size:1.05rem;">${formatMoney(ordTotal)}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  wrap.innerHTML = html;
+}
+
+// ══ RENDER ORDER HISTORY (COMPLETED ORDERS ONLY) ══
+function renderHistory() {
+  const wrap = document.getElementById('history-items-wrap');
+  if (!wrap) return;
+
+  if (MASTER_ORDERS.length > 0 && APP_STATE.orderHistory.length > 0) {
+    APP_STATE.orderHistory = APP_STATE.orderHistory.map(ord => {
+      const match = MASTER_ORDERS.find(m => m.id === ord.id);
+      return match ? match : ord;
+    });
+  }
+
+  // Filter ONLY completed orders
+  const completedList = APP_STATE.orderHistory.filter(o => (o.status || '').toLowerCase() === 'completed');
+
+  const histCountEl = document.getElementById('history-seg-count');
+  if (histCountEl) histCountEl.textContent = completedList.length;
+
+  if (completedList.length === 0) {
     wrap.innerHTML = `
-      <div class="empty-results">
-        <div class="empty-icon">📋</div>
-        <p class="empty-text">No orders yet</p>
-        <p class="empty-sub">Once you place an order, you can track live flame-grilling progress and view your receipt here.</p>
+      <div class="empty-results" style="padding: 36px 16px;">
+        <div class="empty-icon">📜</div>
+        <p class="empty-text">No completed orders yet</p>
+        <p class="empty-sub">Once your meals finish grilling and are marked completed by the kitchen, they will appear here in your order history.</p>
         <button class="nav-pill-btn active" style="margin: 16px auto 0;" onclick="navigateTo('menu')">Browse menu &rarr;</button>
       </div>
     `;
@@ -1443,120 +3264,47 @@ function renderHistory() {
   }
 
   let html = '';
-  APP_STATE.orderHistory.forEach(ord => {
-    const itemsSummary = (ord.items || [])
-      .map(i => `${i.qty}× ${escapeHtml(i.name)}`)
-      .join(', ');
+  completedList.forEach(ord => {
+    let itemsHtml = '';
+    (ord.items || []).forEach(item => {
+      const extrasList = getItemCustomizationsSummary(item);
+      const extrasNote = extrasList.length > 0 
+        ? `<div class="kds-extras-wrap">${extrasList.map(e => `<span class="kds-extra-tag">✨ ${escapeHtml(e)}</span>`).join('')}</div>` 
+        : '';
+      const itemPrice = Number(item.total) || ((Number(item.unitPrice) || Number(item.basePrice) || 0) * (Number(item.qty) || 1));
 
-    // Determine status stage & progress percentage
-    const status = ord.status || 'received';
-    let progressPct = 15;
-    let step1Class = 'completed';
-    let step2Class = '';
-    let step3Class = '';
-    let step4Class = '';
-    let statusPillClass = 'chip-received';
-    let statusTitle = 'Order Received';
-    let statusDesc = 'Ticket confirmed by kitchen system. Waiting for grill master.';
+      itemsHtml += `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:6px 0; border-bottom:1px solid #F1F5F9; font-size:0.86rem;">
+          <div>
+            <strong>${item.qty}× ${escapeHtml(item.name)}</strong>
+            ${extrasNote}
+          </div>
+          <span style="color:#64748B;">${formatMoney(itemPrice)}</span>
+        </div>
+      `;
+    });
 
-    if (status === 'received') {
-      progressPct = 15;
-      step1Class = 'active';
-      statusPillClass = 'chip-received';
-      statusTitle = 'Order Received';
-      statusDesc = 'Your order is queued in the kitchen. Flame grill is prepping!';
-    } else if (status === 'preparing') {
-      progressPct = 50;
-      step1Class = 'completed';
-      step2Class = 'active';
-      statusPillClass = 'chip-preparing';
-      statusTitle = 'Grilling & Cooking';
-      statusDesc = 'Chef is grilling your patties hot and assembling toppings.';
-    } else if (status === 'ready') {
-      progressPct = 85;
-      step1Class = 'completed';
-      step2Class = 'completed';
-      step3Class = 'active';
-      statusPillClass = 'chip-ready';
-      statusTitle = 'Ready for Pickup / Serving';
-      statusDesc = 'Fresh off the grill! Please collect at the counter or your table.';
-    } else if (status === 'completed') {
-      progressPct = 100;
-      step1Class = 'completed';
-      step2Class = 'completed';
-      step3Class = 'completed';
-      step4Class = 'completed';
-      statusPillClass = 'chip-completed';
-      statusTitle = 'Completed';
-      statusDesc = 'Order delivered. Thank you for dining with Alemaya Grill\'d!';
-    } else if (status === 'cancelled') {
-      statusPillClass = 'chip-cancelled';
-      statusTitle = 'Order Cancelled';
-      statusDesc = 'This order was cancelled by staff or management.';
-    }
-
-    const isReady = status === 'ready';
+    const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(item => item.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
 
     html += `
-      <div class="customer-tracking-card ${isReady ? 'ready-alert' : ''}">
+      <div class="customer-tracking-card" style="margin-bottom:16px;">
         <div class="track-card-head">
           <div>
             <span class="track-order-id">#${ord.id}</span>
-            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
-              ${escapeHtml(ord.orderType)} • Ordered at ${ord.timestamp}
+            <div style="font-size:0.75rem; color:#64748B; margin-top:2px;">
+              ${escapeHtml(ord.orderType || 'Dine-in')} • ${ord.date || ''} ${ord.timestamp || ''}
             </div>
           </div>
-          <span class="status-chip ${statusPillClass}">${escapeHtml(statusTitle)}</span>
+          <span class="status-chip chip-completed">Completed ✓</span>
         </div>
 
-        ${status !== 'cancelled' ? `
-          <!-- 4-Step Stepper -->
-          <div class="track-stepper-wrap">
-            <div class="track-stepper-line">
-              <div class="track-stepper-line-progress" style="width: ${progressPct}%"></div>
-            </div>
+        <div style="margin:10px 0 6px;">
+          ${itemsHtml}
+        </div>
 
-            <!-- Step 1 -->
-            <div class="track-step-node ${step1Class}">
-              <div class="step-circle">1</div>
-              <span class="step-label">Received</span>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="track-step-node ${step2Class}">
-              <div class="step-circle">2</div>
-              <span class="step-label">Grilling</span>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="track-step-node ${step3Class}">
-              <div class="step-circle">3</div>
-              <span class="step-label">Ready</span>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="track-step-node ${step4Class}">
-              <div class="step-circle">4</div>
-              <span class="step-label">Served</span>
-            </div>
-          </div>
-
-          <div style="background:var(--bg-subtle); border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:0.8rem; color:var(--text-dark); display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.1rem;">${isReady ? '🛎️' : '⏱️'}</span>
-            <div><strong>${statusTitle}:</strong> ${statusDesc}</div>
-          </div>
-        ` : `
-          <div style="background:#FEE2E2; color:#991B1B; padding:10px 14px; border-radius:8px; font-size:0.82rem; margin:10px 0;">
-            This order was cancelled.
-          </div>
-        `}
-
-        <div class="track-receipt-summary">
-          <div class="track-items-summary">${itemsSummary}</div>
-          <div class="track-receipt-foot">
-            <span>Bill Total:</span>
-            <span style="font-size:1rem; color:var(--brand-terracotta);">${formatMoney(ord.total)}</span>
-          </div>
+        <div style="font-size:0.92rem; color:#0F172A; font-weight:700; padding:8px 0 2px; display:flex; justify-content:space-between; border-top:1.5px dashed #E2E8F0;">
+          <span>Total Paid</span>
+          <span style="color:#15803D; font-size:1.02rem;">${formatMoney(ordTotal)}</span>
         </div>
       </div>
     `;
@@ -1568,6 +3316,10 @@ function renderHistory() {
 // ══ PORTAL SWITCHER & NAVIGATION (CUSTOMER, CHEF, ADMIN) ══
 function switchPortal(portal) {
   APP_STATE.portal = portal;
+  const customerTopNav = document.getElementById('customer-top-nav');
+  if (customerTopNav) {
+    customerTopNav.style.display = (portal === 'customer') ? 'block' : 'none';
+  }
 
   const appEl = document.getElementById('app');
   if (appEl) {
@@ -1575,32 +3327,33 @@ function switchPortal(portal) {
     appEl.classList.add(`portal-${portal}`);
   }
 
-  // Update top portal switcher pills
-  document.querySelectorAll('.portal-btn').forEach(btn => btn.classList.remove('active'));
-  const activePill = document.getElementById(`pbtn-${portal}`);
-  if (activePill) activePill.classList.add('active');
-
-  // Update bottom nav
-  document.querySelectorAll('.bnav-btn').forEach(btn => btn.classList.remove('active'));
+  const bottomNav = document.getElementById('bottom-nav');
+  const floatBar = document.getElementById('floating-cart-bar');
 
   // Toggle views
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
 
   if (portal === 'customer') {
+    if (bottomNav) bottomNav.style.display = 'flex';
     navigateTo(APP_STATE.currentTab === 'orders' ? 'orders' : 'menu');
-  } else if (portal === 'chef') {
+  } else if (portal === 'chef' || portal === 'kitchen') {
+    if (bottomNav) bottomNav.style.display = 'none';
+    if (floatBar) floatBar.classList.add('hidden');
     const chefView = document.getElementById('view-chef');
     if (chefView) chefView.classList.add('active');
-    document.getElementById('bnav-chef')?.classList.add('active');
     renderKdsTickets();
-    window.location.hash = 'chef';
+    if (window.location.hash !== '#kitchen' && window.location.hash !== '#chef') {
+      history.replaceState(null, '', '#kitchen');
+    }
   } else if (portal === 'admin') {
+    if (bottomNav) bottomNav.style.display = 'none';
+    if (floatBar) floatBar.classList.add('hidden');
     const adminView = document.getElementById('view-admin');
     if (adminView) adminView.classList.add('active');
-    document.getElementById('bnav-admin')?.classList.add('active');
-    renderAdminDashboard();
-    renderAdminStock();
-    window.location.hash = 'admin';
+    switchAdminSubTab(APP_STATE.adminSubTab || 'overview');
+    if (window.location.hash !== '#admin') {
+      history.replaceState(null, '', '#admin');
+    }
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1618,152 +3371,102 @@ function renderKdsTickets() {
   let filtered = [];
 
   if (filter === 'active') {
-    filtered = MASTER_ORDERS.filter(o => o.status === 'received' || o.status === 'preparing' || o.status === 'ready');
-  } else if (filter === 'received') {
-    filtered = MASTER_ORDERS.filter(o => o.status === 'received');
-  } else if (filter === 'preparing') {
-    filtered = MASTER_ORDERS.filter(o => o.status === 'preparing');
+    filtered = MASTER_ORDERS.filter(o => {
+      const s = (o.status || '').toLowerCase();
+      return s === 'orders' || s === 'received' || s === 'cooking' || s === 'preparing' || s === 'ready';
+    });
+  } else if (filter === 'orders') {
+    filtered = MASTER_ORDERS.filter(o => {
+      const s = (o.status || '').toLowerCase();
+      return s === 'orders' || s === 'received';
+    });
+  } else if (filter === 'cooking') {
+    filtered = MASTER_ORDERS.filter(o => {
+      const s = (o.status || '').toLowerCase();
+      return s === 'cooking' || s === 'preparing';
+    });
   } else if (filter === 'ready') {
-    filtered = MASTER_ORDERS.filter(o => o.status === 'ready');
-  } else if (filter === 'completed') {
-    // Orders completed today
-    const todayStr = new Date().toISOString().split('T')[0];
-    filtered = MASTER_ORDERS.filter(o => o.status === 'completed' && o.date === todayStr);
+    filtered = MASTER_ORDERS.filter(o => (o.status || '').toLowerCase() === 'ready');
   }
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: var(--bg-card); border: 1.5px dashed var(--border-card); border-radius: var(--radius-lg);">
-        <div style="font-size: 2.8rem; margin-bottom: 10px;">🍳</div>
-        <h3 style="font-family: var(--font-serif); font-size: 1.35rem; color: var(--text-dark); margin-bottom: 6px;">
-          ${filter === 'completed' ? 'No orders completed today yet' : 'No active orders in this kitchen queue'}
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 16px;">
+        <div style="font-size: 2.5rem; margin-bottom: 8px;">🍳</div>
+        <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: #0F172A; margin-bottom: 4px;">
+          No active orders in this queue
         </h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 400px; margin: 0 auto 18px;">
-          Orders placed by customers will chime and appear here with complete recipe specifications and customization options.
+        <p style="font-size: 0.82rem; color: #64748B; max-width: 360px; margin: 0 auto;">
+          Orders placed by customers will chime and appear here in real-time.
         </p>
-        <button class="kds-tool-btn primary" style="margin: 0 auto;" onclick="generateSimulatedOrder()">
-          <i data-lucide="plus-circle"></i>
-          <span>Send Test Order to Kitchen</span>
-        </button>
       </div>
     `;
-    refreshLucideIcons();
     return;
   }
 
-  const nowMs = Date.now();
   let html = '';
-
   filtered.forEach(ord => {
-    const elapsedMinutes = Math.max(0, Math.floor((nowMs - (ord.createdAt || nowMs)) / 60000));
-    
-    // Urgency coloring based on ticket age
-    let urgencyClass = 'elapsed-normal';
-    let urgencyIcon = 'clock';
-    if (elapsedMinutes >= 12) {
-      urgencyClass = 'elapsed-urgent';
-      urgencyIcon = 'alert-triangle';
-    } else if (elapsedMinutes >= 6) {
-      urgencyClass = 'elapsed-warning';
+    const rawStatus = (ord.status || 'orders').toLowerCase();
+    let normStatus = 'orders';
+    let statusLabel = 'Order Placed';
+    let nextActionBtn = '';
+
+    if (rawStatus === 'cooking' || rawStatus === 'preparing') {
+      normStatus = 'cooking';
+      statusLabel = 'Cooking';
+      nextActionBtn = `<button class="kds-action-btn btn-ready" onclick="kdsSetStatus('${ord.id}', 'ready')">Mark Ready 🛎️</button>`;
+    } else if (rawStatus === 'ready') {
+      normStatus = 'ready';
+      statusLabel = 'Ready for Pickup';
+      nextActionBtn = `<button class="kds-action-btn btn-complete" onclick="kdsSetStatus('${ord.id}', 'completed')">Complete Order ✓</button>`;
+    } else if (rawStatus === 'completed') {
+      normStatus = 'completed';
+      statusLabel = 'Completed';
+      nextActionBtn = `<span class="kds-status-done">Completed ✓</span>`;
+    } else {
+      normStatus = 'orders';
+      statusLabel = 'Order Placed';
+      nextActionBtn = `<button class="kds-action-btn btn-cook" onclick="kdsSetStatus('${ord.id}', 'cooking')">Start Cooking 🔥</button>`;
     }
 
-    const typeBadgeClass = (ord.orderType === 'Takeaway') ? 'type-takeaway' : 'type-dinein';
-    const statusClass = `status-${ord.status || 'received'}`;
-
-    // Items list markup
     let itemsHtml = '';
     (ord.items || []).forEach(item => {
-      let optionLabels = [];
-      const product = PRODUCTS.find(p => p.id === item.productId);
-      if (product && item.selections) {
-        (product.customizations || []).forEach(g => {
-          const sel = item.selections[g.id];
-          if (g.multiSelect && Array.isArray(sel)) {
-            sel.forEach(oid => {
-              const opt = (g.options || []).find(o => o.id === oid);
-              if (opt) optionLabels.push(opt.label);
-            });
-          } else if (!g.multiSelect && sel) {
-            const opt = (g.options || []).find(o => o.id === sel);
-            if (opt) optionLabels.push(opt.label);
-          }
-        });
+      const extrasList = getItemCustomizationsSummary(item);
+      let extrasHtml = '';
+      if (extrasList.length > 0) {
+        extrasHtml = `
+          <div class="kds-extras-wrap">
+            ${extrasList.map(e => `<span class="kds-extra-tag">✨ ${escapeHtml(e)}</span>`).join('')}
+          </div>
+        `;
       }
-
-      const optionsStr = optionLabels.join(' • ');
-      const noteStr = item.note ? `<div class="ticket-item-note">“${escapeHtml(item.note)}”</div>` : '';
-
       itemsHtml += `
-        <div class="ticket-item-row">
-          <span class="ticket-item-qty">${item.qty}×</span>
-          <div class="ticket-item-details">
-            <div class="ticket-item-name">${escapeHtml(item.name)}</div>
-            ${optionsStr ? `<div class="ticket-item-options">${escapeHtml(optionsStr)}</div>` : ''}
-            ${noteStr}
+        <div class="kds-item-row" style="margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #F1F5F9;">
+          <div>
+            <span class="kds-item-qty">${item.qty}×</span>
+            <strong style="font-size:0.92rem; color:#0F172A;">${escapeHtml(item.name)}</strong>
+            ${extrasHtml}
+            ${item.note ? `<div class="kds-note-tag">📝 “${escapeHtml(item.note)}”</div>` : ''}
           </div>
         </div>
       `;
     });
 
-    // Primary action button based on current ticket state
-    let actionBtnHtml = '';
-    if (ord.status === 'received') {
-      actionBtnHtml = `
-        <button class="ticket-btn-primary btn-kds-cook" onclick="kdsSetStatus('${ord.id}', 'preparing')">
-          <span>🔥 Start Cooking / Grilling</span>
-        </button>
-      `;
-    } else if (ord.status === 'preparing') {
-      actionBtnHtml = `
-        <button class="ticket-btn-primary btn-kds-ready" onclick="kdsSetStatus('${ord.id}', 'ready')">
-          <span>🛎️ Mark Ready for Pickup</span>
-        </button>
-      `;
-    } else if (ord.status === 'ready') {
-      actionBtnHtml = `
-        <button class="ticket-btn-primary btn-kds-complete" onclick="kdsSetStatus('${ord.id}', 'completed')">
-          <span>✅ Mark Completed / Served</span>
-        </button>
-      `;
-    } else {
-      actionBtnHtml = `
-        <div style="text-align:center; font-size:0.8rem; font-weight:700; color:#10B981; padding:6px;">
-          ✓ Completed
-        </div>
-      `;
-    }
+    const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
 
     html += `
-      <div class="kds-ticket-card ${statusClass}">
-        <!-- Urgency & ID Strip -->
-        <div class="ticket-urgency-strip">
-          <span class="ticket-id-tag">#${ord.id}</span>
-          <span class="ticket-elapsed ${urgencyClass}">
-            <i data-lucide="${urgencyIcon}" style="width:12px; height:12px;"></i>
-            <span>${elapsedMinutes}m ago</span>
-          </span>
+      <div class="kds-ticket-card">
+        <div class="kds-ticket-header status-${normStatus}">
+          <span>#${ord.id} • ${ord.orderType || 'Dine-in'}</span>
+          <span>${statusLabel}</span>
         </div>
-
-        <!-- Meta Strip -->
-        <div class="ticket-header-meta">
-          <span class="ticket-ordertype-badge ${typeBadgeClass}">${escapeHtml(ord.orderType)}</span>
-          <span>Time: ${ord.timestamp}</span>
-        </div>
-
-        <!-- Items Spec -->
-        <div class="ticket-items-list">
+        <div class="kds-ticket-body">
+          <div style="font-size:0.74rem; color:#64748B; margin-bottom:8px;">Placed at ${ord.timestamp}</div>
           ${itemsHtml}
         </div>
-
-        <!-- Ticket Footer & Action Button -->
-        <div class="ticket-card-footer">
-          ${actionBtnHtml}
-          <div class="ticket-secondary-actions">
-            <span class="ticket-subtotal-val">${formatMoney(ord.total)}</span>
-            ${ord.status !== 'completed' && ord.status !== 'cancelled' ? `
-              <button class="ticket-btn-cancel" onclick="kdsCancelOrder('${ord.id}')">Void / Cancel</button>
-            ` : ''}
-          </div>
+        <div class="kds-ticket-footer">
+          <span style="font-weight:700; color:#0F172A; font-size:0.95rem;">${formatMoney(ordTotal)}</span>
+          ${nextActionBtn}
         </div>
       </div>
     `;
@@ -1785,24 +3488,41 @@ function kdsSetStatus(orderId, newStatus) {
   if (!ord) return;
 
   ord.status = newStatus;
-  if (newStatus === 'completed') ord.completedAt = Date.now();
+  let label = 'Order Placed';
+  if (newStatus === 'cooking') label = 'Cooking';
+  if (newStatus === 'ready') label = 'Ready';
+  if (newStatus === 'completed') {
+    label = 'Completed';
+    ord.completedAt = Date.now();
+  }
+  ord.statusLabel = label;
+
+  // Also update customer orderHistory if matching
+  const custOrd = (APP_STATE.orderHistory || []).find(o => o.id === orderId);
+  if (custOrd) {
+    custOrd.status = newStatus;
+    custOrd.statusLabel = label;
+    if (newStatus === 'completed') custOrd.completedAt = Date.now();
+  }
 
   saveToStorage();
   updateKitchenCounters();
   renderKdsTickets();
-
-  // If customer is on tracking view, update it too
+  renderCurrentOrders();
   renderHistory();
 
-  // Play audio chime
+  // Persist directly to real database (database.json) via REST API
+  API.updateOrderStatus(orderId, newStatus, label).catch(e => console.warn('Status update API error:', e));
+
+  // Audio chimes
   if (newStatus === 'ready') {
     playKitchenChime('ready');
-    toast(`Order #${orderId} marked READY!`, 3000);
-  } else if (newStatus === 'preparing') {
+    toast(`Order #${orderId} marked READY for pickup!`, 3000);
+  } else if (newStatus === 'cooking') {
     playKitchenChime('new_order');
-    toast(`Order #${orderId} grilling started`, 2000);
-  } else {
-    toast(`Order #${orderId} marked completed`, 2000);
+    toast(`Order #${orderId} grilling started 🔥`, 2000);
+  } else if (newStatus === 'completed') {
+    toast(`Order #${orderId} marked completed ✓`, 2000);
   }
 
   // Broadcast to other tabs
@@ -1826,6 +3546,10 @@ function kdsCancelOrder(orderId) {
   saveToStorage();
   updateKitchenCounters();
   renderKdsTickets();
+
+  // Persist to real database
+  API.updateOrderStatus(orderId, 'cancelled').catch(e => console.warn('Cancel order API error:', e));
+
   renderHistory();
   toast(`Order #${orderId} cancelled`);
 
@@ -1989,14 +3713,12 @@ function renderAdminDashboard() {
   const kpiRevSub = document.getElementById('kpi-revenue-sub');
   const kpiOrders = document.getElementById('kpi-orders-count');
   const kpiOrdersSub = document.getElementById('kpi-orders-sub');
-  const kpiAov = document.getElementById('kpi-aov');
   const kpiKitchen = document.getElementById('kpi-kitchen-active');
 
   if (kpiRev) kpiRev.textContent = formatMoney(totalRevenue);
   if (kpiRevSub) kpiRevSub.textContent = `Lifetime: ${formatMoney(lifetimeRevenue)}`;
   if (kpiOrders) kpiOrders.textContent = totalOrders;
   if (kpiOrdersSub) kpiOrdersSub.textContent = `Lifetime: ${MASTER_ORDERS.length} orders`;
-  if (kpiAov) kpiAov.textContent = formatMoney(aov);
   if (kpiKitchen) kpiKitchen.textContent = activeKitchen;
 
   // Render 7-Day Revenue Trend Chart
@@ -2010,6 +3732,7 @@ function renderAdminDashboard() {
 
   // Render Orders Ledger Table
   renderAdminOrdersTable(filtered);
+  refreshLucideIcons();
 }
 
 function renderAdminRevenueBars() {
@@ -2259,18 +3982,26 @@ function toggleItemStock(productId) {
     ? APP_STATE.stockStatus[productId]
     : true;
 
-  APP_STATE.stockStatus[productId] = !current;
+  const newState = !current;
+  APP_STATE.stockStatus[productId] = newState;
   saveToStorage();
-  renderAdminStock();
+
+  // Sync directly to real database
+  API.patchProductStock(productId, newState).catch(e => console.warn('Stock sync error:', e));
+
+  // Update in-memory PRODUCTS array
+  const prod = PRODUCTS.find(p => p.id === productId);
+  if (prod) prod.available = newState;
+
+  renderAdminItemsCrud();
   renderMenu();
 
-  const prod = PRODUCTS.find(p => p.id === productId);
   const name = prod ? prod.name : 'Item';
-  toast(`${name} is now ${APP_STATE.stockStatus[productId] ? 'Available' : 'Sold Out (86\'d)'}`);
+  toast(`${name} is now ${newState ? 'Available' : 'Sold Out (86\'d)'}`);
 
   if (SYNC_CHANNEL) {
     try {
-      SYNC_CHANNEL.postMessage({ type: 'STOCK_UPDATE', productId, inStock: APP_STATE.stockStatus[productId] });
+      SYNC_CHANNEL.postMessage({ type: 'STOCK_UPDATE', productId, inStock: newState });
     } catch (e) {}
   }
 }
@@ -2315,56 +4046,65 @@ function openOrderModal(orderId) {
   const content = document.getElementById('order-modal-content');
   if (!modal || !content) return;
 
+  const rawStatus = (ord.status || 'orders').toLowerCase();
+  let normStatus = 'orders';
+  let statusLabel = 'Order Placed';
+  if (rawStatus === 'cooking' || rawStatus === 'preparing') {
+    normStatus = 'cooking';
+    statusLabel = 'Cooking';
+  } else if (rawStatus === 'ready') {
+    normStatus = 'ready';
+    statusLabel = 'Ready';
+  } else if (rawStatus === 'completed') {
+    normStatus = 'completed';
+    statusLabel = 'Completed';
+  }
+
   let itemsHtml = '';
   (ord.items || []).forEach(item => {
+    const extrasList = getItemCustomizationsSummary(item);
+    let extraText = '';
+    if (extrasList.length > 0) {
+      extraText = `<div style="font-size:0.75rem; color:#B45309; font-weight:600; margin-top:2px;">+ ${extrasList.join(', ')}</div>`;
+    }
+    const itemTotal = Number(item.total) || ((Number(item.unitPrice) || Number(item.basePrice) || 0) * (Number(item.qty) || 1));
     itemsHtml += `
-      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.06); font-size:0.86rem;">
+      <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F1F5F9; font-size:0.86rem;">
         <div>
           <strong>${item.qty}× ${escapeHtml(item.name)}</strong>
+          ${extraText}
           ${item.note ? `<div style="font-size:0.75rem; color:#854D0E;">“${escapeHtml(item.note)}”</div>` : ''}
         </div>
-        <span>${formatMoney(item.total)}</span>
+        <span style="font-weight:600; color:#0F172A;">${formatMoney(itemTotal)}</span>
       </div>
     `;
   });
 
+  const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
+
   content.innerHTML = `
     <div style="margin-bottom:14px;">
-      <span class="status-chip chip-${ord.status}">${escapeHtml(ord.status)}</span>
-      <h2 style="font-family:var(--font-serif); font-size:1.5rem; margin-top:8px;">Order #${ord.id}</h2>
-      <div style="font-size:0.82rem; color:var(--text-muted);">${ord.orderType} • Placed on ${ord.date} at ${ord.timestamp}</div>
+      <span class="status-chip chip-${normStatus}">${statusLabel}</span>
+      <h2 style="font-family:var(--font-serif); font-size:1.45rem; margin-top:8px; color:#0F172A;">Order #${ord.id}</h2>
+      <div style="font-size:0.82rem; color:#64748B;">${ord.orderType || 'Dine-in'} • ${ord.date} at ${ord.timestamp}</div>
     </div>
 
     <div style="margin:14px 0;">
-      <h4 style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:8px;">ITEMS BREAKDOWN</h4>
+      <h4 style="font-size:0.82rem; font-weight:700; color:#64748B; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Items Breakdown</h4>
       ${itemsHtml}
     </div>
 
-    <div style="background:var(--bg-subtle); padding:12px; border-radius:8px; margin:14px 0; font-size:0.85rem;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-        <span>Subtotal</span>
-        <span>${formatMoney(ord.subtotal)}</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-        <span>Service Charge (10%)</span>
-        <span>${formatMoney(ord.service)}</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1rem; border-top:1px solid var(--border-warm); padding-top:6px; margin-top:6px;">
-        <span>Total</span>
-        <span style="color:var(--brand-terracotta);">${formatMoney(ord.total)}</span>
+    <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:12px; border-radius:10px; margin:14px 0; font-size:0.88rem;">
+      <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem;">
+        <span>Total Amount</span>
+        <span style="color:#B45309;">${formatMoney(ordTotal)}</span>
       </div>
     </div>
 
-    <!-- Quick Status Changer from Admin Modal -->
-    <div style="margin-top:18px;">
-      <label style="display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">UPDATE ORDER STATUS</label>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn-table-action" onclick="kdsSetStatus('${ord.id}', 'received'); closeOrderModal(); renderAdminDashboard();">Received</button>
-        <button class="btn-table-action" onclick="kdsSetStatus('${ord.id}', 'preparing'); closeOrderModal(); renderAdminDashboard();">Grilling</button>
-        <button class="btn-table-action" onclick="kdsSetStatus('${ord.id}', 'ready'); closeOrderModal(); renderAdminDashboard();">Ready</button>
-        <button class="btn-table-action" onclick="kdsSetStatus('${ord.id}', 'completed'); closeOrderModal(); renderAdminDashboard();">Completed</button>
-        <button class="btn-table-action" style="color:#DC2626;" onclick="kdsCancelOrder('${ord.id}'); closeOrderModal(); renderAdminDashboard();">Cancel</button>
-      </div>
+    <!-- Read-Only Kitchen Status Display (Updates Managed by Kitchen) -->
+    <div style="margin-top:16px; padding:10px 14px; background:#F8FAFC; border-radius:10px; border:1px solid #E2E8F0; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:0.8rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em;">Current Kitchen Status</span>
+      <span class="status-chip chip-${normStatus}">${statusLabel}</span>
     </div>
   `;
 
@@ -2623,3 +4363,799 @@ function toast(msg, duration = 2400) {
   setTimeout(() => t.classList.remove('show'), duration);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ADMIN SUB-NAVIGATION & CRUD SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+// ── Admin Sub-Tab Switcher ──
+function switchAdminSubTab(subTab) {
+  APP_STATE.adminSubTab = subTab;
+
+  // Update tab buttons
+  document.querySelectorAll('.admin-subtab').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`asub-${subTab}`)?.classList.add('active');
+
+  // Update sub-pane visibility
+  document.querySelectorAll('.admin-subpane').forEach(p => p.classList.remove('active'));
+  document.getElementById(`admin-pane-${subTab}`)?.classList.add('active');
+
+  // Render corresponding content
+  if (subTab === 'overview') {
+    renderAdminDashboard();
+  } else if (subTab === 'items') {
+    populateAdminCategoryDropdowns();
+    renderAdminItemsCrud();
+  } else if (subTab === 'categories') {
+    renderAdminCatsCrud();
+  } else if (subTab === 'extras') {
+    renderAdminExtrasCrud();
+  } else if (subTab === 'orders') {
+    renderAdminOrdersSubpane();
+  }
+
+  refreshLucideIcons();
+}
+
+// ── Render Items CRUD List ──
+function renderAdminItemsCrud() {
+  const container = document.getElementById('admin-items-crud-list');
+  const totalCount = document.getElementById('admin-items-total-count');
+  if (!container) return;
+
+  const q = (document.getElementById('admin-crud-item-search')?.value || '').trim().toLowerCase();
+  const catFilter = document.getElementById('admin-crud-cat-filter')?.value || 'all';
+
+  let items = PRODUCTS.filter(p => {
+    const matchQ = !q || p.name.toLowerCase().includes(q) || (p.categoryId || '').toLowerCase().includes(q);
+    const matchCat = catFilter === 'all' || p.categoryId === catFilter;
+    return matchQ && matchCat;
+  });
+
+  if (totalCount) totalCount.textContent = PRODUCTS.length;
+
+  if (items.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+        <div style="font-size:2rem;margin-bottom:10px;">🍽️</div>
+        <p style="font-size:0.85rem;">No items found. Add your first dish!</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  items.forEach(p => {
+    const isAvail = (APP_STATE.stockStatus && APP_STATE.stockStatus[p.id] !== undefined)
+      ? APP_STATE.stockStatus[p.id]
+      : (p.available !== false);
+
+    const cat = CATEGORIES.find(c => c.id === p.categoryId);
+    const catName = cat ? cat.name : p.categoryId;
+
+    html += `
+      <div class="admin-item-crud-card">
+        <div class="admin-item-crud-top">
+          <img src="${p.image || 'logo.png'}" alt="${escapeHtml(p.name)}" class="crud-item-thumb" onerror="this.src='logo.png'">
+          <div class="crud-item-meta">
+            <div class="crud-item-title">${escapeHtml(p.name)}</div>
+            <div class="crud-item-sub">${escapeHtml(catName)} ${p.badge ? '• <strong>' + escapeHtml(p.badge) + '</strong>' : ''}</div>
+            <div class="crud-item-price">${formatMoney(p.basePrice)}</div>
+          </div>
+        </div>
+        <div class="admin-item-crud-actions">
+          <button class="crud-stock-pill ${isAvail ? 'stock-active' : 'stock-inactive'}" onclick="toggleItemStock('${p.id}')">
+            ${isAvail ? '✓ In Stock' : '✕ 86\'d / Out'}
+          </button>
+          <div class="crud-btn-group">
+            <button class="btn-edit-action" onclick="openEditItemModal('${p.id}')">✏️ Edit</button>
+            <button class="btn-delete-action" onclick="handleDeleteItem('${p.id}')">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Render Categories CRUD List ──
+function renderAdminCatsCrud() {
+  const container = document.getElementById('admin-cats-crud-list');
+  const totalCount = document.getElementById('admin-cats-total-count');
+  if (!container) return;
+
+  if (totalCount) totalCount.textContent = CATEGORIES.length;
+
+  if (CATEGORIES.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+        <p style="font-size:0.85rem;">No categories yet. Add your first category!</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  CATEGORIES.forEach(cat => {
+    const itemCount = PRODUCTS.filter(p => p.categoryId === cat.id).length;
+    const svgIcon = getCategorySvg(cat);
+    html += `
+      <div class="admin-cat-crud-row">
+        <div class="admin-cat-left">
+          <div class="admin-cat-icon-box">${svgIcon}</div>
+          <div>
+            <div class="admin-cat-name">${escapeHtml(cat.name)}</div>
+            <div class="admin-cat-count">${itemCount} items • ID: ${escapeHtml(cat.id)}</div>
+          </div>
+        </div>
+        <div class="crud-btn-group">
+          <button class="btn-edit-action" onclick="openEditCategoryModal('${cat.id}')">✏️</button>
+          <button class="btn-delete-action" onclick="handleDeleteCategory('${cat.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Render Admin Orders Mobile Cards ──
+function renderAdminOrdersSubpane() {
+  const container = document.getElementById('admin-mobile-orders-list');
+  if (!container) return;
+
+  const q = (document.getElementById('admin-order-search')?.value || '').trim().toLowerCase();
+  const statusFilter = document.getElementById('admin-status-filter')?.value || 'all';
+
+  let list = [...MASTER_ORDERS];
+
+  if (statusFilter !== 'all') {
+    if (statusFilter === 'orders') {
+      list = list.filter(o => o.status === 'orders' || o.status === 'received');
+    } else if (statusFilter === 'cooking') {
+      list = list.filter(o => o.status === 'cooking' || o.status === 'preparing');
+    } else if (statusFilter === 'ready') {
+      list = list.filter(o => o.status === 'ready' || o.status === 'completed');
+    } else {
+      list = list.filter(o => o.status === statusFilter);
+    }
+  }
+
+  if (q) {
+    list = list.filter(o =>
+      o.id.toLowerCase().includes(q) ||
+      (o.orderType || '').toLowerCase().includes(q) ||
+      (o.items || []).some(i => i.name.toLowerCase().includes(q))
+    );
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+        <div style="font-size:2rem;margin-bottom:10px;">📋</div>
+        <p style="font-size:0.85rem;">No orders match your filter.</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  list.forEach(ord => {
+    const rawStatus = (ord.status || 'orders').toLowerCase();
+    let normStatus = 'orders';
+    let statusLabel = 'Order Placed';
+    if (rawStatus === 'cooking' || rawStatus === 'preparing') {
+      normStatus = 'cooking';
+      statusLabel = 'Cooking';
+    } else if (rawStatus === 'ready') {
+      normStatus = 'ready';
+      statusLabel = 'Ready';
+    } else if (rawStatus === 'completed') {
+      normStatus = 'completed';
+      statusLabel = 'Completed';
+    } else if (rawStatus === 'cancelled') {
+      normStatus = 'cancelled';
+      statusLabel = 'Cancelled';
+    }
+
+    const itemSummary = (ord.items || []).map(i => {
+      const extrasList = getItemCustomizationsSummary(i);
+      const extrasStr = extrasList.length > 0 ? ` (+ ${extrasList.join(', ')})` : '';
+      return `${i.qty}× ${escapeHtml(i.name)}${extrasStr}`;
+    }).join(', ');
+
+    const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
+
+    html += `
+      <div class="admin-mobile-order-card" style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:14px; margin-bottom:12px;">
+        <div class="admin-moc-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong style="font-size:0.95rem; color:#0F172A;">#${ord.id}</strong>
+          <span class="status-chip chip-${normStatus}">${statusLabel}</span>
+        </div>
+        <div class="admin-moc-items" style="font-size:0.84rem; color:#334155; margin-bottom:10px;">${itemSummary}</div>
+        <div class="admin-moc-foot" style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #F1F5F9; padding-top:8px;">
+          <div style="font-size:0.75rem; color:#64748B;">
+            ${escapeHtml(ord.orderType || 'Dine-in')} • ${ord.date || ''} ${ord.timestamp || ''}
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="color:#B45309; font-size:0.92rem;">${formatMoney(ordTotal)}</strong>
+            <button class="btn-table-action" onclick="openOrderModal('${ord.id}')">
+              <i data-lucide="eye" style="width:13px; height:13px;"></i>
+              <span>View</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  refreshLucideIcons();
+}
+
+// ── Image Preset & Cloudinary Helpers ──
+function handleImagePresetChange(val) {
+  const customInput = document.getElementById('crud-item-image-custom');
+  if (val === 'custom') {
+    if (customInput) {
+      customInput.style.display = 'block';
+      customInput.focus();
+      updatePhotoPreview(customInput.value || 'logo.png');
+    }
+  } else {
+    if (customInput) customInput.style.display = 'none';
+    updatePhotoPreview(val);
+  }
+}
+
+function updatePhotoPreview(url) {
+  const img = document.getElementById('crud-item-thumb-preview');
+  const status = document.getElementById('crud-item-photo-status');
+  const cleanUrl = (url || '').trim() || 'logo.png';
+  if (img) img.src = cleanUrl;
+  if (status) {
+    if (cleanUrl.includes('cloudinary.com')) {
+      status.innerHTML = `<span style="color:#059669;font-weight:700;">☁️ Cloudinary:</span> ${escapeHtml(cleanUrl.split('/').pop())}`;
+    } else {
+      status.textContent = `Photo: ${cleanUrl}`;
+    }
+  }
+}
+
+async function handleAdminPhotoUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('crud-item-photo-status');
+  if (status) status.innerHTML = '<span style="color:var(--brand-terracotta);font-weight:700;">⏳ Uploading to Cloudinary / Server...</span>';
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64Data = e.target.result;
+    try {
+      const res = await API.uploadImage(base64Data);
+      if (res && res.success && res.url) {
+        const sel = document.getElementById('crud-item-image');
+        const customInput = document.getElementById('crud-item-image-custom');
+        if (sel) sel.value = 'custom';
+        if (customInput) {
+          customInput.style.display = 'block';
+          customInput.value = res.url;
+        }
+        updatePhotoPreview(res.url);
+        toast('Photo uploaded successfully! ☁️', 3000);
+      } else {
+        toast('Upload notice: ' + ((res && res.error) || 'Failed to upload'), 3500);
+        updatePhotoPreview('burger_classic.jpg');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast('Upload failed. Check server.', 3500);
+      updatePhotoPreview('burger_classic.jpg');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function getActivePhotoUrl() {
+  const sel = document.getElementById('crud-item-image');
+  const customInput = document.getElementById('crud-item-image-custom');
+  if (sel && sel.value === 'custom') {
+    return (customInput && customInput.value.trim()) || 'logo.png';
+  }
+  return (sel && sel.value) || 'burger_classic.jpg';
+}
+
+// ── Item Modal: Open for Create ──
+function openCreateItemModal() {
+  document.getElementById('crud-item-modal-title').textContent = 'Add Menu Item';
+  document.getElementById('crud-item-submit-btn').textContent = 'Save Dish to Real Database';
+  document.getElementById('crud-item-id').value = '';
+  document.getElementById('crud-item-name').value = '';
+  document.getElementById('crud-item-price').value = '';
+  document.getElementById('crud-item-badge').value = '';
+  document.getElementById('crud-item-desc').value = '';
+  document.getElementById('crud-item-ingredients').value = '';
+  document.getElementById('crud-item-available').checked = true;
+
+  const imgSel = document.getElementById('crud-item-image');
+  const customInput = document.getElementById('crud-item-image-custom');
+  if (imgSel) imgSel.value = 'burger_classic.jpg';
+  if (customInput) {
+    customInput.value = '';
+    customInput.style.display = 'none';
+  }
+  updatePhotoPreview('burger_classic.jpg');
+
+  populateAdminCategoryDropdowns();
+
+  document.getElementById('crud-item-overlay').classList.add('open');
+  document.getElementById('crud-item-modal').classList.add('open');
+  refreshLucideIcons();
+}
+
+// ── Item Modal: Open for Edit ──
+function openEditItemModal(productId) {
+  const prod = PRODUCTS.find(p => p.id === productId);
+  if (!prod) return;
+
+  document.getElementById('crud-item-modal-title').textContent = 'Edit Menu Item';
+  document.getElementById('crud-item-submit-btn').textContent = 'Update Dish in Real Database';
+  document.getElementById('crud-item-id').value = prod.id;
+  document.getElementById('crud-item-name').value = prod.name || '';
+  document.getElementById('crud-item-price').value = prod.basePrice || '';
+  document.getElementById('crud-item-badge').value = prod.badge || '';
+  document.getElementById('crud-item-desc').value = prod.description || '';
+  document.getElementById('crud-item-ingredients').value = Array.isArray(prod.ingredients)
+    ? prod.ingredients.join(', ')
+    : (prod.ingredients || '');
+  document.getElementById('crud-item-available').checked = (prod.available !== false);
+
+  populateAdminCategoryDropdowns();
+
+  const catSel = document.getElementById('crud-item-category');
+  if (catSel) catSel.value = prod.categoryId || '';
+
+  const imgSel = document.getElementById('crud-item-image');
+  const customInput = document.getElementById('crud-item-image-custom');
+  const prodImg = prod.image || 'burger_classic.jpg';
+  
+  const knownPresets = ['burger_classic.jpg', 'pizza_margherita.jpg', 'chicken_sandwich.jpg', 'smoothie_tropical.jpg', 'milkshake_chocolate.jpg', 'pasta_carbonara.jpg', 'burrito_bowl.jpg'];
+  if (knownPresets.includes(prodImg)) {
+    if (imgSel) imgSel.value = prodImg;
+    if (customInput) {
+      customInput.value = '';
+      customInput.style.display = 'none';
+    }
+  } else {
+    if (imgSel) imgSel.value = 'custom';
+    if (customInput) {
+      customInput.value = prodImg;
+      customInput.style.display = 'block';
+    }
+  }
+  updatePhotoPreview(prodImg);
+
+  document.getElementById('crud-item-overlay').classList.add('open');
+  document.getElementById('crud-item-modal').classList.add('open');
+  refreshLucideIcons();
+}
+
+// ── Item Modal: Close ──
+function closeItemCrudModal() {
+  document.getElementById('crud-item-overlay').classList.remove('open');
+  document.getElementById('crud-item-modal').classList.remove('open');
+}
+
+// ── Item Modal: Save (Create or Update) ──
+async function handleSaveItem(event) {
+  event.preventDefault();
+
+  const id = document.getElementById('crud-item-id').value.trim();
+  const isEdit = !!id;
+
+  const name = document.getElementById('crud-item-name').value.trim();
+  const basePrice = parseFloat(document.getElementById('crud-item-price').value);
+  const categoryId = document.getElementById('crud-item-category').value;
+  const badge = document.getElementById('crud-item-badge').value.trim();
+  const description = document.getElementById('crud-item-desc').value.trim();
+  const ingredientsRaw = document.getElementById('crud-item-ingredients').value.trim();
+  const available = document.getElementById('crud-item-available').checked;
+  const image = getActivePhotoUrl();
+
+  const ingredients = ingredientsRaw
+    ? ingredientsRaw.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
+
+  const submitBtn = document.getElementById('crud-item-submit-btn');
+  submitBtn.textContent = 'Saving...';
+  submitBtn.disabled = true;
+
+  const prodPayload = {
+    id: isEdit ? id : undefined,
+    name,
+    basePrice,
+    categoryId,
+    badge,
+    description,
+    ingredients,
+    available,
+    image,
+    rating: 4.8,
+    reviewsCount: 10,
+    customizations: []
+  };
+
+  try {
+    const result = await API.saveProduct(prodPayload, isEdit);
+    if (result && result.success) {
+      closeItemCrudModal();
+      await syncDataFromBackend(false);
+      renderAdminItemsCrud();
+      populateAdminCategoryDropdowns();
+      toast(isEdit ? `"${name}" updated!` : `"${name}" added to menu!`, 3000);
+    } else {
+      const msg = (result && result.error) ? result.error : 'Save failed';
+      toast(`Error: ${msg}`, 3500);
+    }
+  } catch (err) {
+    toast('Network error. Check server is running.', 3500);
+    console.error('handleSaveItem error:', err);
+  } finally {
+    submitBtn.textContent = isEdit ? 'Update Dish in Real Database' : 'Save Dish to Real Database';
+    submitBtn.disabled = false;
+  }
+}
+
+// ── Item: Delete ──
+async function handleDeleteItem(productId) {
+  const prod = PRODUCTS.find(p => p.id === productId);
+  const name = prod ? prod.name : productId;
+  if (!confirm(`Delete "${name}" from the menu? This cannot be undone.`)) return;
+
+  try {
+    const result = await API.deleteProduct(productId);
+    if (result && result.success) {
+      await syncDataFromBackend(false);
+      renderAdminItemsCrud();
+      toast(`"${name}" removed from menu.`);
+    } else {
+      toast('Delete failed. Try again.', 3000);
+    }
+  } catch (err) {
+    toast('Network error.', 3000);
+    console.error('handleDeleteItem error:', err);
+  }
+}
+
+// ── Category Modal: Open for Create ──
+function openCreateCategoryModal() {
+  document.getElementById('crud-cat-modal-title').textContent = 'Add Food Category';
+  document.getElementById('crud-cat-submit-btn').textContent = 'Save Category to Real Database';
+  document.getElementById('crud-cat-is-edit').value = '0';
+  document.getElementById('crud-cat-name').value = '';
+  document.getElementById('crud-cat-id').value = '';
+  document.getElementById('crud-cat-id').readOnly = false;
+  const iconSel = document.getElementById('crud-cat-icon');
+  if (iconSel) iconSel.value = 'utensils';
+
+  document.getElementById('crud-cat-overlay').classList.add('open');
+  document.getElementById('crud-cat-modal').classList.add('open');
+  refreshLucideIcons();
+}
+
+// ── Category Modal: Open for Edit ──
+function openEditCategoryModal(catId) {
+  const cat = CATEGORIES.find(c => c.id === catId);
+  if (!cat) return;
+
+  document.getElementById('crud-cat-modal-title').textContent = 'Edit Category';
+  document.getElementById('crud-cat-submit-btn').textContent = 'Update Category in Real Database';
+  document.getElementById('crud-cat-is-edit').value = '1';
+  document.getElementById('crud-cat-name').value = cat.name || '';
+  document.getElementById('crud-cat-id').value = cat.id || '';
+  document.getElementById('crud-cat-id').readOnly = true; // can't change slug when editing
+
+  const iconSel = document.getElementById('crud-cat-icon');
+  if (iconSel && cat.icon) iconSel.value = cat.icon;
+
+  document.getElementById('crud-cat-overlay').classList.add('open');
+  document.getElementById('crud-cat-modal').classList.add('open');
+  refreshLucideIcons();
+}
+
+// ── Category Modal: Auto-generate slug from name ──
+function autoGenerateCatId(value) {
+  const isEdit = document.getElementById('crud-cat-is-edit')?.value === '1';
+  if (isEdit) return; // Don't overwrite slug when editing
+  const idField = document.getElementById('crud-cat-id');
+  if (idField) {
+    idField.value = value.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
+  }
+}
+
+// ── Category Modal: Close ──
+function closeCategoryCrudModal() {
+  document.getElementById('crud-cat-overlay').classList.remove('open');
+  document.getElementById('crud-cat-modal').classList.remove('open');
+}
+
+// ── Category Modal: Save (Create or Update) ──
+async function handleSaveCategory(event) {
+  event.preventDefault();
+
+  const isEdit = document.getElementById('crud-cat-is-edit').value === '1';
+  const name = document.getElementById('crud-cat-name').value.trim();
+  const id = document.getElementById('crud-cat-id').value.trim();
+  const icon = document.getElementById('crud-cat-icon').value;
+
+  if (!name || !id) {
+    toast('Category name and ID are required.', 2500);
+    return;
+  }
+
+  const submitBtn = document.getElementById('crud-cat-submit-btn');
+  submitBtn.textContent = 'Saving...';
+  submitBtn.disabled = true;
+
+  const catPayload = { id, name, icon };
+
+  try {
+    const result = await API.saveCategory(catPayload, isEdit);
+    if (result && result.success) {
+      closeCategoryCrudModal();
+      await syncDataFromBackend(false);
+      renderAdminCatsCrud();
+      populateAdminCategoryDropdowns();
+      toast(isEdit ? `Category "${name}" updated!` : `Category "${name}" added!`, 3000);
+    } else {
+      const msg = (result && result.error) ? result.error : 'Save failed';
+      toast(`Error: ${msg}`, 3500);
+    }
+  } catch (err) {
+    toast('Network error. Check server is running.', 3500);
+    console.error('handleSaveCategory error:', err);
+  } finally {
+    submitBtn.textContent = isEdit ? 'Update Category in Real Database' : 'Save Category to Real Database';
+    submitBtn.disabled = false;
+  }
+}
+
+// ── Category: Delete ──
+async function handleDeleteCategory(catId) {
+  const cat = CATEGORIES.find(c => c.id === catId);
+  const name = cat ? cat.name : catId;
+  const itemCount = PRODUCTS.filter(p => p.categoryId === catId).length;
+  const msg = itemCount > 0
+    ? `Delete "${name}"? This will NOT delete the ${itemCount} items in this category, but they will become uncategorized.`
+    : `Delete category "${name}"? This cannot be undone.`;
+  if (!confirm(msg)) return;
+
+  try {
+    const result = await API.deleteCategory(catId);
+    if (result && result.success) {
+      await syncDataFromBackend(false);
+      renderAdminCatsCrud();
+      toast(`Category "${name}" removed.`);
+    } else {
+      toast('Delete failed. Try again.', 3000);
+    }
+  } catch (err) {
+    toast('Network error.', 3000);
+    console.error('handleDeleteCategory error:', err);
+  }
+}
+
+function handleKdsFilterChange(val) {
+  APP_STATE.kdsFilter = val;
+  renderKdsTickets();
+}
+
+// ══ ADMIN STATUS UPDATER (PERSISTS TO SUPABASE & SYNCS IN REAL TIME) ══
+async function adminUpdateOrderStatus(orderId, newStatus) {
+  const ord = MASTER_ORDERS.find(o => o.id === orderId);
+  if (!ord) return;
+
+  let label = 'Order Placed';
+  if (newStatus === 'cooking' || newStatus === 'preparing') label = 'Cooking';
+  if (newStatus === 'ready' || newStatus === 'completed') label = 'Ready';
+
+  ord.status = newStatus;
+  ord.statusLabel = label;
+
+  // Sync to database
+  try {
+    await API.updateOrderStatus(orderId, newStatus, label);
+    toast(`Order #${orderId} marked as "${label}"`, 2500);
+  } catch (err) {
+    console.error('Failed to update order status:', err);
+    toast('Error updating status on server', 3000);
+  }
+
+  // Update customer orderHistory if matching
+  const custOrd = (APP_STATE.orderHistory || []).find(o => o.id === orderId);
+  if (custOrd) {
+    custOrd.status = newStatus;
+    custOrd.statusLabel = label;
+  }
+
+  // Re-render views
+  renderAdminOrdersSubpane();
+  renderAdminDashboard();
+  renderKdsTickets();
+  renderHistory();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN EXTRAS & ADD-ONS CRUD MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+function renderAdminExtrasCrud() {
+  const container = document.getElementById('admin-extras-crud-list');
+  const totalCount = document.getElementById('admin-extras-total-count');
+  if (!container) return;
+
+  if (totalCount) totalCount.textContent = EXTRAS.length;
+
+  if (EXTRAS.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+        <div style="font-size:2rem;margin-bottom:10px;">✨</div>
+        <p style="font-size:0.85rem;">No extras yet. Click "Add Extra" to create your first add-on!</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  EXTRAS.forEach(extra => {
+    const isAvail = extra.available !== false;
+    const catPills = (extra.categories && extra.categories.length > 0 && !extra.categories.includes('all'))
+      ? extra.categories.map(cid => {
+          const cat = CATEGORIES.find(c => c.id === cid);
+          return `<span class="extra-cat-pill">${escapeHtml(cat ? cat.name : cid)}</span>`;
+        }).join('')
+      : '<span class="extra-cat-pill" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">All Dishes</span>';
+
+    html += `
+      <div class="admin-extra-crud-card">
+        <div class="admin-extra-meta">
+          <div class="admin-extra-title">${escapeHtml(extra.name)}</div>
+          <div class="admin-extra-price">+${formatMoney(extra.price)}</div>
+          <div class="admin-extra-cats">${catPills}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+          <button class="crud-stock-pill ${isAvail ? 'stock-active' : 'stock-inactive'}" onclick="toggleExtraStock('${extra.id}')">
+            ${isAvail ? '✓ In Stock' : "✕ Sold Out"}
+          </button>
+          <div class="crud-btn-group">
+            <button class="btn-edit-action" onclick="openEditExtraModal('${extra.id}')">✏️ Edit</button>
+            <button class="btn-delete-action" onclick="handleDeleteExtra('${extra.id}')">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function populateAdminExtraCategoryCheckboxes(selectedCats = []) {
+  const container = document.getElementById('crud-extra-categories-checkboxes');
+  if (!container) return;
+
+  let html = '';
+  CATEGORIES.forEach(cat => {
+    const isChecked = selectedCats.includes(cat.id);
+    html += `
+      <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; cursor:pointer;">
+        <input type="checkbox" name="extra_cat_cb" value="${cat.id}" ${isChecked ? 'checked' : ''}>
+        <span>${escapeHtml(cat.name)}</span>
+      </label>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function openCreateExtraModal() {
+  document.getElementById('crud-extra-modal-title').textContent = 'Add Extra / Add-on';
+  document.getElementById('crud-extra-is-edit').value = '0';
+  document.getElementById('crud-extra-id').value = '';
+  document.getElementById('crud-extra-name').value = '';
+  document.getElementById('crud-extra-price').value = '';
+  document.getElementById('crud-extra-available').checked = true;
+  document.getElementById('crud-extra-submit-btn').textContent = 'Save Extra to Real Database';
+  populateAdminExtraCategoryCheckboxes([]);
+
+  document.getElementById('crud-extra-overlay')?.classList.add('open');
+  document.getElementById('crud-extra-modal')?.classList.add('open');
+}
+
+function openEditExtraModal(id) {
+  const extra = EXTRAS.find(e => e.id === id);
+  if (!extra) return;
+
+  document.getElementById('crud-extra-modal-title').textContent = 'Edit Extra / Add-on';
+  document.getElementById('crud-extra-is-edit').value = '1';
+  document.getElementById('crud-extra-id').value = extra.id;
+  document.getElementById('crud-extra-name').value = extra.name;
+  document.getElementById('crud-extra-price').value = extra.price;
+  document.getElementById('crud-extra-available').checked = extra.available !== false;
+  document.getElementById('crud-extra-submit-btn').textContent = 'Update Extra';
+  populateAdminExtraCategoryCheckboxes(extra.categories || []);
+
+  document.getElementById('crud-extra-overlay')?.classList.add('open');
+  document.getElementById('crud-extra-modal')?.classList.add('open');
+}
+
+function closeExtraCrudModal() {
+  document.getElementById('crud-extra-overlay')?.classList.remove('open');
+  document.getElementById('crud-extra-modal')?.classList.remove('open');
+}
+
+async function handleSaveExtra(event) {
+  event.preventDefault();
+  const isEdit = document.getElementById('crud-extra-is-edit').value === '1';
+  const id = document.getElementById('crud-extra-id').value || ('ext_' + Date.now().toString(36));
+  const name = (document.getElementById('crud-extra-name').value || '').trim();
+  const price = Number(document.getElementById('crud-extra-price').value) || 0;
+  const available = document.getElementById('crud-extra-available').checked;
+
+  const checkedCats = [];
+  document.querySelectorAll('input[name="extra_cat_cb"]:checked').forEach(cb => checkedCats.push(cb.value));
+
+  const extraPayload = {
+    id,
+    name,
+    price,
+    categories: checkedCats.length > 0 ? checkedCats : ['all'],
+    available
+  };
+
+  try {
+    if (isEdit) {
+      await API.updateExtra(extraPayload);
+      const idx = EXTRAS.findIndex(e => e.id === id);
+      if (idx !== -1) EXTRAS[idx] = extraPayload;
+      toast(`Extra "${name}" updated!`);
+    } else {
+      await API.createExtra(extraPayload);
+      EXTRAS.push(extraPayload);
+      toast(`Extra "${name}" added!`);
+    }
+    closeExtraCrudModal();
+    renderAdminExtrasCrud();
+  } catch (err) {
+    toast(`Error saving extra: ${err.message}`);
+  }
+}
+
+async function handleDeleteExtra(id) {
+  const extra = EXTRAS.find(e => e.id === id);
+  if (!confirm(`Delete extra "${extra ? extra.name : id}"?`)) return;
+
+  try {
+    await API.deleteExtra(id);
+    EXTRAS = EXTRAS.filter(e => e.id !== id);
+    toast('Extra deleted');
+    renderAdminExtrasCrud();
+  } catch (err) {
+    toast(`Delete error: ${err.message}`);
+  }
+}
+
+async function toggleExtraStock(id) {
+  const extra = EXTRAS.find(e => e.id === id);
+  if (!extra) return;
+
+  extra.available = !extra.available;
+  try {
+    await API.patchExtraStock(id, extra.available);
+    toast(`${extra.name} marked ${extra.available ? 'In Stock' : 'Sold Out'}`);
+    renderAdminExtrasCrud();
+  } catch (e) {
+    renderAdminExtrasCrud();
+  }
+}

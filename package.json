@@ -1,0 +1,15 @@
+{
+  "name": "alemaya-burger",
+  "version": "1.0.0",
+  "description": "Alemaya Grill'd Healthy Burgers with Live Kitchen KDS and Admin Management",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "node -e \"console.log('Build completed successfully')\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {}
+}

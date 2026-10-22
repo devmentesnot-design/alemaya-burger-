@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Alemaya Grill'd Healthy Burgers - Fresh grilled food made for your cravings with real-time kitchen & admin portals.">
-  <title>Alemaya Grill'd - Healthy Burgers & Kitchen Hub</title>
+  <title>Alemaya Grill'd - Healthy Burgers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261021_3">
+  <link rel="stylesheet" href="style.css?v=20261022_5">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -21,33 +21,18 @@
     </div>
   </div>
 
-  <!-- MAIN APP CONTAINER -->
+  <!-- MAIN APP CONTAINER (ALWAYS MOBILE SCREEN SIZE) -->
   <div id="app" class="portal-customer">
     
-    <!-- TOP NAVBAR WITH BRAND LOGO, ROLE/PORTAL SWITCHER & SEARCH -->
-    <header class="top-nav-bar">
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- CUSTOMER TOP NAVBAR (BRAND LOGO + SEARCH ONLY)                    -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <header class="top-nav-bar" id="customer-top-nav">
       <div class="top-nav-inner">
         <!-- Brand Logo -->
-        <div class="nav-brand" onclick="switchPortal('customer')" title="Back to Customer Menu">
+        <div class="nav-brand" onclick="navigateTo('menu')" title="Alemaya Grill'd">
           <img src="logo.png" alt="Alemaya Grill'd" class="nav-logo">
         </div>
-
-        <!-- Portal / Role Switcher Pill -->
-        <nav class="portal-switcher" id="portal-switcher" aria-label="Portal Navigation">
-          <button class="portal-btn active" id="pbtn-customer" onclick="switchPortal('customer')" title="Customer Menu & Ordering">
-            <i data-lucide="utensils" class="lucide-icon"></i>
-            <span class="pbtn-label">Menu</span>
-          </button>
-          <button class="portal-btn" id="pbtn-chef" onclick="switchPortal('chef')" title="Kitchen Display System (KDS)">
-            <i data-lucide="flame" class="lucide-icon"></i>
-            <span class="pbtn-label">Kitchen</span>
-            <span class="portal-badge" id="chef-pending-badge" style="display:none">0</span>
-          </button>
-          <button class="portal-btn" id="pbtn-admin" onclick="switchPortal('admin')" title="Manager & Admin Analytics">
-            <i data-lucide="bar-chart-3" class="lucide-icon"></i>
-            <span class="pbtn-label">Admin</span>
-          </button>
-        </nav>
 
         <!-- Navbar Actions (Search Icon for Menu view) -->
         <div class="nav-actions">
@@ -59,7 +44,7 @@
     </header>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- VIEW 1: CUSTOMER MENU                                             -->
+    <!-- VIEW 1: CUSTOMER MENU (MAIN VIEW)                                 -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <main id="view-menu" class="view active">
       <!-- SEARCH BAR (TOGGLED VIA NAVBAR SEARCH ICON) -->
@@ -118,6 +103,11 @@
         <div class="vertical-items-list" id="unified-items-list"></div>
       </section>
 
+      <!-- SUBTLE FOOTER -->
+      <footer class="customer-footer">
+        <p class="brand-foot">Alemaya Grill'd • Fresh, Healthy & Flame-Grilled</p>
+      </footer>
+
       <div class="scroll-bottom-spacer"></div>
     </main>
 
@@ -133,52 +123,56 @@
           </button>
         </div>
         <h1 class="orders-title">Your Orders</h1>
-        <p class="orders-subtitle">Review your cart & track live kitchen preparation</p>
+        <p class="orders-subtitle">Track live kitchen preparation &amp; view your order history</p>
         
-        <!-- Segmented Toggle: Cart vs Past Orders -->
+        <!-- Segmented Toggle: Current Orders vs Recent Orders -->
         <div class="orders-segment">
-          <button class="seg-btn active" id="seg-cart" onclick="switchOrdersTab('cart')">
-            Current Cart (<span id="cart-seg-count">0</span>)
+          <button class="seg-btn active" id="seg-current" onclick="switchOrdersTab('current')">
+            Current Orders (<span id="current-orders-seg-count">0</span>)
           </button>
           <button class="seg-btn" id="seg-history" onclick="switchOrdersTab('history')">
-            Recent Orders & Status (<span id="history-seg-count">0</span>)
+            Recent Orders (<span id="history-seg-count">0</span>)
           </button>
         </div>
       </header>
 
-      <!-- TAB 1: CURRENT CART -->
-      <div id="orders-tab-cart" class="orders-tab-pane active">
-        <div id="cart-items-wrap"></div>
-        
-        <div id="cart-summary-card" class="summary-card hidden">
-          <div class="summary-title">Bill Breakdown</div>
-          <div class="sum-row">
-            <span>Subtotal</span>
-            <span id="sum-subtotal">Br 0</span>
+      <!-- TAB 1: CURRENT ORDERS (PENDING ITEMS + LIVE ACTIVE KITCHEN TRACKER) -->
+      <div id="orders-tab-current" class="orders-tab-pane active">
+        <!-- Pending Order Items (if customer added dishes to cart) -->
+        <div id="pending-cart-section">
+          <div id="cart-items-wrap"></div>
+          
+          <div id="cart-summary-card" class="summary-card hidden">
+            <div class="summary-title">Bill Breakdown</div>
+            <div class="sum-row">
+              <span>Subtotal</span>
+              <span id="sum-subtotal">Br 0</span>
+            </div>
+            <div class="sum-row total">
+              <span>Total Amount</span>
+              <span id="sum-total" class="sum-total-val">Br 0</span>
+            </div>
+            <div class="sum-ordertype-note">
+              Order Type: <strong id="sum-ordertype-label">Dine-in</strong>
+            </div>
           </div>
-          <div class="sum-row">
-            <span>Service Charge (10%)</span>
-            <span id="sum-service">Br 0</span>
-          </div>
-          <div class="sum-row total">
-            <span>Total Amount</span>
-            <span id="sum-total" class="sum-total-val">Br 0</span>
-          </div>
-          <div class="sum-ordertype-note">
-            Order Type: <strong id="sum-ordertype-label">Dine-in</strong>
+
+          <div id="cart-checkout-actions" class="checkout-actions hidden">
+            <button class="btn-checkout" onclick="placeOrder()">
+              <span>Confirm &amp; Place Order</span>
+              <span id="btn-checkout-price">Br 0</span>
+            </button>
+            <p class="checkout-guarantee">Fresh flame-grilled to order • Real-time kitchen tracking</p>
           </div>
         </div>
 
-        <div id="cart-checkout-actions" class="checkout-actions hidden">
-          <button class="btn-checkout" onclick="placeOrder()">
-            <span>Confirm & Place Order</span>
-            <span id="btn-checkout-price">Br 0</span>
-          </button>
-          <p class="checkout-guarantee">Fresh flame-grilled to order • Real-time kitchen tracking</p>
+        <!-- Live In-Progress Orders Stream (Orders Placed, Cooking, Ready) -->
+        <div id="active-orders-section" style="margin-top: 18px;">
+          <div id="current-orders-items-wrap"></div>
         </div>
       </div>
 
-      <!-- TAB 2: RECENT ORDERS & LIVE STATUS TRACKER -->
+      <!-- TAB 2: RECENT ORDERS (COMPLETED ORDERS ONLY) -->
       <div id="orders-tab-history" class="orders-tab-pane">
         <div id="history-items-wrap"></div>
       </div>
@@ -187,66 +181,47 @@
     </main>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- VIEW 3: CHEF KITCHEN DISPLAY SYSTEM (KDS)                         -->
+    <!-- VIEW 3: CHEF KITCHEN DISPLAY (KDS - MOBILE PHONE SCREEN SIZE)     -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <main id="view-chef" class="view">
-      <!-- KDS Top Control Header -->
-      <section class="kds-header">
-        <div class="kds-header-top">
-          <div class="kds-title-group">
-            <div class="kds-badge-pill">
-              <span class="live-pulse-dot"></span>
-              <span>LIVE KITCHEN DISPLAY</span>
-            </div>
-            <h1 class="kds-title">Chef & Kitchen Operations</h1>
-            <p class="kds-subtitle">Active grill tickets, recipe specs, and real-time order status controller</p>
+      <!-- KDS Mobile Header -->
+      <header class="staff-mobile-nav">
+        <div class="staff-mobile-nav-top">
+          <div class="kds-clock-box">
+            <i data-lucide="clock" class="lucide-icon" style="width:14px; height:14px;"></i>
+            <span id="kds-live-clock">--:--:--</span>
           </div>
-          <div class="kds-quick-tools">
-            <div class="kds-clock-box">
-              <span class="kds-clock-icon"><i data-lucide="clock" class="lucide-icon"></i></span>
-              <span id="kds-live-clock" class="kds-live-clock">--:--:--</span>
-            </div>
-            <button class="kds-tool-btn" id="kds-sound-btn" onclick="toggleKitchenAudio()" title="Toggle Kitchen Alert Sound">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="kds-icon-tool" id="kds-sound-btn" onclick="toggleKitchenAudio()" title="Sound alert">
               <i data-lucide="volume-2" class="lucide-icon" id="kds-sound-icon"></i>
-              <span id="kds-sound-text">Chime: ON</span>
-            </button>
-            <button class="kds-tool-btn primary" onclick="generateSimulatedOrder()" title="Send a simulated test order to test live workflow">
-              <i data-lucide="plus-circle" class="lucide-icon"></i>
-              <span>+ Test Order</span>
             </button>
           </div>
         </div>
 
-        <!-- KDS Status Metric Strip & Filters -->
-        <div class="kds-filter-strip" role="tablist">
-          <button class="kds-filter-tab active" id="kds-flt-active" onclick="filterKdsOrders('active')">
-            <span class="kds-tab-name">All Active</span>
-            <span class="kds-tab-count" id="kds-cnt-active">0</span>
-          </button>
-          <button class="kds-filter-tab" id="kds-flt-received" onclick="filterKdsOrders('received')">
-            <span class="kds-tab-dot dot-received"></span>
-            <span class="kds-tab-name">Received</span>
-            <span class="kds-tab-count" id="kds-cnt-received">0</span>
-          </button>
-          <button class="kds-filter-tab" id="kds-flt-preparing" onclick="filterKdsOrders('preparing')">
-            <span class="kds-tab-dot dot-preparing"></span>
-            <span class="kds-tab-name">Grilling / Cooking</span>
-            <span class="kds-tab-count" id="kds-cnt-preparing">0</span>
-          </button>
-          <button class="kds-filter-tab" id="kds-flt-ready" onclick="filterKdsOrders('ready')">
-            <span class="kds-tab-dot dot-ready"></span>
-            <span class="kds-tab-name">Ready for Pickup</span>
-            <span class="kds-tab-count" id="kds-cnt-ready">0</span>
-          </button>
-          <button class="kds-filter-tab" id="kds-flt-completed" onclick="filterKdsOrders('completed')">
-            <span class="kds-tab-dot dot-completed"></span>
-            <span class="kds-tab-name">Completed Today</span>
-            <span class="kds-tab-count" id="kds-cnt-completed">0</span>
-          </button>
+        <div class="staff-header-info">
+          <div class="kds-badge-pill">
+            <span class="live-pulse-dot"></span>
+            <span>KITCHEN DISPLAY (KDS)</span>
+          </div>
+          <h2 class="staff-header-title">Chef Grill Station</h2>
         </div>
-      </section>
 
-      <!-- Active Orders Ticket Board -->
+        <!-- Professional Filter Dropdown for Kitchen -->
+        <div class="kds-filter-bar">
+          <label for="kds-filter-select" class="kds-filter-label">
+            <i data-lucide="list-filter" class="lucide-icon" style="width:14px;height:14px;"></i>
+            <span>Active Queue:</span>
+          </label>
+          <select id="kds-filter-select" class="kds-filter-dropdown" onchange="handleKdsFilterChange(this.value)">
+            <option value="active">All Active (Orders, Cooking, Ready)</option>
+            <option value="orders">1. Orders (Placed)</option>
+            <option value="cooking">2. Cooking</option>
+            <option value="ready">3. Ready</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- Active Orders Ticket Board (Mobile Phone stream) -->
       <section class="kds-board-section">
         <div class="kds-tickets-grid" id="kds-tickets-container"></div>
       </section>
@@ -255,201 +230,217 @@
     </main>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- VIEW 4: ADMIN DASHBOARD & REVENUE REPORTING                       -->
+    <!-- VIEW 4: ADMIN DASHBOARD & CRUD (MOBILE PHONE SCREEN SIZE)         -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <main id="view-admin" class="view">
-      <!-- Admin Control Header -->
-      <section class="admin-header">
-        <div class="admin-header-row">
-          <div class="admin-title-group">
-            <div class="admin-badge-pill">
-              <i data-lucide="shield-check" class="lucide-icon"></i>
-              <span>MANAGEMENT & REVENUE CONSOLE</span>
-            </div>
-            <h1 class="admin-title">Sales, Orders & Daily Revenue</h1>
-            <p class="admin-subtitle">Comprehensive performance metrics, revenue audit, and kitchen inventory controls</p>
-          </div>
-          <div class="admin-actions-bar">
-            <!-- Time Window Selector -->
-            <div class="admin-time-select">
-              <label for="admin-date-filter" class="admin-time-label"><i data-lucide="calendar" class="lucide-icon"></i></label>
-              <select id="admin-date-filter" onchange="handleAdminDateFilter(this.value)">
-                <option value="today" selected>Today's Shift</option>
-                <option value="yesterday">Yesterday</option>
-                <option value="week">Past 7 Days</option>
-                <option value="all">All Time History</option>
-              </select>
-            </div>
-            <button class="admin-btn-action" onclick="exportOrdersCsv()" title="Export CSV spreadsheet of orders">
-              <i data-lucide="download" class="lucide-icon"></i>
-              <span>Export CSV</span>
-            </button>
-            <button class="admin-btn-action" onclick="seedSampleData()" title="Load realistic test week data">
-              <i data-lucide="refresh-cw" class="lucide-icon"></i>
-              <span>Demo Data</span>
-            </button>
-          </div>
+      <!-- Admin Mobile Header -->
+      <header class="staff-mobile-nav">
+        <div class="staff-mobile-nav-top">
+          <span class="admin-top-badge"><i data-lucide="shield-check" class="lucide-icon" style="width:13px;height:13px;margin-right:4px;"></i>ADMIN CONSOLE</span>
+          <button class="kds-icon-tool" onclick="syncDataFromBackend()" title="Refresh Data from DB">
+            <i data-lucide="refresh-cw" class="lucide-icon"></i>
+          </button>
         </div>
 
-        <!-- KEY PERFORMANCE INDICATOR (KPI) METRIC CARDS -->
+        <div class="staff-header-info">
+          <h2 class="staff-header-title">Store Management &amp; Real DB</h2>
+        </div>
+
+        <!-- Admin Sub-Navigation Tabs (Overview, Items CRUD, Categories CRUD, Extras CRUD, Orders) -->
+        <div class="admin-mobile-subnav" role="tablist">
+          <button class="admin-subtab active" id="asub-overview" onclick="switchAdminSubTab('overview')">
+            <i data-lucide="bar-chart-3" class="lucide-icon"></i>
+            <span>Overview</span>
+          </button>
+          <button class="admin-subtab" id="asub-items" onclick="switchAdminSubTab('items')">
+            <i data-lucide="utensils" class="lucide-icon"></i>
+            <span>Items</span>
+          </button>
+          <button class="admin-subtab" id="asub-categories" onclick="switchAdminSubTab('categories')">
+            <i data-lucide="tags" class="lucide-icon"></i>
+            <span>Categories</span>
+          </button>
+          <button class="admin-subtab" id="asub-extras" onclick="switchAdminSubTab('extras')">
+            <i data-lucide="sparkles" class="lucide-icon"></i>
+            <span>Extras</span>
+          </button>
+          <button class="admin-subtab" id="asub-orders" onclick="switchAdminSubTab('orders')">
+            <i data-lucide="clipboard-list" class="lucide-icon"></i>
+            <span>Orders</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ── SUB-PANE 1: ADMIN OVERVIEW & REVENUE ── -->
+      <section id="admin-pane-overview" class="admin-subpane active">
+        <!-- Date Selector & CSV Export -->
+        <div class="admin-overview-tools">
+          <div class="admin-time-select">
+            <i data-lucide="calendar" class="lucide-icon" style="width:14px; height:14px;"></i>
+            <select id="admin-date-filter" onchange="handleAdminDateFilter(this.value)">
+              <option value="today" selected>Today's Shift</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week">Past 7 Days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+          <button class="admin-btn-action" onclick="exportOrdersCsv()" title="Export CSV spreadsheet">
+            <i data-lucide="download" class="lucide-icon"></i>
+            <span>CSV</span>
+          </button>
+        </div>
+
+        <!-- 2x2 KPI Cards for Mobile Phone -->
         <div class="admin-kpi-grid">
-          <!-- Card 1: Revenue -->
           <div class="kpi-card revenue-card">
             <div class="kpi-card-header">
-              <span class="kpi-label">TOTAL REVENUE</span>
+              <span class="kpi-label">REVENUE</span>
               <div class="kpi-icon-wrap icon-rev"><i data-lucide="banknote" class="lucide-icon"></i></div>
             </div>
             <div class="kpi-value" id="kpi-revenue">Br 0</div>
-            <div class="kpi-subtext" id="kpi-revenue-sub">Filtered period sales</div>
+            <div class="kpi-subtext" id="kpi-revenue-sub">Filtered period</div>
           </div>
 
-          <!-- Card 2: Orders Count -->
           <div class="kpi-card orders-card">
             <div class="kpi-card-header">
-              <span class="kpi-label">TOTAL ORDERS</span>
+              <span class="kpi-label">ORDERS</span>
               <div class="kpi-icon-wrap icon-orders"><i data-lucide="shopping-bag" class="lucide-icon"></i></div>
             </div>
             <div class="kpi-value" id="kpi-orders-count">0</div>
-            <div class="kpi-subtext" id="kpi-orders-sub">Filtered period count</div>
+            <div class="kpi-subtext" id="kpi-orders-sub">Filtered period</div>
           </div>
 
-          <!-- Card 3: Average Order Value -->
-          <div class="kpi-card aov-card">
-            <div class="kpi-card-header">
-              <span class="kpi-label">AVERAGE BASKET (AOV)</span>
-              <div class="kpi-icon-wrap icon-aov"><i data-lucide="trending-up" class="lucide-icon"></i></div>
-            </div>
-            <div class="kpi-value" id="kpi-aov">Br 0</div>
-            <div class="kpi-subtext">Average spend per customer</div>
-          </div>
 
-          <!-- Card 4: Active In Kitchen -->
           <div class="kpi-card active-card">
             <div class="kpi-card-header">
-              <span class="kpi-label">ACTIVE IN KITCHEN</span>
+              <span class="kpi-label">KITCHEN</span>
               <div class="kpi-icon-wrap icon-kitchen"><i data-lucide="flame" class="lucide-icon"></i></div>
             </div>
             <div class="kpi-value" id="kpi-kitchen-active">0</div>
-            <div class="kpi-subtext" id="kpi-kitchen-sub">Orders currently preparing</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- VISUAL ANALYTICS & CHARTS SECTION -->
-      <section class="admin-charts-section">
-        <div class="admin-charts-grid">
-          <!-- Chart 1: 7-Day Revenue Trend -->
-          <div class="admin-chart-box">
-            <div class="chart-box-header">
-              <div>
-                <h3 class="chart-box-title">Daily Revenue Trend</h3>
-                <p class="chart-box-sub">Daily revenue comparisons across the past 7 days</p>
-              </div>
-              <span class="chart-badge">7 Days</span>
-            </div>
-            <div class="chart-bars-wrap" id="admin-revenue-bars">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- Chart 2: Category Breakdown & Channel Split -->
-          <div class="admin-chart-box">
-            <div class="chart-box-header">
-              <div>
-                <h3 class="chart-box-title">Category Sales & Channel Split</h3>
-                <p class="chart-box-sub">Revenue share by food category and order type</p>
-              </div>
-              <span class="chart-badge">Share</span>
-            </div>
-            <div class="category-breakdown-list" id="admin-category-breakdown">
-              <!-- Rendered via JS -->
-            </div>
+            <div class="kpi-subtext">Active cooking</div>
           </div>
         </div>
 
-        <!-- Bestsellers Leaderboard -->
-        <div class="admin-bestsellers-box">
+        <!-- 7-Day Revenue Trend Chart -->
+        <div class="admin-card-block">
           <div class="chart-box-header">
             <div>
-              <h3 class="chart-box-title">Top-Selling Menu Items</h3>
-              <p class="chart-box-sub">Most ordered dishes ranked by volume and total earnings</p>
+              <h3 class="chart-box-title">7-Day Revenue Trend</h3>
+              <p class="chart-box-sub">Daily sales performance</p>
             </div>
-            <span class="chart-badge">Top 5</span>
           </div>
-          <div class="bestsellers-table-wrap" id="admin-bestsellers-wrap">
-            <!-- Rendered via JS -->
+          <div class="chart-bars-wrap" id="admin-revenue-bars"></div>
+        </div>
+
+        <!-- Category Sales Breakdown -->
+        <div class="admin-card-block">
+          <div class="chart-box-header">
+            <h3 class="chart-box-title">Category Revenue Share</h3>
           </div>
+          <div class="category-breakdown-list" id="admin-category-breakdown"></div>
+        </div>
+
+        <!-- Top Bestsellers -->
+        <div class="admin-card-block">
+          <div class="chart-box-header">
+            <h3 class="chart-box-title">Top-Selling Dishes</h3>
+          </div>
+          <div class="bestsellers-table-wrap" id="admin-bestsellers-wrap"></div>
         </div>
       </section>
 
-      <!-- ADMIN ORDERS MANAGEMENT TABLE -->
-      <section class="admin-orders-section">
-        <div class="admin-section-header">
+      <!-- ── SUB-PANE 2: ITEMS CRUD (PRODUCTS) ── -->
+      <section id="admin-pane-items" class="admin-subpane">
+        <div class="crud-header-row">
           <div>
-            <h2 class="admin-sec-title">Order Ledger & Status Control</h2>
-            <p class="admin-sec-sub">Live audit trail with instant status override and customer breakdown</p>
+            <h3 class="crud-pane-title">Menu Items (<span id="admin-items-total-count">0</span>)</h3>
+            <p class="crud-pane-sub">Create, update, or remove dishes with real DB sync</p>
           </div>
-          <!-- Order Table Search & Status Filter -->
-          <div class="admin-orders-controls">
-            <div class="admin-search-input-wrap">
-              <i data-lucide="search" class="lucide-icon"></i>
-              <input type="text" id="admin-order-search" placeholder="Search order ID or item..." oninput="handleAdminOrderSearch(this.value)">
-            </div>
-            <select id="admin-status-filter" onchange="handleAdminStatusFilter(this.value)">
-              <option value="all">All Statuses</option>
-              <option value="received">Received</option>
-              <option value="preparing">Grilling / Cooking</option>
-              <option value="ready">Ready</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
+          <button class="btn-add-primary" onclick="openCreateItemModal()">
+            <i data-lucide="plus" class="lucide-icon"></i>
+            <span>Add Item</span>
+          </button>
         </div>
 
-        <!-- Orders Table -->
-        <div class="admin-table-container">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Time & Date</th>
-                <th>Type</th>
-                <th>Items Ordered</th>
-                <th>Total</th>
-                <th>Current Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="admin-orders-table-body">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- MENU AVAILABILITY (86 STOCK MANAGER) -->
-      <section class="admin-stock-section">
-        <div class="admin-section-header">
-          <div>
-            <h2 class="admin-sec-title">Kitchen Stock & Menu Availability (86 Manager)</h2>
-            <p class="admin-sec-sub">Instantly mark ingredients or dishes as "In Stock" or "Sold Out" on the customer menu</p>
-          </div>
-          <div class="admin-search-input-wrap">
+        <!-- Search & Category Filter -->
+        <div class="crud-filters-row">
+          <div class="admin-search-input-wrap" style="flex:1;">
             <i data-lucide="search" class="lucide-icon"></i>
-            <input type="text" id="admin-stock-search" placeholder="Filter dishes..." oninput="renderAdminStock(this.value)">
+            <input type="text" id="admin-crud-item-search" placeholder="Search dishes..." oninput="renderAdminItemsCrud()">
+          </div>
+          <select id="admin-crud-cat-filter" onchange="renderAdminItemsCrud()" class="crud-select">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
+
+        <!-- Items Card List -->
+        <div class="admin-items-crud-list" id="admin-items-crud-list"></div>
+      </section>
+
+      <!-- ── SUB-PANE 3: CATEGORIES CRUD ── -->
+      <section id="admin-pane-categories" class="admin-subpane">
+        <div class="crud-header-row">
+          <div>
+            <h3 class="crud-pane-title">Categories (<span id="admin-cats-total-count">0</span>)</h3>
+            <p class="crud-pane-sub">Manage categories, icons, and display ordering</p>
+          </div>
+          <button class="btn-add-primary" onclick="openCreateCategoryModal()">
+            <i data-lucide="plus" class="lucide-icon"></i>
+            <span>Add Category</span>
+          </button>
+        </div>
+
+        <!-- Categories List -->
+        <div class="admin-cats-crud-list" id="admin-cats-crud-list"></div>
+      </section>
+
+      <!-- ── SUB-PANE 4: EXTRAS MANAGEMENT ── -->
+      <section id="admin-pane-extras" class="admin-subpane">
+        <div class="crud-header-row">
+          <div>
+            <h3 class="crud-pane-title">Extras &amp; Add-ons (<span id="admin-extras-total-count">0</span>)</h3>
+            <p class="crud-pane-sub">Category-scoped add-ons customers can select when ordering</p>
+          </div>
+          <button class="btn-add-primary" onclick="openCreateExtraModal()">
+            <i data-lucide="plus" class="lucide-icon"></i>
+            <span>Add Extra</span>
+          </button>
+        </div>
+        <!-- Extras List -->
+        <div class="admin-extras-crud-list" id="admin-extras-crud-list"></div>
+      </section>
+
+      <!-- ── SUB-PANE 5: ORDERS MANAGEMENT ── -->
+      <section id="admin-pane-orders" class="admin-subpane">
+        <div class="crud-header-row">
+          <div>
+            <h3 class="crud-pane-title">Orders Ledger</h3>
+            <p class="crud-pane-sub">Audit trail & manual status override</p>
           </div>
         </div>
 
-        <div class="admin-stock-grid" id="admin-stock-grid">
-          <!-- Rendered via JS -->
+        <div class="crud-filters-row">
+          <div class="admin-search-input-wrap" style="flex:1;">
+            <i data-lucide="search" class="lucide-icon"></i>
+            <input type="text" id="admin-order-search" placeholder="Search order ID or item..." oninput="handleAdminOrderSearch(this.value)">
+          </div>
+          <select id="admin-status-filter" onchange="handleAdminStatusFilter(this.value)" class="crud-select">
+            <option value="all">All Statuses</option>
+            <option value="orders">Orders (Placed)</option>
+            <option value="cooking">Cooking</option>
+            <option value="ready">Ready</option>
+          </select>
         </div>
+
+        <!-- Mobile Card-based Orders Ledger -->
+        <div class="admin-mobile-orders-list" id="admin-mobile-orders-list"></div>
       </section>
 
       <div class="scroll-bottom-spacer"></div>
     </main>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- FLOATING CART BAR (FOR CUSTOMER MENU VIEW)                        -->
+    <!-- FLOATING CART BAR (CUSTOMER VIEW)                                 -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <div class="floating-cart-bar hidden" id="floating-cart-bar" onclick="navigateTo('orders')">
       <div class="cart-bar-inner">
@@ -465,11 +456,11 @@
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- BOTTOM NAVIGATION (4 TABS: MENU, ORDERS, KITCHEN, ADMIN)          -->
+    <!-- BOTTOM NAVIGATION (CUSTOMER ONLY: MENU & ORDERS)                  -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <nav class="bottom-nav" id="bottom-nav">
       <!-- Menu Tab -->
-      <button class="bnav-btn active" id="bnav-menu" onclick="switchPortal('customer'); navigateTo('menu')">
+      <button class="bnav-btn active" id="bnav-menu" onclick="navigateTo('menu')">
         <div class="bnav-icon-wrap">
           <i data-lucide="utensils" class="bnav-lucide"></i>
         </div>
@@ -477,29 +468,12 @@
       </button>
 
       <!-- Customer Orders Tab -->
-      <button class="bnav-btn" id="bnav-orders" onclick="switchPortal('customer'); navigateTo('orders')">
+      <button class="bnav-btn" id="bnav-orders" onclick="navigateTo('orders')">
         <div class="bnav-icon-wrap">
           <i data-lucide="clipboard-list" class="bnav-lucide"></i>
           <span class="bnav-badge" id="bnav-orders-badge" style="display:none">0</span>
         </div>
         <span class="bnav-label">Orders</span>
-      </button>
-
-      <!-- Chef / Kitchen Tab -->
-      <button class="bnav-btn" id="bnav-chef" onclick="switchPortal('chef')">
-        <div class="bnav-icon-wrap">
-          <i data-lucide="flame" class="bnav-lucide"></i>
-          <span class="bnav-badge" id="bnav-chef-badge" style="display:none">0</span>
-        </div>
-        <span class="bnav-label">Kitchen</span>
-      </button>
-
-      <!-- Admin Tab -->
-      <button class="bnav-btn" id="bnav-admin" onclick="switchPortal('admin')">
-        <div class="bnav-icon-wrap">
-          <i data-lucide="bar-chart-3" class="bnav-lucide"></i>
-        </div>
-        <span class="bnav-label">Admin</span>
       </button>
     </nav>
 
@@ -516,7 +490,7 @@
     </div>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- ORDER TICKET DETAIL MODAL (FOR CHEF & ADMIN)                      -->
+    <!-- ORDER TICKET DETAIL MODAL (CHEF & ADMIN)                          -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <div class="modal-overlay" id="order-modal-overlay" onclick="closeOrderModal()"></div>
     <div class="order-detail-modal" id="order-detail-modal" role="dialog" aria-modal="true">
@@ -526,11 +500,213 @@
       <div id="order-modal-content"></div>
     </div>
 
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- ITEM / PRODUCT CRUD MODAL (ADD & EDIT)                            -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="crud-item-overlay" onclick="closeItemCrudModal()"></div>
+    <div class="bottom-sheet crud-modal" id="crud-item-modal" role="dialog" aria-modal="true">
+      <div class="sheet-pull-handle"></div>
+      <button class="sheet-close-btn" onclick="closeItemCrudModal()" aria-label="Close modal">
+        <i data-lucide="x" class="sheet-close-icon"></i>
+      </button>
+      <div class="crud-modal-content">
+        <h3 id="crud-item-modal-title" class="crud-modal-title">Add Menu Item</h3>
+        <form id="crud-item-form" onsubmit="handleSaveItem(event)">
+          <input type="hidden" id="crud-item-id">
+          
+          <div class="form-group">
+            <label for="crud-item-name">Dish / Item Name *</label>
+            <input type="text" id="crud-item-name" required placeholder="e.g. Smoky Truffle Smash">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex:1;">
+              <label for="crud-item-category">Category *</label>
+              <select id="crud-item-category" required></select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label for="crud-item-price">Price (ETB Br) *</label>
+              <input type="number" id="crud-item-price" required min="0" placeholder="180">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="crud-item-badge">Badge (optional)</label>
+            <input type="text" id="crud-item-badge" placeholder="e.g. BESTSELLER, NEW, VEGAN">
+          </div>
+
+          <div class="form-group">
+            <label>Dish Photo & Cloudinary Integration</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <select id="crud-item-image" onchange="handleImagePresetChange(this.value)" style="flex:1;">
+                <option value="burger_classic.jpg">🍔 Classic Burger Photo</option>
+                <option value="pizza_margherita.jpg">🍕 Artisan Pizza Photo</option>
+                <option value="chicken_sandwich.jpg">🍗 Chicken & Wrap Photo</option>
+                <option value="smoothie_tropical.jpg">🥤 Tropical Juice & Smoothie</option>
+                <option value="milkshake_chocolate.jpg">🍨 Shake & Dessert Photo</option>
+                <option value="pasta_carbonara.jpg">🍝 Carbonara & Pasta Photo</option>
+                <option value="burrito_bowl.jpg">🥗 Healthy Bowl & Breakfast</option>
+                <option value="custom">🌐 Custom Cloudinary / Image URL</option>
+              </select>
+              <button type="button" onclick="document.getElementById('crud-item-file-input').click()" style="padding:10px 14px;white-space:nowrap;background:var(--brand-terracotta);color:#ffffff;border:none;border-radius:10px;font-size:0.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                ☁️ Upload
+              </button>
+            </div>
+            <input type="file" id="crud-item-file-input" accept="image/*" style="display:none;" onchange="handleAdminPhotoUpload(event)">
+            <input type="text" id="crud-item-image-custom" placeholder="https://res.cloudinary.com/xheul1fe/image/upload/..." style="display:none;margin-top:8px;" oninput="updatePhotoPreview(this.value)">
+            <div id="crud-item-image-preview-wrap" style="display:flex;align-items:center;gap:12px;margin-top:8px;padding:8px 12px;background:var(--bg-cream);border-radius:10px;border:1px dashed var(--border-warm);">
+              <img id="crud-item-thumb-preview" src="burger_classic.jpg" style="width:44px;height:44px;object-fit:cover;border-radius:8px;" onerror="this.src='logo.png'">
+              <div style="flex:1;overflow:hidden;">
+                <span id="crud-item-photo-status" style="display:block;font-size:0.75rem;color:var(--text-muted);word-break:break-all;">Photo: burger_classic.jpg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="crud-item-desc">Description</label>
+            <textarea id="crud-item-desc" rows="2" placeholder="Ingredients, recipe style..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="crud-item-ingredients">Ingredients (comma-separated)</label>
+            <input type="text" id="crud-item-ingredients" placeholder="Beef patty, Cheddar, Brioche bun, Pickles">
+          </div>
+
+          <div class="form-checkbox-row">
+            <input type="checkbox" id="crud-item-available" checked>
+            <label for="crud-item-available">Available in Stock (Uncheck to mark 86'd / Sold Out)</label>
+          </div>
+
+          <button type="submit" class="btn-crud-submit" id="crud-item-submit-btn">Save Dish to Real Database</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- CATEGORY CRUD MODAL (ADD & EDIT)                                  -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="crud-cat-overlay" onclick="closeCategoryCrudModal()"></div>
+    <div class="bottom-sheet crud-modal" id="crud-cat-modal" role="dialog" aria-modal="true">
+      <div class="sheet-pull-handle"></div>
+      <button class="sheet-close-btn" onclick="closeCategoryCrudModal()" aria-label="Close modal">
+        <i data-lucide="x" class="sheet-close-icon"></i>
+      </button>
+      <div class="crud-modal-content">
+        <h3 id="crud-cat-modal-title" class="crud-modal-title">Add Food Category</h3>
+        <form id="crud-cat-form" onsubmit="handleSaveCategory(event)">
+          <input type="hidden" id="crud-cat-is-edit" value="0">
+          
+          <div class="form-group">
+            <label for="crud-cat-name">Category Name *</label>
+            <input type="text" id="crud-cat-name" required placeholder="e.g. Loaded Tacos" oninput="autoGenerateCatId(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label for="crud-cat-id">Category ID Slug *</label>
+            <input type="text" id="crud-cat-id" required placeholder="e.g. tacos">
+          </div>
+
+          <div class="form-group">
+            <label for="crud-cat-icon">Icon</label>
+            <select id="crud-cat-icon">
+              <option value="burger">🍔 Burger</option>
+              <option value="pizza">🍕 Pizza</option>
+              <option value="wrap">🌯 Wrap</option>
+              <option value="package">🍟 Sides / Fries</option>
+              <option value="cup-soda">🥤 Drinks</option>
+              <option value="soup">🍝 Pasta / Bowls</option>
+              <option value="sandwich">🥪 Sandwich</option>
+              <option value="drumstick">🍗 Chicken</option>
+              <option value="egg-fried">🍳 Breakfast</option>
+              <option value="dumbbell">💪 Protein</option>
+              <option value="glass-water">🍹 Smoothie</option>
+              <option value="citrus">🍊 Fresh Juice</option>
+              <option value="ice-cream-2">🍨 Milkshakes</option>
+              <option value="cake-slice">🍰 Desserts</option>
+              <option value="utensils">🍽️ General Dish</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-crud-submit" id="crud-cat-submit-btn">Save Category to Real Database</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- EXTRAS CRUD MODAL (ADD & EDIT)                                    -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="crud-extra-overlay" onclick="closeExtraCrudModal()"></div>
+    <div class="bottom-sheet crud-modal" id="crud-extra-modal" role="dialog" aria-modal="true">
+      <div class="sheet-pull-handle"></div>
+      <button class="sheet-close-btn" onclick="closeExtraCrudModal()" aria-label="Close modal">
+        <i data-lucide="x" class="sheet-close-icon"></i>
+      </button>
+      <div class="crud-modal-content">
+        <h3 id="crud-extra-modal-title" class="crud-modal-title">Add Extra / Add-on</h3>
+        <form id="crud-extra-form" onsubmit="handleSaveExtra(event)">
+          <input type="hidden" id="crud-extra-id" value="">
+          <input type="hidden" id="crud-extra-is-edit" value="0">
+          
+          <div class="form-group">
+            <label for="crud-extra-name">Extra Name *</label>
+            <input type="text" id="crud-extra-name" required placeholder="e.g. Extra Melted Cheese">
+          </div>
+
+          <div class="form-group">
+            <label for="crud-extra-price">Price (Br) *</label>
+            <input type="number" id="crud-extra-price" required min="0" step="1" placeholder="e.g. 149">
+          </div>
+
+          <div class="form-group">
+            <label>Applicable Food Categories</label>
+            <div id="crud-extra-categories-checkboxes" style="display:grid; grid-template-columns:1fr 1fr; gap:6px; max-height:160px; overflow-y:auto; padding:8px; background:var(--bg-cream); border:1px solid var(--border-warm); border-radius:10px; margin-top:6px;">
+              <!-- Checkboxes dynamically populated -->
+            </div>
+            <small style="color:var(--text-muted); font-size:0.75rem; margin-top:4px; display:block;">Select which dish categories this extra applies to (leave all empty for All Dishes)</small>
+          </div>
+
+          <div class="form-checkbox-row">
+            <input type="checkbox" id="crud-extra-available" checked>
+            <label for="crud-extra-available">In Stock / Available</label>
+          </div>
+
+          <button type="submit" class="btn-crud-submit" id="crud-extra-submit-btn">Save Extra to Real Database</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- STAFF PASSWORD ACCESS MODAL (KITCHEN & ADMIN ROUTES)             -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="staff-auth-overlay"></div>
+    <div class="staff-auth-modal" id="staff-auth-modal" role="dialog" aria-modal="true">
+      <div class="staff-auth-card">
+        <div class="staff-auth-icon-wrap">
+          <i data-lucide="shield-check" class="lucide-icon"></i>
+        </div>
+        <h3 class="staff-auth-title" id="staff-auth-title">Staff Portal Access</h3>
+        <p class="staff-auth-desc" id="staff-auth-desc">Enter staff passcode to access this terminal</p>
+        
+        <form id="staff-auth-form" onsubmit="handleStaffAuthSubmit(event)">
+          <div class="staff-auth-input-wrap">
+            <input type="password" id="staff-auth-input" class="staff-auth-input" placeholder="Enter staff passcode..." required autocomplete="current-password">
+          </div>
+          <div id="staff-auth-error" class="staff-auth-error" style="display:none;">
+            Incorrect passcode. Access denied.
+          </div>
+          <div class="staff-auth-actions">
+            <button type="button" class="staff-auth-cancel-btn" onclick="cancelStaffAuth()">Cancel (Back to Menu)</button>
+            <button type="submit" class="staff-auth-submit-btn">Unlock Portal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- TOAST NOTIFICATIONS -->
     <div class="toast-popup" id="toast"></div>
 
   </div>
 
-  <script src="app.js?v=20261021_3"></script>
+  <script src="app.js?v=20261022_7"></script>
 </body>
 </html>
