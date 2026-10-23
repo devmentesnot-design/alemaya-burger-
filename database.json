@@ -1624,6 +1624,185 @@
   ],
   "orders": [
     {
+      "id": "AG-TEST-99",
+      "timestamp": "11:45 AM",
+      "date": "2026-10-23",
+      "createdAt": 1792744790799,
+      "orderType": "Dine-in (Table 1)",
+      "items": [
+        {
+          "id": "classic-burger",
+          "qty": 2,
+          "name": "Classic Burger",
+          "total": 560,
+          "unitPrice": 280
+        }
+      ],
+      "subtotal": 560,
+      "service": 0,
+      "total": 560,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    },
+    {
+      "id": "AG-6133",
+      "timestamp": "09:18 AM",
+      "date": "2026-10-23",
+      "createdAt": 1792736302343,
+      "orderType": "Takeaway",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Avocado Juice",
+          "note": "gjj",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+          "total": 288,
+          "extras": [
+            {
+              "id": "ext_honey",
+              "name": "Organic Pure Honey",
+              "price": 59
+            }
+          ],
+          "basePrice": 229,
+          "productId": "item_77",
+          "unitPrice": 288,
+          "selections": {
+            "extras_addons": [
+              "ext_honey"
+            ]
+          },
+          "customizations": []
+        },
+        {
+          "qty": 1,
+          "name": "Beef with Cheese Wrap",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+          "total": 838,
+          "extras": [
+            {
+              "id": "ext_tuna",
+              "name": "Extra Premium Tuna",
+              "price": 269
+            }
+          ],
+          "basePrice": 569,
+          "productId": "item_26",
+          "unitPrice": 838,
+          "selections": {
+            "extras_addons": [
+              "ext_tuna"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 1126,
+      "service": 0,
+      "total": 1126,
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    },
+    {
+      "id": "AG-5131",
+      "timestamp": "09:11 AM",
+      "date": "2026-10-23",
+      "createdAt": 1792735911800,
+      "orderType": "Takeaway",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Pineapple Juice",
+          "note": "fgsdfg",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+          "total": 308,
+          "extras": [
+            {
+              "id": "ext_honey",
+              "name": "Organic Pure Honey",
+              "price": 59
+            }
+          ],
+          "basePrice": 249,
+          "productId": "item_80",
+          "unitPrice": 308,
+          "selections": {
+            "extras_addons": [
+              "ext_honey"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 308,
+      "service": 0,
+      "total": 308,
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    },
+    {
+      "id": "AG-7833",
+      "timestamp": "09:06 AM",
+      "date": "2026-10-23",
+      "createdAt": 1792735612976,
+      "orderType": "Dine-in",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Rice",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
+          "total": 612,
+          "extras": [
+            {
+              "id": "ext_beef",
+              "name": "Extra Flame Grilled Beef Patty",
+              "price": 169
+            },
+            {
+              "id": "ext_chicken",
+              "name": "Extra Flame Grilled Chicken",
+              "price": 169
+            },
+            {
+              "id": "ext_egg",
+              "name": "Extra Farm Egg",
+              "price": 45
+            }
+          ],
+          "basePrice": 229,
+          "productId": "item_31",
+          "unitPrice": 612,
+          "selections": {
+            "extras_addons": [
+              "ext_beef",
+              "ext_chicken",
+              "ext_egg"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 612,
+      "service": 0,
+      "total": 612,
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    },
+    {
       "id": "AG-4779",
       "timestamp": "08:05 PM",
       "date": "2026-10-22",
@@ -1676,8 +1855,11 @@
       "subtotal": 1806,
       "service": 0,
       "total": 1806,
-      "status": "ready",
-      "statusLabel": "Ready"
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-1337",
@@ -1704,7 +1886,10 @@
       "service": 0,
       "total": 799,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-6219",
@@ -1747,7 +1932,10 @@
       "service": 0,
       "total": 687,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-4925",
@@ -1790,7 +1978,10 @@
       "service": 0,
       "total": 937,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-7703",
@@ -1839,7 +2030,10 @@
       "service": 0,
       "total": 666,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-4836",
@@ -1882,7 +2076,10 @@
       "service": 0,
       "total": 713,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-1792",
@@ -1907,7 +2104,10 @@
       "service": 70,
       "total": 769,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     },
     {
       "id": "AG-9574",
@@ -1932,7 +2132,10 @@
       "service": 80,
       "total": 879,
       "status": "completed",
-      "statusLabel": "Completed"
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
     }
   ],
   "extras": [

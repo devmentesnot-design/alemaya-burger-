@@ -273,7 +273,25 @@ async function createOrder(order) {
     table_token: order.tableToken || null
   };
 
-  await supabaseFetch('orders', 'POST', payload);
+  let res = await supabaseFetch('orders', 'POST', payload);
+  if (!res) {
+    // If Supabase schema does not have table_id/table_name columns yet, fallback to standard schema
+    const fallbackPayload = {
+      id: order.id,
+      timestamp: order.timestamp,
+      date: order.date,
+      created_at: Number(order.createdAt) || Date.now(),
+      order_type: order.tableName ? `${order.orderType || 'Dine-in'} (${order.tableName})` : (order.orderType || 'Dine-in'),
+      items: order.items || [],
+      subtotal: Number(order.subtotal) || 0,
+      service: Number(order.service) || 0,
+      total: Number(order.total) || 0,
+      status: order.status || 'received',
+      status_label: order.statusLabel || 'Order Received'
+    };
+    res = await supabaseFetch('orders', 'POST', fallbackPayload);
+  }
+
 
   const local = readLocalDb();
   local.orders = local.orders || [];
@@ -281,6 +299,7 @@ async function createOrder(order) {
   writeLocalDb(local);
   return { success: true, data: order };
 }
+
 
 async function updateOrderStatus(id, status, statusLabel) {
   const payload = { status };

@@ -1815,34 +1815,43 @@ i[data-lucide] {
   background: var(--bg-subtle);
   border: 1px solid var(--border-warm);
   border-radius: var(--radius-pill);
-  padding: 3px;
+  padding: 4px 6px;
   margin-top: 4px;
-  gap: 2px;
+  gap: 4px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.admin-mobile-subnav::-webkit-scrollbar {
+  display: none;
 }
 .admin-subtab {
-  flex: 1;
-  display: flex;
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 6px 4px;
+  gap: 6px;
+  padding: 7px 13px;
   border-radius: var(--radius-pill);
   border: none;
   background: transparent;
   color: var(--text-dark);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 .admin-subtab.active {
-  background: var(--bg-cream);
-  color: var(--brand-terracotta);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: var(--brand-terracotta);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
 }
 .admin-subtab.active svg {
-  stroke: var(--brand-terracotta) !important;
+  stroke: #FFFFFF !important;
 }
+
 
 .admin-subpane {
   display: none;

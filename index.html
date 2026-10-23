@@ -218,10 +218,12 @@
             <span>Active Queue:</span>
           </label>
           <select id="kds-filter-select" class="kds-filter-dropdown" onchange="handleKdsFilterChange(this.value)">
-            <option value="active">All Active (Orders, Cooking, Ready)</option>
-            <option value="orders">1. Orders (Placed)</option>
+            <option value="active">All Active Queue (Orders, Cooking, Ready)</option>
+            <option value="orders">1. Orders (Placed / New)</option>
             <option value="cooking">2. Cooking</option>
-            <option value="ready">3. Ready</option>
+            <option value="ready">3. Ready for Pickup</option>
+            <option value="completed">4. Completed Orders</option>
+            <option value="all">5. All Orders</option>
           </select>
         </div>
       </header>
@@ -340,7 +342,6 @@
             <div class="kpi-subtext" id="kpi-orders-sub">Filtered period</div>
           </div>
 
-
           <div class="kpi-card active-card">
             <div class="kpi-card-header">
               <span class="kpi-label">KITCHEN</span>
@@ -349,7 +350,17 @@
             <div class="kpi-value" id="kpi-kitchen-active">0</div>
             <div class="kpi-subtext">Active cooking</div>
           </div>
+
+          <div class="kpi-card tables-card" onclick="switchAdminSubTab('tables')" style="cursor:pointer;" title="Click to manage restaurant tables & QR codes">
+            <div class="kpi-card-header">
+              <span class="kpi-label">TABLES &amp; QR</span>
+              <div class="kpi-icon-wrap" style="background:#FEF2F2; color:var(--brand-terracotta);"><i data-lucide="qr-code" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-tables-count">Manage</div>
+            <div class="kpi-subtext" style="color:var(--brand-terracotta); font-weight:700;">Tap to view QR codes →</div>
+          </div>
         </div>
+
 
         <!-- 7-Day Revenue Trend Chart -->
         <div class="admin-card-block">

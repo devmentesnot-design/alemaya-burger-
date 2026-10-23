@@ -2164,15 +2164,26 @@ function handleHashRouting() {
   const isOrdersRoute = hash === 'orders' || path === '/orders' || path.endsWith('/orders');
 
   if (isKitchenRoute) {
-    switchPortal('chef');
+    const isAuthed = sessionStorage.getItem('staff_auth_kitchen') === '1';
+    if (isAuthed) {
+      switchPortal('chef');
+    } else {
+      promptStaffPassword('kitchen');
+    }
   } else if (isAdminRoute) {
-    switchPortal('admin');
+    const isAuthed = sessionStorage.getItem('staff_auth_admin') === '1';
+    if (isAuthed) {
+      switchPortal('admin');
+    } else {
+      promptStaffPassword('admin');
+    }
   } else if (isOrdersRoute) {
     navigateTo('orders');
   } else {
     navigateTo('menu');
   }
 }
+
 
 
 // ══ STAFF AUTHENTICATION & SECURE ROUTES (/kitchen & /admin) ══
@@ -3435,7 +3446,10 @@ function switchPortal(portal) {
     const chefView = document.getElementById('view-chef');
     if (chefView) chefView.classList.add('active');
     renderKdsTickets();
-    if (window.location.hash !== '#kitchen' && window.location.hash !== '#chef') {
+    const isCleanKitchen = window.location.pathname.endsWith('/kitchen') || window.location.pathname.endsWith('/chef');
+    if (isCleanKitchen) {
+      if (window.location.hash) history.replaceState(null, '', window.location.pathname);
+    } else if (window.location.hash !== '#kitchen' && window.location.hash !== '#chef') {
       history.replaceState(null, '', '#kitchen');
     }
   } else if (portal === 'admin') {
@@ -3444,7 +3458,10 @@ function switchPortal(portal) {
     const adminView = document.getElementById('view-admin');
     if (adminView) adminView.classList.add('active');
     switchAdminSubTab(APP_STATE.adminSubTab || 'overview');
-    if (window.location.hash !== '#admin') {
+    const isCleanAdmin = window.location.pathname.endsWith('/admin');
+    if (isCleanAdmin) {
+      if (window.location.hash) history.replaceState(null, '', window.location.pathname);
+    } else if (window.location.hash !== '#admin') {
       history.replaceState(null, '', '#admin');
     }
   }
@@ -3480,6 +3497,10 @@ function renderKdsTickets() {
     });
   } else if (filter === 'ready') {
     filtered = MASTER_ORDERS.filter(o => (o.status || '').toLowerCase() === 'ready');
+  } else if (filter === 'completed') {
+    filtered = MASTER_ORDERS.filter(o => (o.status || '').toLowerCase() === 'completed');
+  } else if (filter === 'all') {
+    filtered = [...MASTER_ORDERS];
   }
 
   if (filtered.length === 0) {
@@ -3487,10 +3508,10 @@ function renderKdsTickets() {
       <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 16px;">
         <div style="font-size: 2.5rem; margin-bottom: 8px;">🍳</div>
         <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: #0F172A; margin-bottom: 4px;">
-          No active orders in this queue
+          No orders in this queue
         </h3>
         <p style="font-size: 0.82rem; color: #64748B; max-width: 360px; margin: 0 auto;">
-          Orders placed by customers will chime and appear here in real-time.
+          Orders placed by customers will chime and appear here in real-time. Use the filter dropdown above to view all or completed orders.
         </p>
       </div>
     `;
@@ -3547,9 +3568,11 @@ function renderKdsTickets() {
 
     const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
 
-    const tableBadgeHtml = ord.tableName
-      ? `<div class="kds-table-badge">🍽️ ${escapeHtml(ord.tableName)}</div>`
+    const resolvedTable = ord.tableName || (ord.orderType && ord.orderType.includes('(') ? ord.orderType.replace(/^.*?\(|\)$/g, '') : null);
+    const tableBadgeHtml = resolvedTable
+      ? `<div class="kds-table-badge">🍽️ ${escapeHtml(resolvedTable)}</div>`
       : '';
+
 
     html += `
       <div class="kds-ticket-card">
