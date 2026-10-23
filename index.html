@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=20261023_1">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
 <body>
   <!-- SPLASH SCREEN -->
@@ -80,6 +81,21 @@
         <!-- 4-Column Category Grid -->
         <div class="cat-grid" id="cat-grid" role="tablist"></div>
       </section>
+
+      <!-- ACTIVE TABLE BANNER (WHEN QR SCANNED) -->
+      <div id="customer-active-table-banner" class="customer-active-table-banner hidden">
+        <div class="active-table-info">
+          <span class="table-icon-pill">🍽️</span>
+          <div>
+            <div class="active-table-title" id="cust-table-title">Table 1</div>
+            <div class="active-table-sub">Orders served directly to your table</div>
+          </div>
+        </div>
+        <div class="table-badge-actions">
+          <span class="table-verified-badge"><i data-lucide="check-circle" class="lucide-icon" style="width:12px;height:12px;margin-right:3px;"></i>QR Verified</span>
+          <button class="table-clear-btn" onclick="clearCustomerTableContext()" title="Clear / Switch Table">✕</button>
+        </div>
+      </div>
 
       <!-- ORDER TYPE TABS (Dine-in / Takeaway) -->
       <section class="order-type-section">
@@ -153,7 +169,8 @@
               <span id="sum-total" class="sum-total-val">Br 0</span>
             </div>
             <div class="sum-ordertype-note">
-              Order Type: <strong id="sum-ordertype-label">Dine-in</strong>
+              <div>Order Type: <strong id="sum-ordertype-label">Dine-in</strong></div>
+              <div id="checkout-table-info-wrap" class="checkout-table-info-wrap" style="margin-top:6px;"></div>
             </div>
           </div>
 
@@ -267,6 +284,10 @@
           <button class="admin-subtab" id="asub-orders" onclick="switchAdminSubTab('orders')">
             <i data-lucide="clipboard-list" class="lucide-icon"></i>
             <span>Orders</span>
+          </button>
+          <button class="admin-subtab" id="asub-tables" onclick="switchAdminSubTab('tables')">
+            <i data-lucide="qr-code" class="lucide-icon"></i>
+            <span>Tables</span>
           </button>
         </div>
       </header>
@@ -455,6 +476,52 @@
 
         <!-- Mobile Card-based Orders Ledger -->
         <div class="admin-mobile-orders-list" id="admin-mobile-orders-list"></div>
+      </section>
+
+      <!-- ── SUB-PANE 6: TABLES & QR CODE MANAGEMENT ── -->
+      <section id="admin-pane-tables" class="admin-subpane">
+        <div class="crud-header-row" style="flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 class="crud-pane-title">Table Management &amp; QR Codes</h3>
+            <p class="crud-pane-sub">Automatic table assignment, printable stand cards &amp; secure tokens</p>
+          </div>
+          <div class="crud-actions-wrap" style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-crud-add" onclick="openAddTableModal()">
+              <i data-lucide="plus" class="lucide-icon"></i>
+              <span>Add Table</span>
+            </button>
+            <button class="btn-crud-action-sec" onclick="openBulkTablesModal()">
+              <i data-lucide="layers" class="lucide-icon"></i>
+              <span>Bulk Generate</span>
+            </button>
+            <button class="btn-crud-action-sec" onclick="openBulkPrintModal()">
+              <i data-lucide="printer" class="lucide-icon"></i>
+              <span>Bulk Print QRs</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="crud-filters-row">
+          <div class="admin-search-input-wrap" style="flex:1;">
+            <i data-lucide="search" class="lucide-icon"></i>
+            <input type="text" id="admin-table-search" placeholder="Search tables (e.g. VIP, Table 7)..." oninput="handleAdminTableSearch(this.value)">
+          </div>
+          <select id="admin-table-status-filter" onchange="handleAdminTableStatusFilter(this.value)" class="crud-select">
+            <option value="all">All Tables</option>
+            <option value="active">Active Only</option>
+            <option value="inactive">Deactivated</option>
+          </select>
+        </div>
+
+        <!-- Tables Metric Counts Bar -->
+        <div class="admin-tables-stats-bar">
+          <div class="stat-pill"><span class="stat-dot dot-all"></span> Total: <strong id="tables-stat-total">0</strong></div>
+          <div class="stat-pill"><span class="stat-dot dot-active"></span> Active: <strong id="tables-stat-active">0</strong></div>
+          <div class="stat-pill"><span class="stat-dot dot-inactive"></span> Deactivated: <strong id="tables-stat-inactive">0</strong></div>
+        </div>
+
+        <!-- Tables Cards Grid -->
+        <div class="admin-tables-crud-list" id="admin-tables-crud-list"></div>
       </section>
 
       <div class="scroll-bottom-spacer"></div>
@@ -694,7 +761,171 @@
           <button type="submit" class="btn-crud-submit" id="crud-extra-submit-btn">Save Extra to Real Database</button>
         </form>
       </div>
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: ADD / EDIT TABLE CRUD                                      -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="crud-table-overlay" onclick="closeTableCrudModal()"></div>
+    <div class="bottom-sheet crud-modal" id="crud-table-modal" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <button class="sheet-close-btn" onclick="closeTableCrudModal()" aria-label="Close modal">
+        <i data-lucide="x" class="lucide-icon"></i>
+      </button>
+      <div class="crud-modal-content">
+        <h3 id="crud-table-modal-title" class="crud-modal-title">Add Table</h3>
+        <p class="crud-modal-desc">Create or update a dining table with an automatically generated QR code</p>
+        <form id="crud-table-form" onsubmit="handleTableCrudSubmit(event)">
+          <input type="hidden" id="crud-table-id">
+          
+          <div class="form-group">
+            <label for="crud-table-name">Table Name / Identifier *</label>
+            <input type="text" id="crud-table-name" placeholder="e.g. Table 1, VIP 1, Terrace 2" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="crud-table-number">Table Number / Order</label>
+              <input type="number" id="crud-table-number" min="1" placeholder="e.g. 1">
+            </div>
+            <div class="form-group">
+              <label for="crud-table-capacity">Seating Capacity</label>
+              <input type="number" id="crud-table-capacity" min="1" max="50" value="4">
+            </div>
+          </div>
+
+          <div class="form-checkbox-row">
+            <input type="checkbox" id="crud-table-active" checked>
+            <label for="crud-table-active">Active (Customers can scan &amp; order from this table)</label>
+          </div>
+
+          <button type="submit" class="btn-crud-submit" id="crud-table-submit-btn">Save Table</button>
+        </form>
+      </div>
     </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: BULK GENERATE TABLES                                       -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="crud-bulk-tables-overlay" onclick="closeBulkTablesModal()"></div>
+    <div class="bottom-sheet crud-modal" id="crud-bulk-tables-modal" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <button class="sheet-close-btn" onclick="closeBulkTablesModal()" aria-label="Close modal">
+        <i data-lucide="x" class="lucide-icon"></i>
+      </button>
+      <div class="crud-modal-content">
+        <h3 class="crud-modal-title">Bulk Generate Tables</h3>
+        <p class="crud-modal-desc">Automatically create a sequence of tables with unique persistent QR tokens</p>
+        <form id="crud-bulk-tables-form" onsubmit="handleBulkTablesSubmit(event)">
+          <div class="form-group">
+            <label for="bulk-table-prefix">Table Name Prefix</label>
+            <input type="text" id="bulk-table-prefix" value="Table " placeholder="e.g. Table , VIP , Terrace ">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bulk-table-from">From Table # *</label>
+              <input type="number" id="bulk-table-from" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+              <label for="bulk-table-to">To Table # *</label>
+              <input type="number" id="bulk-table-to" min="1" max="100" value="20" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bulk-table-capacity">Default Seating Capacity</label>
+            <input type="number" id="bulk-table-capacity" min="1" max="50" value="4">
+          </div>
+
+          <div class="bulk-tables-hint" style="font-size:0.78rem; color:#64748B; margin-bottom:14px; background:#F8FAFC; border:1px solid #E2E8F0; padding:10px 12px; border-radius:8px;">
+            💡 <em>Existing tables with the same name will be preserved and not duplicated.</em>
+          </div>
+
+          <button type="submit" class="btn-crud-submit">Generate Tables &amp; QR Codes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: TABLE QR STAND CARD PREVIEW & PRINT                       -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="table-qr-stand-overlay" onclick="closeTableQrModal()"></div>
+    <div class="table-stand-preview-modal" id="table-qr-stand-modal" role="dialog" aria-modal="true">
+      <button class="modal-close-icon" onclick="closeTableQrModal()" aria-label="Close dialog">
+        <i data-lucide="x" class="lucide-icon"></i>
+      </button>
+
+      <!-- Printable Stand Card Inside -->
+      <div class="qr-stand-card" id="single-qr-stand-card">
+        <div class="stand-card-header">
+          <img src="logo.png" alt="Alemaya Grill'd" class="stand-logo">
+          <div class="stand-brand-sub">Healthy Burgers &amp; Flame Grill'd</div>
+        </div>
+
+        <div class="stand-table-title" id="stand-modal-table-title">Table 1</div>
+        <div class="stand-table-token" id="stand-modal-table-token">Token: t_tbl1</div>
+
+        <div class="stand-qr-box">
+          <canvas id="stand-modal-qr-canvas" width="220" height="220"></canvas>
+        </div>
+
+        <div class="stand-instructions">
+          <strong>SCAN WITH YOUR PHONE CAMERA</strong>
+          <p>Scan to view the live menu &amp; order directly to this table</p>
+        </div>
+
+        <div class="stand-footer-tag">
+          <span>Alemaya Grill'd • Fresh, Fast &amp; Healthy</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="stand-actions-bar">
+        <button class="btn-stand-print" onclick="printSingleTableCard()">
+          <i data-lucide="printer" class="lucide-icon"></i>
+          <span>Print Table Stand</span>
+        </button>
+        <button class="btn-stand-download" onclick="downloadCurrentTableQr()">
+          <i data-lucide="download" class="lucide-icon"></i>
+          <span>Download PNG QR</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: BULK PRINT QR CODES SHEET                                  -->
+    <!-- ═════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="table-bulk-print-overlay" onclick="closeBulkPrintModal()"></div>
+    <div class="table-bulk-modal" id="table-bulk-print-modal" role="dialog" aria-modal="true">
+      <div class="bulk-modal-head">
+        <div>
+          <h3 style="font-family:var(--font-serif); font-size:1.15rem; color:var(--text-dark); margin-bottom:2px;">Bulk Print Table QR Cards</h3>
+          <p style="font-size:0.78rem; color:var(--text-muted);">Select tables to generate printable stand cards</p>
+        </div>
+        <button class="sheet-close-btn" onclick="closeBulkPrintModal()" aria-label="Close modal">
+          <i data-lucide="x" class="lucide-icon"></i>
+        </button>
+      </div>
+
+      <div class="bulk-select-controls">
+        <label class="bulk-select-all-label">
+          <input type="checkbox" id="bulk-print-select-all" onchange="toggleSelectAllBulkPrint(this.checked)" checked>
+          <span>Select All Tables (<span id="bulk-print-count">0</span>)</span>
+        </label>
+      </div>
+
+      <div class="bulk-tables-checklist" id="bulk-tables-checklist"></div>
+
+      <div class="bulk-modal-foot">
+        <button type="button" class="btn-crud-secondary" onclick="closeBulkPrintModal()">Cancel</button>
+        <button type="button" class="btn-crud-add" onclick="executeBulkPrint()">
+          <i data-lucide="printer" class="lucide-icon"></i>
+          <span>Print Selected QR Stands</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden on screen, shown in @media print for bulk printing -->
+    <div id="printable-qr-stand-sheet" class="printable-qr-stand-sheet" style="display:none;"></div>
 
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <!-- STAFF PASSWORD ACCESS MODAL (KITCHEN & ADMIN ROUTES)             -->

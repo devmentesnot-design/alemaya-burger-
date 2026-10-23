@@ -137,6 +137,7 @@ async function handleRequest(req, res) {
             "/api/products",
             "/api/orders",
             "/api/extras",
+            "/api/tables",
             "/api/stats",
             "/api/cloudinary-config"
           ]
@@ -303,19 +304,38 @@ async function handleRequest(req, res) {
           const body = await parseJsonBody(req);
           const orderId = body.id || 'AG-' + Math.floor(1000 + Math.random() * 9000);
           const now = new Date();
+
+          let tableId = body.tableId || null;
+          let tableName = body.tableName || body.tableNumber || null;
+          let tableToken = body.tableToken || null;
+
+          // If a tableToken is provided, validate it on the server
+          if (tableToken) {
+            const table = await supabaseDb.getTableByToken(tableToken);
+            if (table) {
+              if (table.active === false) {
+                return sendJson(res, 400, { success: false, error: 'Table is deactivated. Cannot place order.' });
+              }
+              tableId = table.id;
+              tableName = table.name;
+            }
+          }
           
           const newOrder = {
             id: orderId,
             timestamp: body.timestamp || now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             date: body.date || now.toISOString().split('T')[0],
             createdAt: body.createdAt || Date.now(),
-            orderType: body.orderType || 'Dine-in',
+            orderType: body.orderType || (tableName ? 'Dine-in' : 'Takeaway'),
             items: body.items || [],
             subtotal: Number(body.subtotal) || 0,
             service: Number(body.service) || 0,
             total: Number(body.total) || 0,
             status: body.status || 'received',
-            statusLabel: body.statusLabel || 'Order Received'
+            statusLabel: body.statusLabel || 'Order Received',
+            tableId,
+            tableName,
+            tableToken
           };
 
           const saved = await supabaseDb.createOrder(newOrder);
@@ -337,6 +357,111 @@ async function handleRequest(req, res) {
           const body = await parseJsonBody(req);
           await supabaseDb.updateOrderStatus(orderId, body.status, body.statusLabel);
           return sendJson(res, 200, { success: true });
+        }
+      }
+
+      // ── 3.5 RESTAURANT TABLES & QR CODES CRUD ──
+      if (pathname === '/api/tables') {
+        if (req.method === 'GET') {
+          const tables = await supabaseDb.getTables();
+          return sendJson(res, 200, { success: true, data: tables });
+        }
+        if (req.method === 'POST') {
+          const body = await parseJsonBody(req);
+
+          // Bulk table generation (e.g. from 1 to 20 with prefix "Table ")
+          if (body.bulk) {
+            const prefix = (body.prefix !== undefined ? String(body.prefix) : 'Table ').trim();
+            const from = Math.max(1, parseInt(body.from) || 1);
+            const to = Math.min(200, Math.max(from, parseInt(body.to) || from));
+            const capacity = parseInt(body.capacity) || 4;
+
+            const existing = await supabaseDb.getTables();
+            const existingNames = new Set(existing.map(t => (t.name || '').toLowerCase().trim()));
+
+            const tablesToCreate = [];
+            for (let num = from; num <= to; num++) {
+              const name = prefix ? `${prefix} ${num}` : `Table ${num}`;
+              if (!existingNames.has(name.toLowerCase())) {
+                tablesToCreate.push({
+                  name,
+                  number: num,
+                  capacity,
+                  active: true
+                });
+              }
+            }
+
+            if (tablesToCreate.length === 0) {
+              return sendJson(res, 200, { success: true, message: 'All specified tables already exist', data: existing });
+            }
+
+            const result = await supabaseDb.saveTablesBulk(tablesToCreate);
+            return sendJson(res, 201, result);
+          }
+
+          // Single table creation
+          if (!body.name) return sendJson(res, 400, { success: false, error: 'Table name is required' });
+          const id = body.id || ('tbl_' + Date.now().toString(36));
+          const num = parseInt(body.number) || (parseInt(body.name.replace(/[^0-9]/g, '')) || 0);
+
+          const newTable = {
+            id,
+            name: body.name.trim(),
+            number: num,
+            capacity: parseInt(body.capacity) || 4,
+            active: body.active !== false
+          };
+
+          const saved = await supabaseDb.saveTable(newTable, false);
+          return sendJson(res, 201, saved);
+        }
+      }
+
+      if (pathname.startsWith('/api/tables/validate/')) {
+        const token = decodeURIComponent(pathname.replace('/api/tables/validate/', '')).trim();
+        const table = await supabaseDb.getTableByToken(token);
+        if (!table) {
+          return sendJson(res, 404, { success: false, error: 'Invalid or expired table QR token' });
+        }
+        if (table.active === false) {
+          return sendJson(res, 400, { success: false, error: 'Table is currently deactivated', data: table });
+        }
+        return sendJson(res, 200, { success: true, data: table });
+      }
+
+      if (pathname.startsWith('/api/tables/') && pathname.endsWith('/regenerate-token')) {
+        const id = decodeURIComponent(pathname.replace('/api/tables/', '').replace('/regenerate-token', ''));
+        const result = await supabaseDb.regenerateTableToken(id);
+        return sendJson(res, 200, result);
+      }
+
+      if (pathname.startsWith('/api/tables/')) {
+        const id = decodeURIComponent(pathname.replace('/api/tables/', ''));
+
+        if (req.method === 'GET') {
+          const tables = await supabaseDb.getTables();
+          const found = tables.find(t => t.id === id);
+          if (!found) return sendJson(res, 404, { success: false, error: 'Table not found' });
+          return sendJson(res, 200, { success: true, data: found });
+        }
+
+        if (req.method === 'PUT') {
+          const body = await parseJsonBody(req);
+          const table = { id, ...body };
+          const result = await supabaseDb.saveTable(table, true);
+          return sendJson(res, 200, result);
+        }
+
+        if (req.method === 'PATCH') {
+          const body = await parseJsonBody(req);
+          const result = await supabaseDb.patchTable(id, body);
+          return sendJson(res, 200, result);
+        }
+
+        if (req.method === 'DELETE') {
+          await supabaseDb.deleteTable(id);
+          return sendJson(res, 200, { success: true, message: 'Table deleted' });
         }
       }
 

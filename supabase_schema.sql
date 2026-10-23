@@ -37,7 +37,20 @@ CREATE TABLE IF NOT EXISTS public.orders (
   service NUMERIC(10,2) DEFAULT 0,
   total NUMERIC(10,2) DEFAULT 0,
   status TEXT DEFAULT 'received',
-  status_label TEXT DEFAULT 'Order Received'
+  status_label TEXT DEFAULT 'Order Received',
+  table_id TEXT,
+  table_name TEXT,
+  table_token TEXT
+);
+
+CREATE TABLE IF NOT EXISTS public.tables (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  number INTEGER DEFAULT 0,
+  token TEXT UNIQUE NOT NULL,
+  capacity INTEGER DEFAULT 4,
+  active BOOLEAN DEFAULT TRUE,
+  created_at BIGINT DEFAULT (EXTRACT(EPOCH FROM NOW()) * 1000)::BIGINT
 );
 
 -- CLEAN PREVIOUS DATA

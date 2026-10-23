@@ -242,7 +242,10 @@ async function getOrders() {
       service: Number(o.service) || 0,
       total: Number(o.total) || 0,
       status: o.status || 'received',
-      statusLabel: o.status_label || 'Order Received'
+      statusLabel: o.status_label || 'Order Received',
+      tableId: o.table_id || o.tableId || null,
+      tableName: o.table_name || o.tableName || o.tableNumber || null,
+      tableToken: o.table_token || o.tableToken || null
     }));
     const local = readLocalDb();
     local.orders = mapped;
@@ -264,7 +267,10 @@ async function createOrder(order) {
     service: Number(order.service) || 0,
     total: Number(order.total) || 0,
     status: order.status || 'received',
-    status_label: order.statusLabel || 'Order Received'
+    status_label: order.statusLabel || 'Order Received',
+    table_id: order.tableId || null,
+    table_name: order.tableName || order.tableNumber || null,
+    table_token: order.tableToken || null
   };
 
   await supabaseFetch('orders', 'POST', payload);
@@ -358,6 +364,168 @@ async function deleteExtra(id) {
   return { success: true };
 }
 
+// ── TABLES & UNIQUE QR TOKENS ──
+function generateSecureToken() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let token = 't_';
+  for (let i = 0; i < 8; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
+async function getTables() {
+  const data = await supabaseFetch('tables?select=*&order=number.asc');
+  if (Array.isArray(data) && data.length > 0) {
+    const mapped = data.map(t => ({
+      id: t.id,
+      name: t.name,
+      number: Number(t.number) || 0,
+      token: t.token || ('t_' + t.id),
+      active: t.active !== false,
+      capacity: Number(t.capacity) || 4,
+      createdAt: Number(t.created_at) || Date.now()
+    }));
+    const local = readLocalDb();
+    local.tables = mapped;
+    writeLocalDb(local);
+    return mapped;
+  }
+  return readLocalDb().tables || [];
+}
+
+async function saveTable(table, isEdit = false) {
+  const token = table.token || generateSecureToken();
+  const tableData = {
+    id: table.id || ('tbl_' + Date.now()),
+    name: table.name,
+    number: Number(table.number) || 0,
+    token: token,
+    active: table.active !== false,
+    capacity: Number(table.capacity) || 4,
+    created_at: table.createdAt || Date.now()
+  };
+
+  const payload = {
+    id: tableData.id,
+    name: tableData.name,
+    number: tableData.number,
+    token: tableData.token,
+    active: tableData.active,
+    capacity: tableData.capacity,
+    created_at: tableData.created_at
+  };
+
+  if (isEdit) {
+    await supabaseFetch(`tables?id=eq.${encodeURIComponent(table.id)}`, 'PATCH', payload);
+  } else {
+    await supabaseFetch('tables', 'POST', payload);
+  }
+
+  const local = readLocalDb();
+  local.tables = local.tables || [];
+  const idx = local.tables.findIndex(t => t.id === tableData.id);
+  if (idx !== -1) {
+    local.tables[idx] = { ...local.tables[idx], ...tableData };
+  } else {
+    local.tables.push(tableData);
+  }
+  local.tables.sort((a, b) => (a.number || 0) - (b.number || 0));
+  writeLocalDb(local);
+  return { success: true, data: tableData };
+}
+
+async function saveTablesBulk(tablesList) {
+  const local = readLocalDb();
+  local.tables = local.tables || [];
+
+  const created = [];
+  for (const t of tablesList) {
+    const tableData = {
+      id: t.id || ('tbl_' + Date.now() + '_' + Math.floor(Math.random() * 1000)),
+      name: t.name,
+      number: Number(t.number) || 0,
+      token: t.token || generateSecureToken(),
+      active: t.active !== false,
+      capacity: Number(t.capacity) || 4,
+      created_at: Date.now()
+    };
+    created.push(tableData);
+
+    const idx = local.tables.findIndex(ex => ex.id === tableData.id || ex.name.toLowerCase() === tableData.name.toLowerCase());
+    if (idx !== -1) {
+      local.tables[idx] = { ...local.tables[idx], ...tableData };
+    } else {
+      local.tables.push(tableData);
+    }
+  }
+
+  local.tables.sort((a, b) => (a.number || 0) - (b.number || 0));
+  writeLocalDb(local);
+
+  try {
+    const payloads = created.map(t => ({
+      id: t.id,
+      name: t.name,
+      number: t.number,
+      token: t.token,
+      active: t.active,
+      capacity: t.capacity,
+      created_at: t.created_at
+    }));
+    await supabaseFetch('tables', 'POST', payloads);
+  } catch (e) {}
+
+  return { success: true, count: created.length, data: local.tables };
+}
+
+async function patchTable(id, patch) {
+  await supabaseFetch(`tables?id=eq.${encodeURIComponent(id)}`, 'PATCH', patch);
+  const local = readLocalDb();
+  local.tables = local.tables || [];
+  const t = local.tables.find(item => item.id === id);
+  if (t) {
+    Object.assign(t, patch);
+    writeLocalDb(local);
+  }
+  return { success: true, data: t };
+}
+
+async function regenerateTableToken(id) {
+  const newToken = generateSecureToken();
+  return await patchTable(id, { token: newToken });
+}
+
+async function deleteTable(id) {
+  await supabaseFetch(`tables?id=eq.${encodeURIComponent(id)}`, 'DELETE');
+  const local = readLocalDb();
+  local.tables = (local.tables || []).filter(t => t.id !== id);
+  writeLocalDb(local);
+  return { success: true };
+}
+
+async function getTableByToken(token) {
+  if (!token) return null;
+  const local = readLocalDb();
+  const tables = local.tables || [];
+  const found = tables.find(t => t.token === token);
+  if (found) return found;
+
+  const data = await supabaseFetch(`tables?token=eq.${encodeURIComponent(token)}&select=*`);
+  if (Array.isArray(data) && data.length > 0) {
+    const t = data[0];
+    return {
+      id: t.id,
+      name: t.name,
+      number: Number(t.number) || 0,
+      token: t.token,
+      active: t.active !== false,
+      capacity: Number(t.capacity) || 4
+    };
+  }
+  return null;
+}
+
 module.exports = {
   getCategories,
   saveCategory,
@@ -372,5 +540,12 @@ module.exports = {
   getExtras,
   saveExtra,
   patchExtraStock,
-  deleteExtra
+  deleteExtra,
+  getTables,
+  saveTable,
+  saveTablesBulk,
+  patchTable,
+  regenerateTableToken,
+  deleteTable,
+  getTableByToken
 };

@@ -1697,10 +1697,14 @@ let APP_STATE = {
   portal: 'customer',           // 'customer', 'chef', 'admin'
   currentTab: 'menu',           // 'menu', 'orders', 'chef', 'admin'
   ordersSubTab: 'cart',         // 'cart' or 'history'
-  adminSubTab: 'overview',      // 'overview', 'items', 'categories', 'orders'
+  adminSubTab: 'overview',      // 'overview', 'items', 'categories', 'orders', 'tables'
   activeCategory: 'burger',
   searchQuery: '',
   orderType: 'Dine-in',         // 'Dine-in' or 'Takeaway'
+  activeTable: null,            // { id, name, token, capacity, active }
+  tables: [],                   // Loaded tables list from backend
+  tableFilter: 'all',           // 'all', 'active', 'inactive'
+  tableSearchQuery: '',
   cart: [],
   orderHistory: [],
   stockStatus: {},              // { [productId]: boolean }
@@ -1929,6 +1933,48 @@ const API = (() => {
         const r = await req('POST', '/upload-image', { file: fileData });
         return r;
       } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    // ── Restaurant Table Management & QR API ──
+    async getTables() {
+      try {
+        const r = await req('GET', '/tables');
+        return r.data || [];
+      } catch { return []; }
+    },
+    async getTableByToken(token) {
+      try {
+        return await req('GET', `/tables/validate/${encodeURIComponent(token)}`);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async saveTable(tablePayload, isEdit = false) {
+      try {
+        if (isEdit) {
+          return await req('PUT', `/tables/${encodeURIComponent(tablePayload.id)}`, tablePayload);
+        } else {
+          return await req('POST', '/tables', tablePayload);
+        }
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async saveTablesBulk(bulkPayload) {
+      try {
+        return await req('POST', '/tables', { bulk: true, ...bulkPayload });
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async patchTable(id, patchData) {
+      try {
+        return await req('PATCH', `/tables/${encodeURIComponent(id)}`, patchData);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async regenerateTableToken(id) {
+      try {
+        return await req('POST', `/tables/${encodeURIComponent(id)}/regenerate-token`);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+    async deleteTable(id) {
+      try {
+        return await req('DELETE', `/tables/${encodeURIComponent(id)}`);
+      } catch (e) { return { success: false, error: e.message }; }
     }
   };
 })();
@@ -1936,11 +1982,12 @@ const API = (() => {
 // ══ SYNC LIVE DATA FROM REAL DATABASE ══
 async function syncDataFromBackend(showToast = false) {
   try {
-    const [cats, prods, orders, extrasData] = await Promise.all([
+    const [cats, prods, orders, extrasData, tablesData] = await Promise.all([
       API.getCategories(),
       API.getProducts(),
       API.getOrders(),
-      API.getExtras()
+      API.getExtras(),
+      API.getTables()
     ]);
 
     if (cats && cats.length > 0) {
@@ -1958,11 +2005,23 @@ async function syncDataFromBackend(showToast = false) {
     if (extrasData && extrasData.length > 0) {
       EXTRAS = extrasData;
     }
+    if (tablesData && tablesData.length > 0) {
+      APP_STATE.tables = tablesData;
+      // If we have an active table, refresh its data in case name/capacity/status was edited
+      if (APP_STATE.activeTable) {
+        const refreshed = tablesData.find(t => t.id === APP_STATE.activeTable.id || t.token === APP_STATE.activeTable.token);
+        if (refreshed) {
+          APP_STATE.activeTable = refreshed;
+          try { localStorage.setItem('alemaya_active_table', JSON.stringify(refreshed)); } catch {}
+        }
+      }
+    }
 
     populateAdminCategoryDropdowns();
     buildCategoryGrid();
     renderMenu();
     updateCartUI();
+    renderCustomerActiveTableBanner();
     renderHistory();
     updateKitchenCounters();
     if (APP_STATE.portal === 'chef') renderKdsTickets();
@@ -1971,6 +2030,7 @@ async function syncDataFromBackend(showToast = false) {
       renderAdminItemsCrud();
       renderAdminCatsCrud();
       renderAdminOrdersSubpane();
+      renderAdminTablesCrud();
     }
     refreshLucideIcons();
 
@@ -2050,11 +2110,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Restore saved cart, stock, and orders from localStorage
   restoreFromStorage();
 
+  // Initialize table token from URL (?table=... or ?tableToken=...) or localStorage
+  await initTableFromUrlOrStorage();
+
   // Populate dropdowns and build initial UI
   populateAdminCategoryDropdowns();
   buildCategoryGrid();
   renderMenu();
   updateCartUI();
+  renderCustomerActiveTableBanner();
   renderCurrentOrders();
   renderHistory();
   updateKitchenCounters();
@@ -2253,6 +2317,8 @@ function setOrderType(type) {
   }
   const label = document.getElementById('sum-ordertype-label');
   if (label) label.textContent = type;
+  renderCustomerActiveTableBanner();
+  updateCartUI();
   toast(`Selected ${type}`);
 }
 
@@ -3019,6 +3085,7 @@ function renderCart() {
     document.getElementById('sum-subtotal').textContent = formatMoney(subtotal);
     document.getElementById('sum-total').textContent = formatMoney(total);
     document.getElementById('sum-ordertype-label').textContent = APP_STATE.orderType;
+    renderCartCheckoutTableSlot();
   }
 
   // Checkout actions
@@ -3041,12 +3108,40 @@ async function placeOrder() {
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dateStr = now.toISOString().split('T')[0];
 
+  // Resolve table assignment if dine-in
+  let tableId = null;
+  let tableName = null;
+  let tableToken = null;
+
+  if (APP_STATE.orderType === 'Dine-in') {
+    if (APP_STATE.activeTable) {
+      tableId = APP_STATE.activeTable.id;
+      tableName = APP_STATE.activeTable.name;
+      tableToken = APP_STATE.activeTable.token;
+    } else {
+      const manualSelect = document.getElementById('checkout-manual-table-select');
+      if (manualSelect && manualSelect.value) {
+        const found = APP_STATE.tables.find(t => t.id === manualSelect.value);
+        if (found) {
+          tableId = found.id;
+          tableName = found.name;
+          tableToken = found.token;
+          APP_STATE.activeTable = found;
+          try { localStorage.setItem('alemaya_active_table', JSON.stringify(found)); } catch {}
+        }
+      }
+    }
+  }
+
   const newOrder = {
     id: orderId,
     timestamp: timeStr,
     date: dateStr,
     createdAt: Date.now(),
     orderType: APP_STATE.orderType,
+    tableId: tableId,
+    tableName: tableName,
+    tableToken: tableToken,
     items: JSON.parse(JSON.stringify(APP_STATE.cart)),
     subtotal: subtotal,
     service: service,
@@ -3193,6 +3288,7 @@ function renderCurrentOrders() {
             <span class="track-order-id">#${ord.id}</span>
             <div style="font-size:0.75rem; color:#64748B; margin-top:2px;">
               ${escapeHtml(ord.orderType || 'Dine-in')} • ${ord.timestamp || ''}
+              ${ord.tableName ? ` • <strong style="color:var(--primary-color);">🍽️ ${escapeHtml(ord.tableName)}</strong>` : ''}
             </div>
           </div>
           <span class="status-chip ${statusPillClass}">${statusLabel}</span>
@@ -3293,6 +3389,7 @@ function renderHistory() {
             <span class="track-order-id">#${ord.id}</span>
             <div style="font-size:0.75rem; color:#64748B; margin-top:2px;">
               ${escapeHtml(ord.orderType || 'Dine-in')} • ${ord.date || ''} ${ord.timestamp || ''}
+              ${ord.tableName ? ` • <strong style="color:var(--primary-color);">🍽️ ${escapeHtml(ord.tableName)}</strong>` : ''}
             </div>
           </div>
           <span class="status-chip chip-completed">Completed ✓</span>
@@ -3454,12 +3551,17 @@ function renderKdsTickets() {
 
     const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
 
+    const tableBadgeHtml = ord.tableName
+      ? `<div class="kds-table-badge">🍽️ ${escapeHtml(ord.tableName)}</div>`
+      : '';
+
     html += `
       <div class="kds-ticket-card">
         <div class="kds-ticket-header status-${normStatus}">
           <span>#${ord.id} • ${ord.orderType || 'Dine-in'}</span>
           <span>${statusLabel}</span>
         </div>
+        ${tableBadgeHtml}
         <div class="kds-ticket-body">
           <div style="font-size:0.74rem; color:#64748B; margin-bottom:8px;">Placed at ${ord.timestamp}</div>
           ${itemsHtml}
@@ -4052,7 +4154,10 @@ function renderAdminOrdersTable(orders) {
       <tr>
         <td><strong>#${ord.id}</strong></td>
         <td>${ord.date} <span style="color:var(--text-muted); font-size:0.75rem;">${ord.timestamp}</span></td>
-        <td><span class="ticket-ordertype-badge ${ord.orderType === 'Takeaway' ? 'type-takeaway' : 'type-dinein'}">${escapeHtml(ord.orderType)}</span></td>
+        <td>
+          <span class="ticket-ordertype-badge ${ord.orderType === 'Takeaway' ? 'type-takeaway' : 'type-dinein'}">${escapeHtml(ord.orderType)}</span>
+          ${ord.tableName ? `<span class="admin-table-chip">🍽️ ${escapeHtml(ord.tableName)}</span>` : ''}
+        </td>
         <td style="max-width:280px; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(itemsSummary)}">${escapeHtml(itemsSummary)}</td>
         <td><strong>${formatMoney(ord.total)}</strong></td>
         <td><span class="status-chip ${chipClass}">${escapeHtml(ord.status)}</span></td>
@@ -4287,7 +4392,10 @@ function openOrderModal(orderId) {
     <div style="margin-bottom:14px;">
       <span class="status-chip chip-${normStatus}">${statusLabel}</span>
       <h2 style="font-family:var(--font-serif); font-size:1.45rem; margin-top:8px; color:#0F172A;">Order #${ord.id}</h2>
-      <div style="font-size:0.82rem; color:#64748B;">${ord.orderType || 'Dine-in'} • ${ord.date} at ${ord.timestamp}</div>
+      <div style="font-size:0.82rem; color:#64748B;">
+        ${ord.orderType || 'Dine-in'} • ${ord.date} at ${ord.timestamp}
+        ${ord.tableName ? ` • <strong style="color:var(--primary-color);">🍽️ ${escapeHtml(ord.tableName)}</strong>` : ''}
+      </div>
     </div>
 
     <div style="margin:14px 0;">
@@ -4517,6 +4625,11 @@ function saveToStorage() {
     localStorage.setItem('alemaya_history', JSON.stringify(APP_STATE.orderHistory));
     localStorage.setItem('alemaya_master_orders', JSON.stringify(MASTER_ORDERS));
     localStorage.setItem('alemaya_stock', JSON.stringify(APP_STATE.stockStatus));
+    if (APP_STATE.activeTable) {
+      localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable));
+    } else {
+      localStorage.removeItem('alemaya_active_table');
+    }
   } catch (e) {
     console.warn('Storage save failed:', e);
   }
@@ -4535,6 +4648,11 @@ function restoreFromStorage() {
 
     const savedStock = localStorage.getItem('alemaya_stock');
     if (savedStock) APP_STATE.stockStatus = JSON.parse(savedStock);
+
+    const savedTable = localStorage.getItem('alemaya_active_table');
+    if (savedTable) {
+      try { APP_STATE.activeTable = JSON.parse(savedTable); } catch {}
+    }
   } catch (e) {
     console.warn('Storage restore failed:', e);
   }
@@ -4592,6 +4710,8 @@ function switchAdminSubTab(subTab) {
     renderAdminExtrasCrud();
   } else if (subTab === 'orders') {
     renderAdminOrdersSubpane();
+  } else if (subTab === 'tables') {
+    renderAdminTablesCrud();
   }
 
   refreshLucideIcons();
@@ -4770,7 +4890,10 @@ function renderAdminOrdersSubpane() {
     html += `
       <div class="admin-mobile-order-card" style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:14px; margin-bottom:12px;">
         <div class="admin-moc-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong style="font-size:0.95rem; color:#0F172A;">#${ord.id}</strong>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="font-size:0.95rem; color:#0F172A;">#${ord.id}</strong>
+            ${ord.tableName ? `<span class="admin-table-chip">🍽️ ${escapeHtml(ord.tableName)}</span>` : ''}
+          </div>
           <span class="status-chip chip-${normStatus}">${statusLabel}</span>
         </div>
         <div class="admin-moc-items" style="font-size:0.84rem; color:#334155; margin-bottom:10px;">${itemSummary}</div>
@@ -5359,4 +5482,753 @@ async function toggleExtraStock(id) {
   } catch (e) {
     renderAdminExtrasCrud();
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ALEMAYA GRILL'D - AUTOMATIC TABLE MANAGEMENT & QR ORDERING SYSTEM
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── URL Table Token & Active Table Resolution ──
+async function initTableFromUrlOrStorage() {
+  try {
+    // 1. Check URL parameters: ?table=... or ?tableToken=... or ?tbl=...
+    const urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get('table') || urlParams.get('tableToken') || urlParams.get('tbl');
+
+    // Also check hash query params if user bookmarked #menu?table=...
+    if (!token && window.location.hash.includes('?')) {
+      const hashQuery = window.location.hash.split('?')[1];
+      if (hashQuery) {
+        const hashParams = new URLSearchParams(hashQuery);
+        token = hashParams.get('table') || hashParams.get('tableToken') || hashParams.get('tbl');
+      }
+    }
+
+    if (token) {
+      token = token.trim();
+      const res = await API.getTableByToken(token);
+      if (res && res.success && res.data) {
+        APP_STATE.activeTable = res.data;
+        APP_STATE.orderType = 'Dine-in';
+        try {
+          localStorage.setItem('alemaya_active_table', JSON.stringify(res.data));
+        } catch {}
+        toast(`🍽️ Welcome! Seated at ${res.data.name}`, 3800);
+      } else {
+        const errMsg = (res && res.error) ? res.error : 'Table QR code is invalid or deactivated.';
+        toast(`⚠️ ${errMsg}`, 4500);
+      }
+    } else {
+      // 2. Restore active table from localStorage if customer previously scanned
+      const saved = localStorage.getItem('alemaya_active_table');
+      if (saved) {
+        try {
+          APP_STATE.activeTable = JSON.parse(saved);
+        } catch {}
+      }
+    }
+
+    renderCustomerActiveTableBanner();
+  } catch (e) {
+    console.warn('initTableFromUrlOrStorage warning:', e);
+  }
+}
+
+// ── Customer Active Table Banner Rendering ──
+function renderCustomerActiveTableBanner() {
+  const banner = document.getElementById('customer-active-table-banner');
+  if (!banner) return;
+
+  if (APP_STATE.orderType === 'Dine-in' && APP_STATE.activeTable) {
+    const t = APP_STATE.activeTable;
+    banner.classList.remove('hidden');
+    banner.innerHTML = `
+      <div class="customer-active-table-banner-inner">
+        <div class="customer-table-info-group">
+          <span class="customer-table-banner-badge">🍽️ ${escapeHtml(t.name)}</span>
+          <span class="customer-table-banner-text">Seated for Dine-in • Capacity: ${t.capacity || 4} Seats</span>
+        </div>
+        <button type="button" class="customer-table-clear-btn" onclick="clearActiveTable()" title="Unlink or switch table">
+          Change Table &times;
+        </button>
+      </div>
+    `;
+  } else {
+    banner.classList.add('hidden');
+    banner.innerHTML = '';
+  }
+}
+
+// ── Clear / Unlink Active Table ──
+function clearActiveTable() {
+  APP_STATE.activeTable = null;
+  try {
+    localStorage.removeItem('alemaya_active_table');
+  } catch {}
+  renderCustomerActiveTableBanner();
+  updateCartUI();
+  toast('Dining table cleared');
+}
+
+// ── Manual Table Selection in Cart Checkout ──
+function handleManualTableSelect(tableId) {
+  if (!tableId) {
+    clearActiveTable();
+    return;
+  }
+  const found = APP_STATE.tables.find(t => t.id === tableId);
+  if (found) {
+    APP_STATE.activeTable = found;
+    try {
+      localStorage.setItem('alemaya_active_table', JSON.stringify(found));
+    } catch {}
+    renderCustomerActiveTableBanner();
+    updateCartUI();
+    toast(`Seated at ${found.name}`);
+  }
+}
+
+// ── Cart Summary Table Slot Renderer ──
+function renderCartCheckoutTableSlot() {
+  const wrap = document.getElementById('checkout-table-info-wrap');
+  if (!wrap) return;
+
+  if (APP_STATE.orderType === 'Takeaway') {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  wrap.style.display = 'block';
+  const titleEl = document.getElementById('checkout-table-title');
+  const subEl = document.getElementById('checkout-table-sub');
+  const slotEl = document.getElementById('checkout-table-action-slot');
+
+  if (APP_STATE.activeTable) {
+    if (titleEl) titleEl.textContent = `Dining Table: ${APP_STATE.activeTable.name}`;
+    if (subEl) subEl.textContent = `Verified via Table QR (${APP_STATE.activeTable.capacity || 4} Seats)`;
+    if (slotEl) {
+      slotEl.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="checkout-table-locked-badge">🍽️ ${escapeHtml(APP_STATE.activeTable.name)}</span>
+          <button type="button" onclick="clearActiveTable()" style="background:none; border:none; color:var(--text-muted); font-size:0.75rem; text-decoration:underline; cursor:pointer;">Change</button>
+        </div>
+      `;
+    }
+  } else {
+    if (titleEl) titleEl.textContent = 'Table Assignment';
+    if (subEl) subEl.textContent = 'Select table number for waiter service';
+    const activeTables = (APP_STATE.tables || []).filter(t => t.active !== false);
+    if (slotEl) {
+      if (activeTables.length === 0) {
+        slotEl.innerHTML = `<span style="font-size:0.8rem; color:#64748B;">No tables configured</span>`;
+      } else {
+        slotEl.innerHTML = `
+          <select id="checkout-manual-table-select" class="checkout-table-select" onchange="handleManualTableSelect(this.value)">
+            <option value="">Select table number...</option>
+            ${activeTables.map(t => `<option value="${t.id}">${escapeHtml(t.name)} (${t.capacity || 4} seats)</option>`).join('')}
+          </select>
+        `;
+      }
+    }
+  }
+}
+
+// ── QR Code Drawing Engine (QRious + High-Res Fallback) ──
+function renderQrToCanvas(canvasEl, text, size = 180) {
+  if (typeof canvasEl === 'string') {
+    canvasEl = document.getElementById(canvasEl);
+  }
+  if (!canvasEl) return;
+
+  canvasEl.width = size;
+  canvasEl.height = size;
+
+  if (typeof QRious !== 'undefined') {
+    try {
+      new QRious({
+        element: canvasEl,
+        value: text,
+        size: size,
+        level: 'H',
+        foreground: '#0F172A',
+        background: '#FFFFFF'
+      });
+      return;
+    } catch (e) {
+      console.warn('QRious render error, falling back:', e);
+    }
+  }
+
+  // Graceful Canvas 2D Fallback
+  const ctx = canvasEl.getContext('2d');
+  if (ctx) {
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, size, size);
+    ctx.strokeStyle = '#0F172A';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(6, 6, size - 12, size - 12);
+
+    // Mock QR finder patterns
+    const drawFinder = (x, y, s) => {
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(x, y, s, s);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(x + 4, y + 4, s - 8, s - 8);
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(x + 8, y + 8, s - 16, s - 16);
+    };
+    drawFinder(12, 12, 36);
+    drawFinder(size - 48, 12, 36);
+    drawFinder(12, size - 48, 36);
+
+    ctx.fillStyle = '#64748B';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('QR Code', size / 2, size / 2 + 3);
+  }
+}
+
+// ── Table URL Builder ──
+function getTableMenuUrl(tableToken) {
+  const origin = window.location.origin;
+  const path = window.location.pathname.replace(/\/index\.html$/, '') || '/';
+  const cleanPath = path.endsWith('/') ? path : `${path}/`;
+  return `${origin}${cleanPath}?table=${encodeURIComponent(tableToken)}`;
+}
+
+// ── Admin Tables Management Rendering ──
+function renderAdminTablesCrud() {
+  const grid = document.getElementById('admin-tables-crud-grid');
+  if (!grid) return;
+
+  const totalCountEl = document.getElementById('admin-tables-total-count');
+  const activeCountEl = document.getElementById('admin-tables-active-count');
+  const inactiveCountEl = document.getElementById('admin-tables-inactive-count');
+
+  const allTables = APP_STATE.tables || [];
+  const activeTables = allTables.filter(t => t.active !== false);
+  const inactiveTables = allTables.filter(t => t.active === false);
+
+  if (totalCountEl) totalCountEl.textContent = allTables.length;
+  if (activeCountEl) activeCountEl.textContent = activeTables.length;
+  if (inactiveCountEl) inactiveCountEl.textContent = inactiveTables.length;
+
+  const q = (APP_STATE.tableSearchQuery || '').trim().toLowerCase();
+  const filter = APP_STATE.tableFilter || 'all';
+
+  let list = [...allTables];
+
+  if (filter === 'active') {
+    list = list.filter(t => t.active !== false);
+  } else if (filter === 'inactive') {
+    list = list.filter(t => t.active === false);
+  }
+
+  if (q.length > 0) {
+    list = list.filter(t =>
+      t.name.toLowerCase().includes(q) ||
+      (t.token && t.token.toLowerCase().includes(q)) ||
+      (t.id && t.id.toLowerCase().includes(q))
+    );
+  }
+
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 16px;">
+        <div style="font-size: 2.5rem; margin-bottom: 8px;">🍽️</div>
+        <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: #0F172A; margin-bottom: 4px;">
+          No tables match your filter
+        </h3>
+        <p style="font-size: 0.84rem; color: #64748B; max-width: 360px; margin: 0 auto 16px;">
+          Add tables individually or generate them in bulk to generate unique QR codes.
+        </p>
+        <button class="btn-admin-add" onclick="openAddTableModal()" style="display:inline-flex;">+ Add New Table</button>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  list.forEach(table => {
+    const isActive = table.active !== false;
+    const menuUrl = getTableMenuUrl(table.token);
+
+    html += `
+      <div class="admin-table-crud-card ${isActive ? 'is-active' : 'is-inactive'}">
+        <div class="atc-head">
+          <div>
+            <div class="atc-name">${escapeHtml(table.name)}</div>
+            <div class="atc-capacity">🪑 ${table.capacity || 4} Guests Capacity</div>
+          </div>
+          <button type="button" class="atc-status-chip ${isActive ? 'chip-active' : 'chip-inactive'}" onclick="toggleTableStatus('${table.id}')" title="Click to toggle table active/inactive">
+            ${isActive ? '● Active' : '○ Inactive'}
+          </button>
+        </div>
+
+        <div class="atc-body">
+          <div class="atc-qr-wrap" onclick="openTableQrModal('${table.id}')" title="Click to preview & print table QR stand">
+            <canvas id="atc-qr-${table.id}" class="atc-qr-canvas"></canvas>
+            <span class="atc-qr-zoom-hint">🔍 Stand Card</span>
+          </div>
+          <div class="atc-meta">
+            <div class="atc-token-row">
+              <span class="atc-label">QR Token:</span>
+              <code class="atc-token-val" title="${escapeHtml(table.token)}">${escapeHtml(table.token)}</code>
+            </div>
+            <div class="atc-url-box">
+              <input type="text" readonly value="${escapeHtml(menuUrl)}" id="url-input-${table.id}" class="atc-url-input" />
+              <button type="button" class="atc-copy-btn" onclick="copyTableUrl('${table.id}')" title="Copy Menu URL">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="atc-footer">
+          <button type="button" class="btn-atc-action btn-atc-stand" onclick="openTableQrModal('${table.id}')">
+            🖨️ QR Stand
+          </button>
+          <button type="button" class="btn-atc-action btn-atc-edit" onclick="openEditTableModal('${table.id}')">
+            ✏️ Edit
+          </button>
+          <button type="button" class="btn-atc-action btn-atc-regen" onclick="handleRegenerateTableToken('${table.id}')" title="Generate new unique QR token for this table">
+            🔄 New QR
+          </button>
+          <button type="button" class="btn-atc-action btn-atc-delete" onclick="handleDeleteTable('${table.id}')" title="Delete table">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+
+  // Render QR Canvas for each card
+  setTimeout(() => {
+    list.forEach(table => {
+      const canvasEl = document.getElementById(`atc-qr-${table.id}`);
+      if (canvasEl) {
+        renderQrToCanvas(canvasEl, getTableMenuUrl(table.token), 100);
+      }
+    });
+  }, 30);
+}
+
+// ── Search & Filter Controls ──
+function handleAdminTableSearch(q) {
+  APP_STATE.tableSearchQuery = q;
+  renderAdminTablesCrud();
+}
+
+function handleAdminTableFilter(filter) {
+  APP_STATE.tableFilter = filter;
+  document.querySelectorAll('.admin-table-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderAdminTablesCrud();
+}
+
+function copyTableUrl(tableId) {
+  const input = document.getElementById(`url-input-${tableId}`);
+  if (input) {
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+      toast('Copied table menu URL to clipboard!');
+    }).catch(() => {
+      document.execCommand('copy');
+      toast('Copied table menu URL!');
+    });
+  }
+}
+
+// ── Table Single Add / Edit Modal ──
+function openAddTableModal() {
+  const modal = document.getElementById('crud-table-modal');
+  const title = document.getElementById('crud-table-title');
+  const form = document.getElementById('crud-table-form');
+  if (!modal || !form) return;
+
+  form.reset();
+  document.getElementById('crud-table-id').value = '';
+  document.getElementById('crud-table-is-edit').value = 'false';
+  document.getElementById('crud-table-name').value = `Table ${(APP_STATE.tables || []).length + 1}`;
+  document.getElementById('crud-table-capacity').value = '4';
+  document.getElementById('crud-table-active').checked = true;
+
+  if (title) title.textContent = 'Add Dining Table';
+  modal.classList.add('active');
+}
+
+function openEditTableModal(tableId) {
+  const table = (APP_STATE.tables || []).find(t => t.id === tableId);
+  if (!table) return;
+
+  const modal = document.getElementById('crud-table-modal');
+  const title = document.getElementById('crud-table-title');
+  if (!modal) return;
+
+  document.getElementById('crud-table-id').value = table.id;
+  document.getElementById('crud-table-is-edit').value = 'true';
+  document.getElementById('crud-table-name').value = table.name || '';
+  document.getElementById('crud-table-capacity').value = table.capacity || 4;
+  document.getElementById('crud-table-active').checked = table.active !== false;
+
+  if (title) title.textContent = `Edit ${table.name}`;
+  modal.classList.add('active');
+}
+
+function closeTableCrudModal() {
+  document.getElementById('crud-table-modal')?.classList.remove('active');
+}
+
+async function handleTableCrudSubmit(event) {
+  if (event) event.preventDefault();
+
+  const isEdit = document.getElementById('crud-table-is-edit').value === 'true';
+  const id = document.getElementById('crud-table-id').value;
+  const name = (document.getElementById('crud-table-name').value || '').trim();
+  const capacity = parseInt(document.getElementById('crud-table-capacity').value, 10) || 4;
+  const active = document.getElementById('crud-table-active').checked;
+
+  if (!name) {
+    toast('Please enter a table name');
+    return;
+  }
+
+  const payload = {
+    id: isEdit ? id : undefined,
+    name: name,
+    capacity: capacity,
+    active: active
+  };
+
+  const btn = event?.submitter || document.querySelector('#crud-table-form button[type="submit"]');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await API.saveTable(payload, isEdit);
+    if (res && res.success) {
+      toast(isEdit ? `Updated ${name}` : `Created ${name} with unique QR!`);
+      closeTableCrudModal();
+      await syncDataFromBackend(false);
+    } else {
+      toast(`Error saving table: ${res?.error || 'Unknown error'}`);
+    }
+  } catch (err) {
+    toast(`Save table error: ${err.message}`);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ── Bulk Table Generation Modal ──
+function openBulkTablesModal() {
+  const modal = document.getElementById('crud-bulk-tables-modal');
+  if (!modal) return;
+  document.getElementById('crud-bulk-prefix').value = 'Table ';
+  document.getElementById('crud-bulk-start').value = '1';
+  document.getElementById('crud-bulk-end').value = '10';
+  document.getElementById('crud-bulk-capacity').value = '4';
+  modal.classList.add('active');
+}
+
+function closeBulkTablesModal() {
+  document.getElementById('crud-bulk-tables-modal')?.classList.remove('active');
+}
+
+async function handleBulkTablesSubmit(event) {
+  if (event) event.preventDefault();
+
+  const prefix = document.getElementById('crud-bulk-prefix').value || 'Table ';
+  const start = parseInt(document.getElementById('crud-bulk-start').value, 10);
+  const end = parseInt(document.getElementById('crud-bulk-end').value, 10);
+  const capacity = parseInt(document.getElementById('crud-bulk-capacity').value, 10) || 4;
+
+  if (isNaN(start) || isNaN(end) || start > end) {
+    toast('Invalid start/end table number range');
+    return;
+  }
+
+  const count = (end - start) + 1;
+  if (count > 100) {
+    toast('Maximum 100 tables can be generated at once');
+    return;
+  }
+
+  const btn = event?.submitter || document.querySelector('#crud-bulk-tables-form button[type="submit"]');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await API.saveTablesBulk({ prefix, start, end, capacity });
+    if (res && res.success) {
+      toast(`🎉 Generated ${res.createdCount || count} tables with unique QR codes!`, 4000);
+      closeBulkTablesModal();
+      await syncDataFromBackend(false);
+    } else {
+      toast(`Bulk generation error: ${res?.error || 'Failed'}`);
+    }
+  } catch (e) {
+    toast(`Bulk error: ${e.message}`);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+// ── Toggle Table Active / Inactive Status ──
+async function toggleTableStatus(tableId) {
+  const table = (APP_STATE.tables || []).find(t => t.id === tableId);
+  if (!table) return;
+
+  const newStatus = !(table.active !== false);
+  table.active = newStatus;
+  renderAdminTablesCrud();
+
+  try {
+    const res = await API.patchTable(tableId, { active: newStatus });
+    if (res && res.success) {
+      toast(`${table.name} is now ${newStatus ? 'Active' : 'Inactive'}`);
+      if (!newStatus && APP_STATE.activeTable && APP_STATE.activeTable.id === tableId) {
+        clearActiveTable();
+      }
+    } else {
+      table.active = !newStatus;
+      renderAdminTablesCrud();
+      toast('Failed to update table status');
+    }
+  } catch (err) {
+    table.active = !newStatus;
+    renderAdminTablesCrud();
+    toast(`Status error: ${err.message}`);
+  }
+}
+
+// ── Regenerate Table Token (Invalidates old QR Code) ──
+async function handleRegenerateTableToken(tableId) {
+  const table = (APP_STATE.tables || []).find(t => t.id === tableId);
+  if (!table) return;
+
+  if (!confirm(`Regenerate QR token for "${table.name}"?\n\nThis will invalidate the previous printed QR code and generate a brand-new token.`)) {
+    return;
+  }
+
+  try {
+    const res = await API.regenerateTableToken(tableId);
+    if (res && res.success && res.table) {
+      table.token = res.table.token;
+      toast(`🔄 New QR code generated for ${table.name}!`);
+      renderAdminTablesCrud();
+      await syncDataFromBackend(false);
+    } else {
+      toast(`Regenerate error: ${res?.error || 'Failed'}`);
+    }
+  } catch (err) {
+    toast(`Regenerate error: ${err.message}`);
+  }
+}
+
+// ── Delete Table ──
+async function handleDeleteTable(tableId) {
+  const table = (APP_STATE.tables || []).find(t => t.id === tableId);
+  if (!table) return;
+
+  if (!confirm(`Are you sure you want to delete "${table.name}"?`)) {
+    return;
+  }
+
+  try {
+    const res = await API.deleteTable(tableId);
+    if (res && res.success) {
+      APP_STATE.tables = (APP_STATE.tables || []).filter(t => t.id !== tableId);
+      if (APP_STATE.activeTable && APP_STATE.activeTable.id === tableId) {
+        clearActiveTable();
+      }
+      toast(`Deleted ${table.name}`);
+      renderAdminTablesCrud();
+      await syncDataFromBackend(false);
+    } else {
+      toast(`Delete error: ${res?.error || 'Failed'}`);
+    }
+  } catch (err) {
+    toast(`Delete error: ${err.message}`);
+  }
+}
+
+// ── Table QR Stand Preview & Print Modal ──
+let CURRENT_STAND_TABLE = null;
+
+function openTableQrModal(tableId) {
+  const table = (APP_STATE.tables || []).find(t => t.id === tableId);
+  if (!table) return;
+
+  CURRENT_STAND_TABLE = table;
+  const modal = document.getElementById('table-qr-stand-modal');
+  if (!modal) return;
+
+  const nameEl = document.getElementById('modal-qr-table-name');
+  const capEl = document.getElementById('modal-qr-table-capacity');
+  const urlEl = document.getElementById('modal-qr-url-text');
+  const tokenEl = document.getElementById('modal-qr-token-text');
+  const canvasEl = document.getElementById('modal-qr-canvas');
+
+  const menuUrl = getTableMenuUrl(table.token);
+
+  if (nameEl) nameEl.textContent = table.name;
+  if (capEl) capEl.textContent = `Table Seating: ${table.capacity || 4} Guests`;
+  if (urlEl) urlEl.textContent = menuUrl;
+  if (tokenEl) tokenEl.textContent = `Token: ${table.token}`;
+
+  renderQrToCanvas(canvasEl, menuUrl, 240);
+
+  modal.classList.add('active');
+}
+
+function closeTableQrModal() {
+  document.getElementById('table-qr-stand-modal')?.classList.remove('active');
+  CURRENT_STAND_TABLE = null;
+}
+
+function printSingleTableCard() {
+  if (!CURRENT_STAND_TABLE) return;
+  const table = CURRENT_STAND_TABLE;
+  const sheet = document.getElementById('printable-qr-stand-sheet');
+  if (!sheet) return;
+
+  const menuUrl = getTableMenuUrl(table.token);
+
+  sheet.innerHTML = `
+    <div class="print-acrylic-stand-card">
+      <div class="pasc-badge-top">FLAME-GRILLED DELIGHTS</div>
+      <img src="logo.png" alt="Alemaya Grill'd Logo" class="pasc-logo" onerror="this.style.display='none'" />
+      <h1 class="pasc-table-name">${escapeHtml(table.name)}</h1>
+      <p class="pasc-capacity">Capacity: ${table.capacity || 4} Guests</p>
+
+      <div class="pasc-qr-frame">
+        <canvas id="print-single-qr-canvas" class="pasc-canvas"></canvas>
+      </div>
+
+      <div class="pasc-instructions">
+        <span class="pasc-scan-step">1. Open Camera on your Phone</span>
+        <span class="pasc-scan-step">2. Point at QR to View Live Menu</span>
+        <span class="pasc-scan-step">3. Place Order & Waiter Will Deliver!</span>
+      </div>
+
+      <div class="pasc-footer">
+        <div class="pasc-footer-brand">Alemaya Grill'd • Harar Road</div>
+        <div class="pasc-footer-url">${escapeHtml(menuUrl)}</div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const canvas = document.getElementById('print-single-qr-canvas');
+    if (canvas) renderQrToCanvas(canvas, menuUrl, 260);
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  }, 30);
+}
+
+function downloadCurrentTableQr() {
+  const canvas = document.getElementById('modal-qr-canvas');
+  if (!canvas || !CURRENT_STAND_TABLE) return;
+
+  try {
+    const a = document.createElement('a');
+    a.download = `alemaya-${CURRENT_STAND_TABLE.name.toLowerCase().replace(/\s+/g, '-')}-qr.png`;
+    a.href = canvas.toDataURL('image/png');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast(`Downloaded QR Code for ${CURRENT_STAND_TABLE.name}`);
+  } catch (e) {
+    toast(`Download error: ${e.message}`);
+  }
+}
+
+// ── Bulk Table Stand Print Modal ──
+function openBulkPrintModal() {
+  const modal = document.getElementById('table-bulk-print-modal');
+  const listEl = document.getElementById('bulk-print-table-checklist');
+  if (!modal || !listEl) return;
+
+  const tables = APP_STATE.tables || [];
+  if (tables.length === 0) {
+    toast('No tables available to print');
+    return;
+  }
+
+  listEl.innerHTML = tables.map(t => `
+    <label class="bulk-print-item-row">
+      <input type="checkbox" class="bulk-print-chk" value="${t.id}" checked />
+      <span class="bulk-print-item-name">${escapeHtml(t.name)} (${t.capacity || 4} seats)</span>
+      <span class="bulk-print-item-status ${t.active !== false ? 'txt-active' : 'txt-inactive'}">
+        ${t.active !== false ? 'Active' : 'Inactive'}
+      </span>
+    </label>
+  `).join('');
+
+  modal.classList.add('active');
+}
+
+function closeBulkPrintModal() {
+  document.getElementById('table-bulk-print-modal')?.classList.remove('active');
+}
+
+function toggleSelectAllBulkPrint(masterCheckbox) {
+  const chks = document.querySelectorAll('.bulk-print-chk');
+  chks.forEach(c => c.checked = masterCheckbox.checked);
+}
+
+function executeBulkPrint() {
+  const selectedIds = Array.from(document.querySelectorAll('.bulk-print-chk:checked')).map(c => c.value);
+  if (selectedIds.length === 0) {
+    toast('Please select at least one table to print');
+    return;
+  }
+
+  const selectedTables = (APP_STATE.tables || []).filter(t => selectedIds.includes(t.id));
+  const sheet = document.getElementById('printable-qr-stand-sheet');
+  if (!sheet) return;
+
+  sheet.innerHTML = selectedTables.map(t => {
+    const menuUrl = getTableMenuUrl(t.token);
+    return `
+      <div class="print-acrylic-stand-card">
+        <div class="pasc-badge-top">FLAME-GRILLED DELIGHTS</div>
+        <img src="logo.png" alt="Alemaya Grill'd Logo" class="pasc-logo" onerror="this.style.display='none'" />
+        <h1 class="pasc-table-name">${escapeHtml(t.name)}</h1>
+        <p class="pasc-capacity">Capacity: ${t.capacity || 4} Guests</p>
+
+        <div class="pasc-qr-frame">
+          <canvas id="bulk-qr-${t.id}" class="pasc-canvas"></canvas>
+        </div>
+
+        <div class="pasc-instructions">
+          <span class="pasc-scan-step">1. Open Camera on your Phone</span>
+          <span class="pasc-scan-step">2. Point at QR to View Live Menu</span>
+          <span class="pasc-scan-step">3. Place Order & Waiter Will Deliver!</span>
+        </div>
+
+        <div class="pasc-footer">
+          <div class="pasc-footer-brand">Alemaya Grill'd • Harar Road</div>
+          <div class="pasc-footer-url">${escapeHtml(menuUrl)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  closeBulkPrintModal();
+
+  setTimeout(() => {
+    selectedTables.forEach(t => {
+      const canvas = document.getElementById(`bulk-qr-${t.id}`);
+      if (canvas) {
+        renderQrToCanvas(canvas, getTableMenuUrl(t.token), 240);
+      }
+    });
+
+    setTimeout(() => {
+      window.print();
+    }, 200);
+  }, 50);
 }

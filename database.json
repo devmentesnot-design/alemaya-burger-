@@ -2059,5 +2059,70 @@
       ],
       "available": true
     }
+  ],
+  "tables": [
+    {
+      "id": "tbl_1",
+      "name": "Table 1",
+      "number": 1,
+      "token": "t_alemaya_tbl1",
+      "active": true,
+      "capacity": 4,
+      "createdAt": 1792688700000
+    },
+    {
+      "id": "tbl_2",
+      "name": "Table 2",
+      "number": 2,
+      "token": "t_alemaya_tbl2",
+      "active": true,
+      "capacity": 4,
+      "createdAt": 1792688700000
+    },
+    {
+      "id": "tbl_3",
+      "name": "Table 3",
+      "number": 3,
+      "token": "t_alemaya_tbl3",
+      "active": true,
+      "capacity": 2,
+      "createdAt": 1792688700000
+    },
+    {
+      "id": "tbl_4",
+      "name": "Table 4",
+      "number": 4,
+      "token": "t_alemaya_tbl4",
+      "active": true,
+      "capacity": 4,
+      "createdAt": 1792688700000
+    },
+    {
+      "id": "tbl_5",
+      "name": "Table 5",
+      "number": 5,
+      "token": "t_alemaya_tbl5",
+      "active": true,
+      "capacity": 6,
+      "createdAt": 1792688700000
+    },
+    {
+      "id": "tbl_vip1",
+      "name": "VIP 1",
+      "number": 6,
+      "token": "t_alemaya_vip1",
+      "active": true,
+      "capacity": 8,
+      "createdAt": 1792688700000
+    },
+    {
+      "id": "tbl_terrace1",
+      "name": "Terrace 1",
+      "number": 7,
+      "token": "t_alemaya_ter1",
+      "active": true,
+      "capacity": 4,
+      "createdAt": 1792688700000
+    }
   ]
 }
