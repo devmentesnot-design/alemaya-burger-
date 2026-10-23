@@ -2156,26 +2156,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function handleHashRouting() {
   const hash = (window.location.hash || '').replace('#', '').toLowerCase();
-  const path = (window.location.pathname || '').toLowerCase();
+  const rawPath = (window.location.pathname || '').toLowerCase().replace(/\/+$/, '');
+  const path = rawPath.endsWith('/index.html') ? rawPath.replace(/\/index\.html$/, '') : rawPath;
 
-  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || path === '/kitchen';
-  const isAdminRoute = hash === 'admin' || path === '/admin';
+  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || hash.startsWith('kitchen') || hash.startsWith('chef') || path === '/kitchen' || path.endsWith('/kitchen') || path === '/chef' || path.endsWith('/chef');
+  const isAdminRoute = hash === 'admin' || hash.startsWith('admin') || path === '/admin' || path.endsWith('/admin');
+  const isOrdersRoute = hash === 'orders' || path === '/orders' || path.endsWith('/orders');
 
   if (isKitchenRoute) {
-    const isAuthed = sessionStorage.getItem('staff_auth_kitchen') === '1';
-    if (isAuthed) {
-      switchPortal('chef');
-    } else {
-      promptStaffPassword('kitchen');
-    }
+    switchPortal('chef');
   } else if (isAdminRoute) {
-    const isAuthed = sessionStorage.getItem('staff_auth_admin') === '1';
-    if (isAuthed) {
-      switchPortal('admin');
-    } else {
-      promptStaffPassword('admin');
-    }
-  } else if (hash === 'orders') {
+    switchPortal('admin');
+  } else if (isOrdersRoute) {
     navigateTo('orders');
   } else {
     navigateTo('menu');
@@ -3416,6 +3408,10 @@ function switchPortal(portal) {
   const customerTopNav = document.getElementById('customer-top-nav');
   if (customerTopNav) {
     customerTopNav.style.display = 'block';
+  }
+  const searchBtn = document.getElementById('nav-search-btn');
+  if (searchBtn) {
+    searchBtn.style.display = (portal === 'chef' || portal === 'kitchen' || portal === 'admin') ? 'none' : '';
   }
 
   const appEl = document.getElementById('app');

@@ -82,20 +82,8 @@
         <div class="cat-grid" id="cat-grid" role="tablist"></div>
       </section>
 
-      <!-- ACTIVE TABLE BANNER (WHEN QR SCANNED) -->
-      <div id="customer-active-table-banner" class="customer-active-table-banner hidden">
-        <div class="active-table-info">
-          <span class="table-icon-pill">🍽️</span>
-          <div>
-            <div class="active-table-title" id="cust-table-title">Table 1</div>
-            <div class="active-table-sub">Orders served directly to your table</div>
-          </div>
-        </div>
-        <div class="table-badge-actions">
-          <span class="table-verified-badge"><i data-lucide="check-circle" class="lucide-icon" style="width:12px;height:12px;margin-right:3px;"></i>QR Verified</span>
-          <button class="table-clear-btn" onclick="clearCustomerTableContext()" title="Clear / Switch Table">✕</button>
-        </div>
-      </div>
+      <!-- ACTIVE TABLE BANNER (WHEN QR SCANNED) - Content rendered by JS -->
+      <div id="customer-active-table-banner" class="customer-active-table-banner hidden"></div>
 
       <!-- ORDER TYPE TABS (Dine-in / Takeaway) -->
       <section class="order-type-section">
@@ -515,13 +503,13 @@
 
         <!-- Tables Metric Counts Bar -->
         <div class="admin-tables-stats-bar">
-          <div class="stat-pill"><span class="stat-dot dot-all"></span> Total: <strong id="tables-stat-total">0</strong></div>
-          <div class="stat-pill"><span class="stat-dot dot-active"></span> Active: <strong id="tables-stat-active">0</strong></div>
-          <div class="stat-pill"><span class="stat-dot dot-inactive"></span> Deactivated: <strong id="tables-stat-inactive">0</strong></div>
+          <div class="stat-pill"><span class="stat-dot dot-all"></span> Total: <strong id="admin-tables-total-count">0</strong></div>
+          <div class="stat-pill"><span class="stat-dot dot-active"></span> Active: <strong id="admin-tables-active-count">0</strong></div>
+          <div class="stat-pill"><span class="stat-dot dot-inactive"></span> Deactivated: <strong id="admin-tables-inactive-count">0</strong></div>
         </div>
 
         <!-- Tables Cards Grid -->
-        <div class="admin-tables-crud-list" id="admin-tables-crud-list"></div>
+        <div class="admin-tables-crud-grid" id="admin-tables-crud-grid"></div>
       </section>
 
       <div class="scroll-bottom-spacer"></div>
@@ -913,7 +901,7 @@
         </label>
       </div>
 
-      <div class="bulk-tables-checklist" id="bulk-tables-checklist"></div>
+      <div class="bulk-tables-checklist" id="bulk-print-table-checklist"></div>
 
       <div class="bulk-modal-foot">
         <button type="button" class="btn-crud-secondary" onclick="closeBulkPrintModal()">Cancel</button>

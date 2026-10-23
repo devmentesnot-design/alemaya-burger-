@@ -281,6 +281,16 @@ i[data-lucide] {
   align-items: center;
   gap: 8px;
 }
+/* Logo-only centered top navbar for Admin & Kitchen */
+.portal-chef .top-nav-inner,
+.portal-admin .top-nav-inner {
+  justify-content: center;
+}
+.portal-chef .nav-actions,
+.portal-admin .nav-actions {
+  display: none !important;
+}
+
 .icon-btn {
   width: 40px;
   height: 40px;

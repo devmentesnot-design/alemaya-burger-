@@ -600,7 +600,8 @@ async function handleRequest(req, res) {
   // ═════════════════════════════════════════════════════════════════
   return new Promise(resolve => {
     let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
-    if (safePath === '/' || safePath === '\\' || safePath === '/kitchen' || safePath === '\\kitchen' || safePath === '/admin' || safePath === '\\admin' || safePath === '/orders' || safePath === '\\orders') {
+    const cleanPath = (pathname || '').toLowerCase().replace(/[\\\/]+$/, '');
+    if (!cleanPath || cleanPath === '' || cleanPath === '/kitchen' || cleanPath === '/admin' || cleanPath === '/chef' || cleanPath === '/orders') {
       safePath = '/index.html';
     }
 
