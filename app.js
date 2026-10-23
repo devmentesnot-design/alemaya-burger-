@@ -3318,7 +3318,7 @@ function switchPortal(portal) {
   APP_STATE.portal = portal;
   const customerTopNav = document.getElementById('customer-top-nav');
   if (customerTopNav) {
-    customerTopNav.style.display = (portal === 'customer') ? 'block' : 'none';
+    customerTopNav.style.display = 'block';
   }
 
   const appEl = document.getElementById('app');
@@ -3673,27 +3673,125 @@ function generateSimulatedOrder() {
 }
 
 // ══ ADMIN DASHBOARD, REVENUE REPORTING & ANALYTICS ══
+function getOrderLocalDateStr(order) {
+  if (order.date && /^\d{4}-\d{2}-\d{2}$/.test(order.date)) {
+    return order.date;
+  }
+  if (order.createdAt) {
+    const d = new Date(Number(order.createdAt));
+    if (!isNaN(d.getTime())) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+  }
+  return '';
+}
+
+function formatDateToIsoString(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function isOrderOnDate(order, targetDateStr) {
+  if (!targetDateStr) return false;
+  const ordDate = getOrderLocalDateStr(order);
+  if (ordDate === targetDateStr) return true;
+  if (order.createdAt) {
+    try {
+      const d = new Date(Number(order.createdAt));
+      if (formatDateToIsoString(d) === targetDateStr) return true;
+      if (d.toISOString().split('T')[0] === targetDateStr) return true;
+    } catch (e) {}
+  }
+  return false;
+}
+
 function renderAdminDashboard() {
   const filter = APP_STATE.adminDateFilter || 'today';
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = formatDateToIsoString(now);
 
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const yesterdayStr = formatDateToIsoString(yesterday);
+
+  const twoDaysAgo = new Date(now);
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  const twoDaysAgoStr = formatDateToIsoString(twoDaysAgo);
+
+  const threeDaysAgo = new Date(now);
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const threeDaysAgoStr = formatDateToIsoString(threeDaysAgo);
 
   const sevenDaysAgoMs = now.getTime() - (7 * 24 * 60 * 60 * 1000);
+  const fourteenDaysAgoMs = now.getTime() - (14 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgoMs = now.getTime() - (30 * 24 * 60 * 60 * 1000);
 
-  // Filter orders according to selected date window
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
   let filtered = [];
+  let periodLabel = "Today's Shift";
+
   if (filter === 'today') {
-    filtered = MASTER_ORDERS.filter(o => o.date === todayStr);
+    filtered = MASTER_ORDERS.filter(o => isOrderOnDate(o, todayStr));
+    periodLabel = `Today's Shift (${now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })})`;
   } else if (filter === 'yesterday') {
-    filtered = MASTER_ORDERS.filter(o => o.date === yesterdayStr);
+    filtered = MASTER_ORDERS.filter(o => isOrderOnDate(o, yesterdayStr));
+    periodLabel = `Yesterday (${yesterday.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })})`;
+  } else if (filter === '2days') {
+    filtered = MASTER_ORDERS.filter(o => isOrderOnDate(o, twoDaysAgoStr));
+    periodLabel = `2 Days Ago (${twoDaysAgo.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })})`;
+  } else if (filter === '3days') {
+    filtered = MASTER_ORDERS.filter(o => isOrderOnDate(o, threeDaysAgoStr));
+    periodLabel = `3 Days Ago (${threeDaysAgo.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })})`;
   } else if (filter === 'week') {
-    filtered = MASTER_ORDERS.filter(o => (o.createdAt || 0) >= sevenDaysAgoMs);
+    filtered = MASTER_ORDERS.filter(o => {
+      if (o.createdAt) return Number(o.createdAt) >= sevenDaysAgoMs;
+      const od = getOrderLocalDateStr(o);
+      if (od) return new Date(od).getTime() >= (now.getTime() - 8 * 86400000);
+      return false;
+    });
+    periodLabel = "Past 7 Days";
+  } else if (filter === '14days') {
+    filtered = MASTER_ORDERS.filter(o => {
+      if (o.createdAt) return Number(o.createdAt) >= fourteenDaysAgoMs;
+      const od = getOrderLocalDateStr(o);
+      if (od) return new Date(od).getTime() >= (now.getTime() - 15 * 86400000);
+      return false;
+    });
+    periodLabel = "Past 14 Days";
+  } else if (filter === '30days') {
+    filtered = MASTER_ORDERS.filter(o => {
+      if (o.createdAt) return Number(o.createdAt) >= thirtyDaysAgoMs;
+      const od = getOrderLocalDateStr(o);
+      if (od) return new Date(od).getTime() >= (now.getTime() - 31 * 86400000);
+      return false;
+    });
+    periodLabel = "Past 30 Days";
+  } else if (filter === 'month') {
+    filtered = MASTER_ORDERS.filter(o => {
+      const d = o.createdAt ? new Date(Number(o.createdAt)) : (o.date ? new Date(o.date) : null);
+      if (!d || isNaN(d.getTime())) return false;
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+    periodLabel = `This Month (${now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})`;
+  } else if (filter === 'custom' && APP_STATE.adminCustomDate) {
+    const custDate = APP_STATE.adminCustomDate;
+    filtered = MASTER_ORDERS.filter(o => isOrderOnDate(o, custDate));
+    const dParts = custDate.split('-');
+    const displayDate = new Date(Number(dParts[0]), Number(dParts[1]) - 1, Number(dParts[2]));
+    const formattedDisplay = !isNaN(displayDate.getTime())
+      ? displayDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+      : custDate;
+    periodLabel = formattedDisplay;
   } else {
     filtered = [...MASTER_ORDERS];
+    periodLabel = "All Time (Lifetime)";
   }
 
   // Exclude cancelled orders from revenue calculation
@@ -3701,7 +3799,7 @@ function renderAdminDashboard() {
   const totalRevenue = validOrders.reduce((sum, o) => sum + (o.total || 0), 0);
   const totalOrders = filtered.length;
   const aov = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
-  const activeKitchen = MASTER_ORDERS.filter(o => o.status === 'received' || o.status === 'preparing').length;
+  const activeKitchen = MASTER_ORDERS.filter(o => o.status === 'received' || o.status === 'preparing' || o.status === 'cooking').length;
 
   // Lifetime revenue
   const lifetimeRevenue = MASTER_ORDERS
@@ -3721,7 +3819,37 @@ function renderAdminDashboard() {
   if (kpiOrdersSub) kpiOrdersSub.textContent = `Lifetime: ${MASTER_ORDERS.length} orders`;
   if (kpiKitchen) kpiKitchen.textContent = activeKitchen;
 
-  // Render 7-Day Revenue Trend Chart
+  // Active Period Banner
+  const periodTextEl = document.getElementById('admin-period-text');
+  if (periodTextEl) {
+    const isFilteredNotToday = (filter !== 'today');
+    periodTextEl.innerHTML = `
+      <span>Viewing Analytics: <strong>${periodLabel}</strong> • <strong>${totalOrders}</strong> order${totalOrders === 1 ? '' : 's'} (${formatMoney(totalRevenue)})</span>
+      ${isFilteredNotToday ? '<button class="btn-period-reset" onclick="resetAdminDateToToday()">Reset to Today</button>' : ''}
+    `;
+  }
+
+  // Handle custom date box visibility
+  const customBox = document.getElementById('admin-custom-date-box');
+  const customInput = document.getElementById('admin-custom-date-input');
+  if (customBox) {
+    if (filter === 'custom') {
+      customBox.classList.remove('hidden');
+      if (customInput && APP_STATE.adminCustomDate) {
+        customInput.value = APP_STATE.adminCustomDate;
+      }
+    } else {
+      customBox.classList.add('hidden');
+    }
+  }
+
+  // Sync dropdown selection
+  const dateSelect = document.getElementById('admin-date-filter');
+  if (dateSelect) {
+    dateSelect.value = (filter === 'custom') ? 'custom' : filter;
+  }
+
+  // Render 7-Day Revenue Trend Chart (interactive)
   renderAdminRevenueBars();
 
   // Render Category Breakdown Bars
@@ -3745,23 +3873,37 @@ function renderAdminRevenueBars() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now);
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    const dayName = i === 0 ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'short' });
+    const dateStr = formatDateToIsoString(d);
+    const dayName = i === 0 ? 'Today' : (i === 1 ? 'Yesterday' : d.toLocaleDateString('en-US', { weekday: 'short' }));
 
     const dayRevenue = MASTER_ORDERS
-      .filter(o => o.date === dateStr && o.status !== 'cancelled')
+      .filter(o => isOrderOnDate(o, dateStr) && o.status !== 'cancelled')
       .reduce((sum, o) => sum + (o.total || 0), 0);
 
-    days.push({ dateStr, dayName, revenue: dayRevenue });
+    const dayOrdersCount = MASTER_ORDERS
+      .filter(o => isOrderOnDate(o, dateStr) && o.status !== 'cancelled').length;
+
+    days.push({
+      dateStr,
+      dayName,
+      revenue: dayRevenue,
+      count: dayOrdersCount,
+      isToday: i === 0,
+      isYesterday: i === 1
+    });
   }
 
   const maxRev = Math.max(...days.map(d => d.revenue), 100);
 
   let html = '';
   days.forEach(d => {
-    const heightPct = Math.max(6, Math.round((d.revenue / maxRev) * 100));
+    const heightPct = Math.max(8, Math.round((d.revenue / maxRev) * 100));
+    const isSelected = (APP_STATE.adminDateFilter === 'custom' && APP_STATE.adminCustomDate === d.dateStr) ||
+                       (APP_STATE.adminDateFilter === 'today' && d.isToday) ||
+                       (APP_STATE.adminDateFilter === 'yesterday' && d.isYesterday);
+
     html += `
-      <div class="chart-bar-col">
+      <div class="chart-bar-col ${isSelected ? 'active-chart-bar' : ''}" onclick="selectAdminChartDate('${d.dateStr}', '${d.dayName}')" title="Click to view analytics for ${d.dayName} (${d.dateStr}) • ${d.count} orders">
         <div class="chart-bar-pill" style="height: ${heightPct}%;">
           <div class="chart-bar-tooltip">${formatMoney(d.revenue)}</div>
         </div>
@@ -3925,8 +4067,46 @@ function renderAdminOrdersTable(orders) {
 }
 
 function handleAdminDateFilter(value) {
-  APP_STATE.adminDateFilter = value;
+  if (value === 'custom') {
+    APP_STATE.adminDateFilter = 'custom';
+    if (!APP_STATE.adminCustomDate) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      APP_STATE.adminCustomDate = formatDateToIsoString(yesterday);
+    }
+  } else {
+    APP_STATE.adminDateFilter = value;
+  }
   renderAdminDashboard();
+}
+
+function handleAdminCustomDate(dateStr) {
+  if (!dateStr) return;
+  APP_STATE.adminDateFilter = 'custom';
+  APP_STATE.adminCustomDate = dateStr;
+  renderAdminDashboard();
+  toast(`Viewing analytics for ${dateStr}`);
+}
+
+function selectAdminChartDate(dateStr, dayName) {
+  if (dayName === 'Today') {
+    APP_STATE.adminDateFilter = 'today';
+    APP_STATE.adminCustomDate = dateStr;
+  } else if (dayName === 'Yesterday') {
+    APP_STATE.adminDateFilter = 'yesterday';
+    APP_STATE.adminCustomDate = dateStr;
+  } else {
+    APP_STATE.adminDateFilter = 'custom';
+    APP_STATE.adminCustomDate = dateStr;
+  }
+  renderAdminDashboard();
+  toast(`Viewing analytics for ${dayName} (${dateStr})`);
+}
+
+function resetAdminDateToToday() {
+  APP_STATE.adminDateFilter = 'today';
+  renderAdminDashboard();
+  toast("Switched back to Today's Shift");
 }
 
 function handleAdminStatusFilter(value) {
@@ -4008,14 +4188,35 @@ function toggleItemStock(productId) {
 
 // ══ EXPORT ORDERS CSV SPREADSHEET ══
 function exportOrdersCsv() {
-  if (MASTER_ORDERS.length === 0) {
+  const filter = APP_STATE.adminDateFilter || 'today';
+  let targetOrders = [...MASTER_ORDERS];
+
+  const now = new Date();
+  const todayStr = formatDateToIsoString(now);
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = formatDateToIsoString(yesterday);
+
+  if (filter === 'today') {
+    targetOrders = MASTER_ORDERS.filter(o => isOrderOnDate(o, todayStr));
+  } else if (filter === 'yesterday') {
+    targetOrders = MASTER_ORDERS.filter(o => isOrderOnDate(o, yesterdayStr));
+  } else if (filter === 'custom' && APP_STATE.adminCustomDate) {
+    targetOrders = MASTER_ORDERS.filter(o => isOrderOnDate(o, APP_STATE.adminCustomDate));
+  }
+
+  if (targetOrders.length === 0) {
+    targetOrders = MASTER_ORDERS;
+  }
+
+  if (targetOrders.length === 0) {
     toast('No orders to export');
     return;
   }
 
   let csv = 'Order ID,Date,Time,Order Type,Items,Subtotal,Service Charge,Total (ETB),Status\n';
 
-  MASTER_ORDERS.forEach(o => {
+  targetOrders.forEach(o => {
     const itemsStr = (o.items || [])
       .map(i => `${i.qty}x ${i.name}`)
       .join(' | ')
@@ -4028,12 +4229,12 @@ function exportOrdersCsv() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `Alemaya_Grilld_Orders_${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `Alemaya_Grilld_${filter}_${formatDateToIsoString(now)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  toast('Order report downloaded as CSV');
+  toast(`Exported ${targetOrders.length} order report rows (${filter})`);
 }
 
 // ══ ORDER TICKET DETAIL MODAL (FOR CHEF & ADMIN) ══

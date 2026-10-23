@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261022_5">
+  <link rel="stylesheet" href="style.css?v=20261023_1">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -280,14 +280,35 @@
             <select id="admin-date-filter" onchange="handleAdminDateFilter(this.value)">
               <option value="today" selected>Today's Shift</option>
               <option value="yesterday">Yesterday</option>
+              <option value="2days">2 Days Ago</option>
+              <option value="3days">3 Days Ago</option>
               <option value="week">Past 7 Days</option>
+              <option value="14days">Past 14 Days</option>
+              <option value="30days">Past 30 Days</option>
+              <option value="month">This Month</option>
               <option value="all">All Time</option>
+              <option value="custom">📅 Pick Specific Date...</option>
             </select>
           </div>
           <button class="admin-btn-action" onclick="exportOrdersCsv()" title="Export CSV spreadsheet">
             <i data-lucide="download" class="lucide-icon"></i>
             <span>CSV</span>
           </button>
+        </div>
+
+        <!-- Custom Date Picker Field -->
+        <div id="admin-custom-date-box" class="admin-custom-date-box hidden">
+          <div class="custom-date-inner">
+            <span class="custom-date-label"><i data-lucide="calendar-days" class="lucide-icon" style="width:14px;height:14px;"></i> Choose Date:</span>
+            <input type="date" id="admin-custom-date-input" class="admin-date-picker-input" onchange="handleAdminCustomDate(this.value)">
+          </div>
+        </div>
+
+        <!-- Active Analytics Period Banner -->
+        <div class="admin-period-banner" id="admin-period-banner">
+          <div class="period-banner-content" id="admin-period-text">
+            <span>Viewing: <strong>Today's Shift</strong></span>
+          </div>
         </div>
 
         <!-- 2x2 KPI Cards for Mobile Phone -->
@@ -707,6 +728,6 @@
 
   </div>
 
-  <script src="app.js?v=20261022_7"></script>
+  <script src="app.js?v=20261023_1"></script>
 </body>
 </html>
