@@ -309,7 +309,13 @@ async function handleRequest(req, res) {
           let tableName = body.tableName || body.tableNumber || null;
           let tableToken = body.tableToken || null;
 
-          // If a tableToken is provided, validate it on the server
+          // If body.orderType contains table e.g. "Dine-in (Table 4)"
+          if (!tableName && body.orderType && body.orderType.includes('(')) {
+            const m = body.orderType.match(/\(([^)]+)\)/);
+            if (m && m[1]) tableName = m[1].trim();
+          }
+
+          // If a tableToken is provided, validate or synthesize
           if (tableToken) {
             const table = await supabaseDb.getTableByToken(tableToken);
             if (table) {
@@ -318,7 +324,16 @@ async function handleRequest(req, res) {
               }
               tableId = table.id;
               tableName = table.name;
+            } else if (!tableName) {
+              const clean = String(tableToken).replace(/^table[\s\-_]*/i, '').trim();
+              tableName = /^\d+$/.test(clean) ? `Table ${clean}` : (tableToken.toLowerCase().startsWith('table') ? tableToken : `Table ${tableToken}`);
+              tableId = `table-${clean || tableToken}`;
             }
+          }
+
+          if (tableName && !tableId) {
+            const clean = String(tableName).replace(/^table[\s\-_]*/i, '').trim();
+            tableId = `table-${clean || tableName}`;
           }
           
           const newOrder = {
@@ -422,7 +437,19 @@ async function handleRequest(req, res) {
         const token = decodeURIComponent(pathname.replace('/api/tables/validate/', '')).trim();
         const table = await supabaseDb.getTableByToken(token);
         if (!table) {
-          return sendJson(res, 404, { success: false, error: 'Invalid or expired table QR token' });
+          const clean = token.replace(/^table[\s\-_]*/i, '').trim();
+          const displayName = /^\d+$/.test(clean) ? `Table ${clean}` : (token.toLowerCase().startsWith('table') ? token : `Table ${token}`);
+          return sendJson(res, 200, {
+            success: true,
+            data: {
+              id: `table-${clean || token}`,
+              name: displayName,
+              tableNumber: clean || token,
+              token: token,
+              capacity: 4,
+              active: true
+            }
+          });
         }
         if (table.active === false) {
           return sendJson(res, 400, { success: false, error: 'Table is currently deactivated', data: table });
@@ -601,14 +628,35 @@ async function handleRequest(req, res) {
   return new Promise(resolve => {
     let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
     const cleanPath = (pathname || '').toLowerCase().replace(/[\\\/]+$/, '');
-    if (!cleanPath || cleanPath === '' || cleanPath === '/kitchen' || cleanPath === '/admin' || cleanPath === '/chef' || cleanPath === '/orders') {
+
+    // SPA client-side routes always serve index.html
+    const isSpaRoute = !cleanPath || cleanPath === '' || cleanPath === '/kitchen' || cleanPath === '/admin' || cleanPath === '/chef' || cleanPath === '/orders' || cleanPath === '/menu';
+    
+    if (isSpaRoute) {
       safePath = '/index.html';
     }
 
-    const filePath = path.join(__dirname, safePath);
+    let filePath = path.join(__dirname, safePath);
+
+    // If file doesn't exist directly, check if it's an asset requested under a route (e.g. /admin/app.js -> /app.js)
+    if (!fs.existsSync(filePath)) {
+      const baseName = path.basename(safePath);
+      const rootAsset = path.join(__dirname, baseName);
+      if (fs.existsSync(rootAsset) && fs.statSync(rootAsset).isFile()) {
+        filePath = rootAsset;
+      }
+    }
 
     fs.stat(filePath, (err, stats) => {
       if (err || !stats.isFile()) {
+        const ext = path.extname(safePath).toLowerCase();
+        // If an actual static file with an extension was requested and not found, return 404
+        if (ext && ext !== '.html') {
+          res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+          res.end('404 Not Found');
+          return resolve();
+        }
+
         // Fallback to index.html for client-side routing
         const indexPath = path.join(__dirname, 'index.html');
         fs.readFile(indexPath, (err2, content) => {

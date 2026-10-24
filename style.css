@@ -2492,17 +2492,29 @@ i[data-lucide] {
 
 .admin-subtab {
   flex-shrink: 0;
-  padding: 7px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 15px;
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.18s ease;
   white-space: nowrap;
   font-family: var(--font-body);
+  user-select: none;
+}
+.admin-subtab svg,
+.admin-subtab .lucide-icon {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.2px;
+  flex-shrink: 0;
 }
 .admin-subtab:hover {
   background: var(--bg-cream);
@@ -2511,6 +2523,11 @@ i[data-lucide] {
 .admin-subtab.active {
   background: var(--brand-terracotta);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
+}
+.admin-subtab.active svg,
+.admin-subtab.active .lucide-icon {
+  stroke: #FFFFFF !important;
 }
 
 /* Sub-pane visibility */
@@ -2909,6 +2926,23 @@ i[data-lucide] {
 /* ═══════════════════════════════════════════════════════════════
    STAFF AUTHENTICATION MODAL (FOR /kitchen & /admin ROUTES)
 ═══════════════════════════════════════════════════════════════ */
+#staff-auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+#staff-auth-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
 .staff-auth-modal {
   position: fixed;
   inset: 0;
@@ -3311,6 +3345,46 @@ i[data-lucide] {
 .kds-ticket-header.status-orders { background: #334155; }
 .kds-ticket-header.status-cooking { background: #B45309; }
 .kds-ticket-header.status-ready { background: #15803D; }
+
+/* KDS Table Badge */
+.kds-table-badge {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  color: #92400E;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid #FCD34D;
+  letter-spacing: 0.4px;
+}
+.kds-table-badge svg,
+.kds-table-badge .lucide-icon {
+  width: 17px;
+  height: 17px;
+  stroke: #92400E;
+  stroke-width: 2.4px;
+  flex-shrink: 0;
+}
+.kds-table-badge.kds-table-takeaway {
+  background: #EFF6FF;
+  color: #1E40AF;
+  border-bottom: 2px solid #BFDBFE;
+}
+.kds-table-badge.kds-table-takeaway svg {
+  stroke: #1E40AF;
+}
+.kds-table-badge.kds-table-unassigned {
+  background: #F8FAFC;
+  color: #64748B;
+  border-bottom: 1.5px solid #E2E8F0;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.kds-table-badge.kds-table-unassigned svg {
+  stroke: #64748B;
+}
 
 .kds-ticket-body {
   padding: 14px;
@@ -4247,4 +4321,226 @@ i[data-lucide] {
     border: 2px dashed #94A3B8 !important;
     background: #FFFDF9 !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIMPLE TABLE QR CODE GENERATOR
+═══════════════════════════════════════════════════════════════ */
+.qr-gen-container {
+  padding: 20px 16px 32px;
+}
+.qr-gen-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.qr-gen-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+.qr-gen-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+.qr-gen-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+/* Form */
+.qr-gen-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+  margin: 0 auto 24px;
+}
+.qr-gen-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.qr-gen-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+.qr-gen-field input {
+  padding: 12px 14px;
+  border: 1.5px solid var(--border-warm);
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-family: var(--font-body);
+  color: var(--text-dark);
+  background: #FFFFFF;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.qr-gen-field input:focus {
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+}
+.qr-gen-field input::placeholder {
+  color: #94A3B8;
+}
+
+/* Generate button */
+.qr-gen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #D97706, #B45309);
+  color: #FFFFFF;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.25);
+  margin-top: 4px;
+}
+.qr-gen-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35);
+}
+.qr-gen-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+}
+
+/* Result section */
+.qr-gen-result {
+  max-width: 400px;
+  margin: 0 auto;
+  animation: qrFadeIn 0.4s ease;
+}
+.qr-gen-result.hidden {
+  display: none;
+}
+@keyframes qrFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Card */
+.qr-result-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-warm);
+  border-radius: 20px;
+  padding: 28px 24px 22px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+}
+.qr-result-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.qr-result-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+.qr-result-brand span {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.qr-result-table-name {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent-warm);
+  margin-bottom: 16px;
+}
+.qr-result-card canvas {
+  display: block;
+  margin: 0 auto 14px;
+  border-radius: 8px;
+}
+.qr-result-hint {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.qr-result-url {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  word-break: break-all;
+  padding: 6px 10px;
+  background: #F8FAFC;
+  border-radius: 8px;
+  font-family: monospace;
+}
+
+/* Action buttons */
+.qr-result-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  width: 100%;
+}
+.qr-action-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 16px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.qr-action-btn svg,
+.qr-action-btn .lucide-icon {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.2px;
+  flex-shrink: 0;
+}
+.qr-download-btn {
+  background: #0F172A;
+  color: #FFFFFF;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.15);
+}
+.qr-download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.24);
+}
+.qr-print-btn {
+  background: #FFFFFF;
+  color: var(--text-dark);
+  border: 1.5px solid var(--border-warm);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.qr-print-btn:hover {
+  background: #FEF3C7;
+  border-color: var(--accent-warm);
+  transform: translateY(-1px);
+}
+.qr-action-btn:active {
+  transform: translateY(0);
 }

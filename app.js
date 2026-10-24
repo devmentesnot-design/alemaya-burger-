@@ -2110,6 +2110,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Restore saved cart, stock, and orders from localStorage
   restoreFromStorage();
 
+  // Route check IMMEDIATELY so the correct portal is shown before async data loads
+  handleHashRouting();
+  window.addEventListener('hashchange', handleHashRouting);
+  window.addEventListener('popstate', handleHashRouting);
+
   // Initialize table token from URL (?table=... or ?tableToken=...) or localStorage
   await initTableFromUrlOrStorage();
 
@@ -2129,10 +2134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Sync fresh live data from database.json via REST API
   await syncDataFromBackend(false);
-
-  // Route check from window.location.hash (#kitchen, #chef, #admin, #orders, #menu)
-  handleHashRouting();
-  window.addEventListener('hashchange', handleHashRouting);
 
   // Fast auto-refresh orders every 3s for live kitchen and order tracking
   setInterval(() => {
@@ -2159,28 +2160,25 @@ function handleHashRouting() {
   const rawPath = (window.location.pathname || '').toLowerCase().replace(/\/+$/, '');
   const path = rawPath.endsWith('/index.html') ? rawPath.replace(/\/index\.html$/, '') : rawPath;
 
-  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || hash.startsWith('kitchen') || hash.startsWith('chef') || path === '/kitchen' || path.endsWith('/kitchen') || path === '/chef' || path.endsWith('/chef');
-  const isAdminRoute = hash === 'admin' || hash.startsWith('admin') || path === '/admin' || path.endsWith('/admin');
-  const isOrdersRoute = hash === 'orders' || path === '/orders' || path.endsWith('/orders');
+  console.log('[ROUTING] Hash:', hash, 'Path:', path, 'Current Portal:', APP_STATE.portal);
+
+  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || hash.startsWith('kitchen') || hash.startsWith('chef') || 
+                         path === '/kitchen' || path.endsWith('/kitchen') || path === '/chef' || path.endsWith('/chef') ||
+                         path.includes('/kitchen') || path.includes('/chef');
+  const isAdminRoute = hash === 'admin' || hash.startsWith('admin') || path === '/admin' || path.endsWith('/admin') || path.includes('/admin');
+  const isOrdersRoute = hash === 'orders' || hash.startsWith('orders') || path === '/orders' || path.endsWith('/orders') || path.includes('/orders');
 
   if (isKitchenRoute) {
-    const isAuthed = sessionStorage.getItem('staff_auth_kitchen') === '1';
-    if (isAuthed) {
-      switchPortal('chef');
-    } else {
-      promptStaffPassword('kitchen');
-    }
+    switchPortal('chef');
   } else if (isAdminRoute) {
-    const isAuthed = sessionStorage.getItem('staff_auth_admin') === '1';
-    if (isAuthed) {
-      switchPortal('admin');
-    } else {
-      promptStaffPassword('admin');
-    }
+    switchPortal('admin');
   } else if (isOrdersRoute) {
     navigateTo('orders');
   } else {
-    navigateTo('menu');
+    // Only navigate to menu if we're not in a staff portal
+    if (APP_STATE.portal === 'customer' || hash === 'menu' || !hash) {
+      navigateTo('menu');
+    }
   }
 }
 
@@ -2190,6 +2188,7 @@ function handleHashRouting() {
 let PENDING_STAFF_PORTAL = null;
 
 function promptStaffPassword(portal) {
+  console.log('[AUTH DEBUG] promptStaffPassword called for portal:', portal);
   PENDING_STAFF_PORTAL = portal;
   const overlay = document.getElementById('staff-auth-overlay');
   const modal = document.getElementById('staff-auth-modal');
@@ -2198,7 +2197,12 @@ function promptStaffPassword(portal) {
   const input = document.getElementById('staff-auth-input');
   const err = document.getElementById('staff-auth-error');
 
-  if (!modal) return;
+  console.log('[AUTH DEBUG] Modal element:', modal, 'Overlay:', overlay);
+
+  if (!modal) {
+    console.error('[AUTH DEBUG] Modal element not found!');
+    return;
+  }
 
   const isKitchen = portal === 'kitchen' || portal === 'chef';
   title.textContent = isKitchen ? 'Kitchen Terminal Access' : 'Admin Management Access';
@@ -2214,6 +2218,9 @@ function promptStaffPassword(portal) {
 
   overlay?.classList.add('open');
   modal?.classList.add('open');
+  
+  console.log('[AUTH DEBUG] Modal classes after adding open:', modal.className);
+  console.log('[AUTH DEBUG] Overlay classes after adding open:', overlay?.className);
 }
 
 function handleStaffAuthSubmit(event) {
@@ -2244,8 +2251,13 @@ function handleStaffAuthSubmit(event) {
 
 function cancelStaffAuth() {
   closeStaffAuthModal();
+  const portal = PENDING_STAFF_PORTAL;
   PENDING_STAFF_PORTAL = null;
-  navigateTo('menu');
+  
+  // Don't force navigate to menu - just close the modal
+  // If user was trying to access admin/kitchen, they'll stay on the route
+  // The portal will remain as customer (default)
+  console.log(`Authentication cancelled for ${portal} portal`);
 }
 
 function closeStaffAuthModal() {
@@ -2466,6 +2478,11 @@ function createVerticalCard(p) {
 
 // ══ NAVIGATION (BOTTOM NAV: MENU & ORDERS TABS) ══
 function navigateTo(tab) {
+  // Don't navigate customer tabs if we're in a staff portal (prevents syncDataFromBackend from resetting portal)
+  if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.portal === 'kitchen') {
+    return;
+  }
+
   const customerTopNav = document.getElementById('customer-top-nav');
   if (customerTopNav) customerTopNav.style.display = 'block';
   APP_STATE.currentTab = tab;
@@ -2501,6 +2518,17 @@ function navigateTo(tab) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
   refreshLucideIcons();
+}
+
+// ══ HANDLE LOGO CLICK (PORTAL-AWARE NAVIGATION) ══
+function handleLogoClick() {
+  // If in admin or kitchen portal, stay in that portal (don't navigate away)
+  if (APP_STATE.portal === 'admin' || APP_STATE.portal === 'chef' || APP_STATE.portal === 'kitchen') {
+    // Do nothing or refresh the current portal view
+    return;
+  }
+  // For customer portal, navigate to menu
+  navigateTo('menu');
 }
 
 function toggleSearch() {
@@ -3111,40 +3139,92 @@ async function placeOrder() {
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dateStr = now.toISOString().split('T')[0];
 
-  // Resolve table assignment if dine-in
-  let tableId = null;
-  let tableName = null;
-  let tableToken = null;
-
-  if (APP_STATE.orderType === 'Dine-in') {
-    if (APP_STATE.activeTable) {
-      tableId = APP_STATE.activeTable.id;
-      tableName = APP_STATE.activeTable.name;
-      tableToken = APP_STATE.activeTable.token;
+  // Resolve table assignment with multi-tier fallback (memory -> quick input -> URL -> localStorage)
+  if (!APP_STATE.activeTable) {
+    const quickIn = document.getElementById('checkout-table-quick-input');
+    const quickVal = (quickIn?.value || '').trim();
+    if (quickVal) {
+      const cleanNum = quickVal.replace(/^table[\s\-_]*/i, '').trim();
+      const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : `Table ${quickVal}`;
+      APP_STATE.activeTable = {
+        id: `table-${cleanNum || quickVal}`,
+        name: displayName,
+        tableNumber: cleanNum || quickVal,
+        token: quickVal,
+        capacity: 4,
+        active: true
+      };
+      APP_STATE.orderType = 'Dine-in';
+      try { localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable)); } catch {}
     } else {
-      const manualSelect = document.getElementById('checkout-manual-table-select');
-      if (manualSelect && manualSelect.value) {
-        const found = APP_STATE.tables.find(t => t.id === manualSelect.value);
-        if (found) {
-          tableId = found.id;
-          tableName = found.name;
-          tableToken = found.token;
-          APP_STATE.activeTable = found;
-          try { localStorage.setItem('alemaya_active_table', JSON.stringify(found)); } catch {}
+      const urlP = new URLSearchParams(window.location.search);
+      let uToken = urlP.get('table') || urlP.get('tableToken') || urlP.get('tbl');
+      if (!uToken && window.location.hash.includes('?')) {
+        const hQuery = window.location.hash.split('?')[1];
+        if (hQuery) {
+          const hp = new URLSearchParams(hQuery);
+          uToken = hp.get('table') || hp.get('tableToken') || hp.get('tbl');
+        }
+      }
+      if (uToken) {
+        const cleanNum = uToken.replace(/^table[\s\-_]*/i, '').trim();
+        const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : (uToken.toLowerCase().startsWith('table') ? uToken : `Table ${uToken}`);
+        APP_STATE.activeTable = {
+          id: `table-${cleanNum || uToken}`,
+          name: displayName,
+          tableNumber: cleanNum || uToken,
+          token: uToken,
+          capacity: 4,
+          active: true
+        };
+        APP_STATE.orderType = 'Dine-in';
+        try { localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable)); } catch {}
+      } else {
+        const saved = localStorage.getItem('alemaya_active_table');
+        if (saved) {
+          try {
+            APP_STATE.activeTable = JSON.parse(saved);
+            APP_STATE.orderType = 'Dine-in';
+          } catch {}
         }
       }
     }
   }
+
+  let tableId = null;
+  let tableName = null;
+  let tableToken = null;
+
+  if (APP_STATE.activeTable) {
+    tableId = APP_STATE.activeTable.id;
+    tableName = APP_STATE.activeTable.name;
+    tableToken = APP_STATE.activeTable.token || APP_STATE.activeTable.tableNumber || APP_STATE.activeTable.name;
+    APP_STATE.orderType = 'Dine-in';
+  } else if (APP_STATE.orderType === 'Dine-in') {
+    const manualSelect = document.getElementById('checkout-manual-table-select');
+    if (manualSelect && manualSelect.value) {
+      const found = (APP_STATE.tables || []).find(t => t.id === manualSelect.value);
+      if (found) {
+        tableId = found.id;
+        tableName = found.name;
+        tableToken = found.token;
+        APP_STATE.activeTable = found;
+      }
+    }
+  }
+
+  const finalOrderType = tableName ? `Dine-in (${tableName})` : APP_STATE.orderType;
 
   const newOrder = {
     id: orderId,
     timestamp: timeStr,
     date: dateStr,
     createdAt: Date.now(),
-    orderType: APP_STATE.orderType,
+    orderType: finalOrderType,
     tableId: tableId,
     tableName: tableName,
     tableToken: tableToken,
+    tableNumber: APP_STATE.activeTable ? (APP_STATE.activeTable.tableNumber || tableName) : null,
     items: JSON.parse(JSON.stringify(APP_STATE.cart)),
     subtotal: subtotal,
     service: service,
@@ -3568,16 +3648,21 @@ function renderKdsTickets() {
 
     const ordTotal = Number(ord.total) || (ord.items || []).reduce((sum, i) => sum + (Number(i.total) || ((Number(i.unitPrice) || Number(i.basePrice) || 0) * (Number(i.qty) || 1))), 0);
 
-    const resolvedTable = ord.tableName || (ord.orderType && ord.orderType.includes('(') ? ord.orderType.replace(/^.*?\(|\)$/g, '') : null);
+    const resolvedTable = getOrderTableName(ord);
     const tableBadgeHtml = resolvedTable
-      ? `<div class="kds-table-badge">🍽️ ${escapeHtml(resolvedTable)}</div>`
-      : '';
+      ? `<div class="kds-table-badge"><i data-lucide="utensils" class="lucide-icon"></i> <span>🪑 ${escapeHtml(resolvedTable)}</span></div>`
+      : (ord.orderType && ord.orderType.toLowerCase().includes('takeaway')
+          ? `<div class="kds-table-badge kds-table-takeaway"><i data-lucide="shopping-bag" class="lucide-icon"></i> <span>🥡 Takeaway</span></div>`
+          : `<div class="kds-table-badge kds-table-unassigned"><i data-lucide="help-circle" class="lucide-icon"></i> <span>🍽️ Dine-in (No Table Assigned)</span></div>`);
 
+    const headerTypeLabel = resolvedTable
+      ? `${escapeHtml(resolvedTable)} (Dine-in)`
+      : (ord.orderType || 'Dine-in');
 
     html += `
       <div class="kds-ticket-card">
         <div class="kds-ticket-header status-${normStatus}">
-          <span>#${ord.id} • ${ord.orderType || 'Dine-in'}</span>
+          <span>#${ord.id} • ${headerTypeLabel}</span>
           <span>${statusLabel}</span>
         </div>
         ${tableBadgeHtml}
@@ -3595,6 +3680,40 @@ function renderKdsTickets() {
 
   container.innerHTML = html;
   refreshLucideIcons();
+}
+
+function getOrderTableName(ord) {
+  if (!ord) return null;
+  if (ord.tableName && String(ord.tableName).trim()) return String(ord.tableName).trim();
+  if (ord.table_name && String(ord.table_name).trim()) return String(ord.table_name).trim();
+  if (ord.tableNumber && String(ord.tableNumber).trim()) {
+    const n = String(ord.tableNumber).trim();
+    return /^\d+$/.test(n) ? `Table ${n}` : n;
+  }
+  if (ord.tableToken && String(ord.tableToken).trim()) {
+    const t = String(ord.tableToken).trim();
+    const clean = t.replace(/^table[\s\-_]*/i, '').trim();
+    return /^\d+$/.test(clean) ? `Table ${clean}` : (t.toLowerCase().startsWith('table') ? t : `Table ${t}`);
+  }
+  if (ord.table_token && String(ord.table_token).trim()) {
+    const t = String(ord.table_token).trim();
+    const clean = t.replace(/^table[\s\-_]*/i, '').trim();
+    return /^\d+$/.test(clean) ? `Table ${clean}` : (t.toLowerCase().startsWith('table') ? t : `Table ${t}`);
+  }
+  if (ord.tableId && String(ord.tableId).trim()) {
+    const id = String(ord.tableId).trim();
+    const clean = id.replace(/^(table|tbl)[\s\-_]*/i, '').trim();
+    if (clean) return /^\d+$/.test(clean) ? `Table ${clean}` : `Table ${clean}`;
+  }
+  if (ord.orderType && ord.orderType.includes('(')) {
+    const match = ord.orderType.match(/\(([^)]+)\)/);
+    if (match && match[1]) return match[1].trim();
+  }
+  if (ord.order_type && ord.order_type.includes('(')) {
+    const match = ord.order_type.match(/\(([^)]+)\)/);
+    if (match && match[1]) return match[1].trim();
+  }
+  return null;
 }
 
 function filterKdsOrders(filter) {
@@ -5525,24 +5644,43 @@ async function initTableFromUrlOrStorage() {
 
     if (token) {
       token = token.trim();
-      const res = await API.getTableByToken(token);
-      if (res && res.success && res.data) {
-        APP_STATE.activeTable = res.data;
-        APP_STATE.orderType = 'Dine-in';
-        try {
-          localStorage.setItem('alemaya_active_table', JSON.stringify(res.data));
-        } catch {}
-        toast(`🍽️ Welcome! Seated at ${res.data.name}`, 3800);
-      } else {
-        const errMsg = (res && res.error) ? res.error : 'Table QR code is invalid or deactivated.';
-        toast(`⚠️ ${errMsg}`, 4500);
-      }
+      const cleanNum = token.replace(/^table[\s\-_]*/i, '').trim();
+      const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : (token.toLowerCase().startsWith('table') ? token : `Table ${token}`);
+      const tableData = {
+        id: `table-${cleanNum || token}`,
+        name: displayName,
+        tableNumber: cleanNum || token,
+        token: token,
+        capacity: 4,
+        active: true
+      };
+
+      APP_STATE.activeTable = tableData;
+      APP_STATE.orderType = 'Dine-in';
+      try {
+        localStorage.setItem('alemaya_active_table', JSON.stringify(tableData));
+      } catch {}
+
+      toast(`🍽️ Welcome! Seated at ${tableData.name}`, 3800);
+
+      // Background check if custom table exists in database
+      API.getTableByToken(token).then(res => {
+        if (res && res.success && res.data) {
+          APP_STATE.activeTable = { ...tableData, ...res.data };
+          try {
+            localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable));
+          } catch {}
+          renderCustomerActiveTableBanner();
+          renderCartCheckoutTableSlot();
+        }
+      }).catch(() => {});
     } else {
       // 2. Restore active table from localStorage if customer previously scanned
       const saved = localStorage.getItem('alemaya_active_table');
       if (saved) {
         try {
           APP_STATE.activeTable = JSON.parse(saved);
+          APP_STATE.orderType = 'Dine-in';
         } catch {}
       }
     }
@@ -5618,37 +5756,51 @@ function renderCartCheckoutTableSlot() {
   }
 
   wrap.style.display = 'block';
-  const titleEl = document.getElementById('checkout-table-title');
-  const subEl = document.getElementById('checkout-table-sub');
-  const slotEl = document.getElementById('checkout-table-action-slot');
 
   if (APP_STATE.activeTable) {
-    if (titleEl) titleEl.textContent = `Dining Table: ${APP_STATE.activeTable.name}`;
-    if (subEl) subEl.textContent = `Verified via Table QR (${APP_STATE.activeTable.capacity || 4} Seats)`;
-    if (slotEl) {
-      slotEl.innerHTML = `
+    wrap.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; background:#FEF3C7; border:1.5px solid #FDE68A; padding:10px 14px; border-radius:12px; margin-top:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span class="checkout-table-locked-badge">🍽️ ${escapeHtml(APP_STATE.activeTable.name)}</span>
-          <button type="button" onclick="clearActiveTable()" style="background:none; border:none; color:var(--text-muted); font-size:0.75rem; text-decoration:underline; cursor:pointer;">Change</button>
+          <span style="font-size:1.2rem;">🪑</span>
+          <div>
+            <strong style="font-size:0.92rem; color:#92400E; display:block;">Seated at ${escapeHtml(APP_STATE.activeTable.name)}</strong>
+            <span style="font-size:0.75rem; color:#B45309;">Dine-in Order</span>
+          </div>
         </div>
-      `;
-    }
+        <button type="button" onclick="clearActiveTable()" style="background:#FFFFFF; border:1px solid #FCD34D; color:#92400E; font-size:0.75rem; font-weight:700; padding:5px 10px; border-radius:8px; cursor:pointer;">Change</button>
+      </div>
+    `;
   } else {
-    if (titleEl) titleEl.textContent = 'Table Assignment';
-    if (subEl) subEl.textContent = 'Select table number for waiter service';
-    const activeTables = (APP_STATE.tables || []).filter(t => t.active !== false);
-    if (slotEl) {
-      if (activeTables.length === 0) {
-        slotEl.innerHTML = `<span style="font-size:0.8rem; color:#64748B;">No tables configured</span>`;
-      } else {
-        slotEl.innerHTML = `
-          <select id="checkout-manual-table-select" class="checkout-table-select" onchange="handleManualTableSelect(this.value)">
-            <option value="">Select table number...</option>
-            ${activeTables.map(t => `<option value="${t.id}">${escapeHtml(t.name)} (${t.capacity || 4} seats)</option>`).join('')}
-          </select>
-        `;
-      }
-    }
+    wrap.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; background:#F8FAFC; border:1px dashed #CBD5E1; padding:8px 12px; border-radius:10px; margin-top:8px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:1rem;">🪑</span>
+          <span style="font-size:0.82rem; font-weight:600; color:#475569;">Table Number:</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <input type="text" id="checkout-table-quick-input" placeholder="e.g. 4" style="width:70px; padding:5px 8px; border:1.5px solid #CBD5E1; border-radius:8px; font-size:0.85rem; font-weight:700; text-align:center;" oninput="handleQuickTableInput(this.value)" />
+        </div>
+      </div>
+    `;
+  }
+}
+
+function handleQuickTableInput(val) {
+  const clean = (val || '').trim();
+  if (clean) {
+    const cleanNum = clean.replace(/^table[\s\-_]*/i, '').trim();
+    const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : (clean.toLowerCase().startsWith('table') ? clean : `Table ${clean}`);
+    APP_STATE.activeTable = {
+      id: `table-${cleanNum || clean}`,
+      name: displayName,
+      tableNumber: cleanNum || clean,
+      token: clean,
+      capacity: 4,
+      active: true
+    };
+    APP_STATE.orderType = 'Dine-in';
+  } else {
+    APP_STATE.activeTable = null;
   }
 }
 
@@ -5716,120 +5868,14 @@ function getTableMenuUrl(tableToken) {
 }
 
 // ── Admin Tables Management Rendering ──
+// ── Simple Table QR Generator Setup ──
 function renderAdminTablesCrud() {
-  const grid = document.getElementById('admin-tables-crud-grid');
-  if (!grid) return;
-
-  const totalCountEl = document.getElementById('admin-tables-total-count');
-  const activeCountEl = document.getElementById('admin-tables-active-count');
-  const inactiveCountEl = document.getElementById('admin-tables-inactive-count');
-
-  const allTables = APP_STATE.tables || [];
-  const activeTables = allTables.filter(t => t.active !== false);
-  const inactiveTables = allTables.filter(t => t.active === false);
-
-  if (totalCountEl) totalCountEl.textContent = allTables.length;
-  if (activeCountEl) activeCountEl.textContent = activeTables.length;
-  if (inactiveCountEl) inactiveCountEl.textContent = inactiveTables.length;
-
-  const q = (APP_STATE.tableSearchQuery || '').trim().toLowerCase();
-  const filter = APP_STATE.tableFilter || 'all';
-
-  let list = [...allTables];
-
-  if (filter === 'active') {
-    list = list.filter(t => t.active !== false);
-  } else if (filter === 'inactive') {
-    list = list.filter(t => t.active === false);
+  const baseUrlInput = document.getElementById('qr-base-url');
+  if (baseUrlInput && !baseUrlInput.value) {
+    baseUrlInput.value = window.location.origin.includes('localhost')
+      ? 'https://alemaya-burger-5pig.vercel.app/'
+      : (window.location.origin + '/');
   }
-
-  if (q.length > 0) {
-    list = list.filter(t =>
-      t.name.toLowerCase().includes(q) ||
-      (t.token && t.token.toLowerCase().includes(q)) ||
-      (t.id && t.id.toLowerCase().includes(q))
-    );
-  }
-
-  if (list.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 16px;">
-        <div style="font-size: 2.5rem; margin-bottom: 8px;">🍽️</div>
-        <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: #0F172A; margin-bottom: 4px;">
-          No tables match your filter
-        </h3>
-        <p style="font-size: 0.84rem; color: #64748B; max-width: 360px; margin: 0 auto 16px;">
-          Add tables individually or generate them in bulk to generate unique QR codes.
-        </p>
-        <button class="btn-admin-add" onclick="openAddTableModal()" style="display:inline-flex;">+ Add New Table</button>
-      </div>
-    `;
-    return;
-  }
-
-  let html = '';
-  list.forEach(table => {
-    const isActive = table.active !== false;
-    const menuUrl = getTableMenuUrl(table.token);
-
-    html += `
-      <div class="admin-table-crud-card ${isActive ? 'is-active' : 'is-inactive'}">
-        <div class="atc-head">
-          <div>
-            <div class="atc-name">${escapeHtml(table.name)}</div>
-            <div class="atc-capacity">🪑 ${table.capacity || 4} Guests Capacity</div>
-          </div>
-          <button type="button" class="atc-status-chip ${isActive ? 'chip-active' : 'chip-inactive'}" onclick="toggleTableStatus('${table.id}')" title="Click to toggle table active/inactive">
-            ${isActive ? '● Active' : '○ Inactive'}
-          </button>
-        </div>
-
-        <div class="atc-body">
-          <div class="atc-qr-wrap" onclick="openTableQrModal('${table.id}')" title="Click to preview & print table QR stand">
-            <canvas id="atc-qr-${table.id}" class="atc-qr-canvas"></canvas>
-            <span class="atc-qr-zoom-hint">🔍 Stand Card</span>
-          </div>
-          <div class="atc-meta">
-            <div class="atc-token-row">
-              <span class="atc-label">QR Token:</span>
-              <code class="atc-token-val" title="${escapeHtml(table.token)}">${escapeHtml(table.token)}</code>
-            </div>
-            <div class="atc-url-box">
-              <input type="text" readonly value="${escapeHtml(menuUrl)}" id="url-input-${table.id}" class="atc-url-input" />
-              <button type="button" class="atc-copy-btn" onclick="copyTableUrl('${table.id}')" title="Copy Menu URL">📋</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="atc-footer">
-          <button type="button" class="btn-atc-action btn-atc-stand" onclick="openTableQrModal('${table.id}')">
-            🖨️ QR Stand
-          </button>
-          <button type="button" class="btn-atc-action btn-atc-edit" onclick="openEditTableModal('${table.id}')">
-            ✏️ Edit
-          </button>
-          <button type="button" class="btn-atc-action btn-atc-regen" onclick="handleRegenerateTableToken('${table.id}')" title="Generate new unique QR token for this table">
-            🔄 New QR
-          </button>
-          <button type="button" class="btn-atc-action btn-atc-delete" onclick="handleDeleteTable('${table.id}')" title="Delete table">
-            🗑️
-          </button>
-        </div>
-      </div>
-    `;
-  });
-
-  grid.innerHTML = html;
-
-  // Render QR Canvas for each card
-  setTimeout(() => {
-    list.forEach(table => {
-      const canvasEl = document.getElementById(`atc-qr-${table.id}`);
-      if (canvasEl) {
-        renderQrToCanvas(canvasEl, getTableMenuUrl(table.token), 100);
-      }
-    });
-  }, 30);
 }
 
 // ── Search & Filter Controls ──
@@ -6250,4 +6296,151 @@ function executeBulkPrint() {
       window.print();
     }, 200);
   }, 50);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SIMPLE TABLE QR CODE GENERATOR (Admin → Tables tab)
+// ═══════════════════════════════════════════════════════════════════════
+let _lastSimpleQrUrl = '';
+
+function generateSimpleTableQr() {
+  const baseUrlInput = document.getElementById('qr-base-url');
+  const tableNumInput = document.getElementById('qr-table-number');
+  const resultSection = document.getElementById('qr-gen-result');
+
+  let baseUrl = (baseUrlInput?.value || '').trim();
+  const tableNum = parseInt(tableNumInput?.value || '', 10);
+
+  if (!baseUrl) {
+    toast('⚠️ Please enter your restaurant link', 3000);
+    baseUrlInput?.focus();
+    return;
+  }
+  if (!tableNum || tableNum < 1) {
+    toast('⚠️ Please enter a valid table number', 3000);
+    tableNumInput?.focus();
+    return;
+  }
+
+  // Ensure URL has protocol
+  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+    baseUrl = 'https://' + baseUrl;
+  }
+  // Ensure trailing slash
+  if (!baseUrl.endsWith('/')) baseUrl += '/';
+
+  // Build the final URL: base + ?table=N
+  const finalUrl = `${baseUrl}?table=${tableNum}`;
+  _lastSimpleQrUrl = finalUrl;
+
+  // Update UI
+  document.getElementById('qr-result-table-name').textContent = `Table ${tableNum}`;
+  document.getElementById('qr-result-url').textContent = finalUrl;
+
+  // Render QR using QRious (already loaded globally)
+  const canvas = document.getElementById('qr-result-canvas');
+  if (canvas && typeof QRious !== 'undefined') {
+    new QRious({
+      element: canvas,
+      value: finalUrl,
+      size: 220,
+      level: 'M',
+      background: '#FFFFFF',
+      foreground: '#0F172A'
+    });
+  } else if (canvas) {
+    // Fallback: try renderQrToCanvas if QRious isn't available
+    renderQrToCanvas(canvas, finalUrl, 220);
+  }
+
+  // Show result
+  if (resultSection) {
+    resultSection.classList.remove('hidden');
+    // Re-trigger animation
+    resultSection.style.animation = 'none';
+    resultSection.offsetHeight; // force reflow
+    resultSection.style.animation = '';
+  }
+
+  refreshLucideIcons();
+  toast(`✅ QR code generated for Table ${tableNum}`, 2500);
+}
+
+function downloadSimpleQr() {
+  const canvas = document.getElementById('qr-result-canvas');
+  const tableName = document.getElementById('qr-result-table-name')?.textContent || 'Table';
+  if (!canvas) return;
+
+  const link = document.createElement('a');
+  link.download = `${tableName.replace(/\s+/g, '_')}_QR.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  toast('📥 QR code downloaded!', 2000);
+}
+
+function printSimpleQr() {
+  const card = document.getElementById('qr-result-card');
+  const canvas = document.getElementById('qr-result-canvas');
+  if (!card || !canvas) return;
+
+  const qrImgData = canvas.toDataURL('image/png');
+  const tableName = document.getElementById('qr-result-table-name')?.textContent || 'Table';
+
+  const printWin = window.open('', '_blank', 'width=420,height=600');
+  if (!printWin) {
+    toast('⚠️ Please allow popups to print', 3000);
+    return;
+  }
+
+  printWin.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Print ${tableName} QR</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          display: flex; align-items: center; justify-content: center;
+          min-height: 100vh; background: #fff;
+          font-family: 'Inter', -apple-system, sans-serif;
+          padding: 20px;
+        }
+        .card {
+          text-align: center; padding: 32px 28px;
+          border: 2px dashed #CBD5E1; border-radius: 20px;
+          max-width: 340px; width: 100%;
+        }
+        .brand { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px; }
+        .brand span { font-size:1.15rem; font-weight:800; color:#0F172A; }
+        .table-name { font-size:1.85rem; font-weight:800; color:#D97706; margin-bottom:16px; }
+        img.qr-img { display:block; margin:0 auto 16px; width:220px; height:220px; border-radius:8px; }
+        .hint { font-size:0.85rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+        .subhint { font-size:0.8rem; color:#64748B; margin-bottom:12px; }
+        .url { font-size:0.7rem; color:#94A3B8; word-break:break-all; font-family:monospace; background:#F8FAFC; padding:4px 8px; border-radius:6px; }
+        .footer { margin-top:16px; font-size:0.75rem; color:#94A3B8; }
+        @media print {
+          body { padding: 0; }
+          .card { border-style: solid; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="brand"><span>Alemaya Grill'd</span></div>
+        <div class="table-name">${tableName}</div>
+        <img src="${qrImgData}" class="qr-img" alt="${tableName} QR Code" />
+        <div class="hint">Scan with your phone camera</div>
+        <div class="subhint">Scan to view the live menu &amp; order directly to this table</div>
+        <div class="url">${_lastSimpleQrUrl}</div>
+        <div class="footer">Alemaya Grill'd • Fresh, Fast &amp; Healthy</div>
+      </div>
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 250);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWin.document.close();
 }

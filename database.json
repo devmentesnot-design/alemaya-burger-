@@ -1624,513 +1624,102 @@
   ],
   "orders": [
     {
-      "id": "AG-TEST-99",
-      "timestamp": "11:45 AM",
-      "date": "2026-10-23",
-      "createdAt": 1792744790799,
-      "orderType": "Dine-in (Table 1)",
+      "id": "AG-TEST1",
+      "timestamp": "07:50 PM",
+      "date": "2026-10-24",
+      "createdAt": 1792860648222,
+      "orderType": "Dine-in (Table 7) (Table 7)",
       "items": [
         {
-          "id": "classic-burger",
-          "qty": 2,
-          "name": "Classic Burger",
-          "total": 560,
-          "unitPrice": 280
+          "qty": 1,
+          "name": "Test Burger",
+          "total": 200,
+          "unitPrice": 200
         }
       ],
-      "subtotal": 560,
+      "subtotal": 200,
       "service": 0,
-      "total": 560,
+      "total": 200,
       "status": "orders",
       "statusLabel": "Order Placed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
+      "tableId": "table-7",
+      "tableName": "Table 7",
+      "tableToken": "7"
     },
     {
-      "id": "AG-6133",
-      "timestamp": "09:18 AM",
-      "date": "2026-10-23",
-      "createdAt": 1792736302343,
-      "orderType": "Takeaway",
+      "id": "AG-8484",
+      "timestamp": "04:34 PM",
+      "date": "2026-10-24",
+      "createdAt": 1792848874188,
+      "orderType": "Dine-in (Table 4)",
       "items": [
         {
           "qty": 1,
-          "name": "Avocado Juice",
-          "note": "gjj",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-          "total": 288,
-          "extras": [
-            {
-              "id": "ext_honey",
-              "name": "Organic Pure Honey",
-              "price": 59
-            }
-          ],
-          "basePrice": 229,
-          "productId": "item_77",
-          "unitPrice": 288,
-          "selections": {
-            "extras_addons": [
-              "ext_honey"
-            ]
-          },
-          "customizations": []
-        },
-        {
-          "qty": 1,
-          "name": "Beef with Cheese Wrap",
+          "name": "Grilled Special Pizza",
           "note": "",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
-          "total": 838,
-          "extras": [
-            {
-              "id": "ext_tuna",
-              "name": "Extra Premium Tuna",
-              "price": 269
-            }
-          ],
-          "basePrice": 569,
-          "productId": "item_26",
-          "unitPrice": 838,
-          "selections": {
-            "extras_addons": [
-              "ext_tuna"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 1126,
-      "service": 0,
-      "total": 1126,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-5131",
-      "timestamp": "09:11 AM",
-      "date": "2026-10-23",
-      "createdAt": 1792735911800,
-      "orderType": "Takeaway",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Pineapple Juice",
-          "note": "fgsdfg",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-          "total": 308,
-          "extras": [
-            {
-              "id": "ext_honey",
-              "name": "Organic Pure Honey",
-              "price": 59
-            }
-          ],
-          "basePrice": 249,
-          "productId": "item_80",
-          "unitPrice": 308,
-          "selections": {
-            "extras_addons": [
-              "ext_honey"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 308,
-      "service": 0,
-      "total": 308,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-7833",
-      "timestamp": "09:06 AM",
-      "date": "2026-10-23",
-      "createdAt": 1792735612976,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Rice",
-          "note": "",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
-          "total": 612,
-          "extras": [
-            {
-              "id": "ext_beef",
-              "name": "Extra Flame Grilled Beef Patty",
-              "price": 169
-            },
-            {
-              "id": "ext_chicken",
-              "name": "Extra Flame Grilled Chicken",
-              "price": 169
-            },
-            {
-              "id": "ext_egg",
-              "name": "Extra Farm Egg",
-              "price": 45
-            }
-          ],
-          "basePrice": 229,
-          "productId": "item_31",
-          "unitPrice": 612,
-          "selections": {
-            "extras_addons": [
-              "ext_beef",
-              "ext_chicken",
-              "ext_egg"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 612,
-      "service": 0,
-      "total": 612,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-4779",
-      "timestamp": "08:05 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792688700079,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Grilled Special Burger",
-          "note": "",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 799,
-          "extras": [],
-          "basePrice": 799,
-          "productId": "item_1",
-          "unitPrice": 799,
-          "selections": {},
-          "customizations": []
-        },
-        {
-          "qty": 1,
-          "name": "Beef with Cheese Wrap",
-          "note": "errtfg",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
-          "total": 1007,
-          "extras": [
-            {
-              "id": "ext_chicken",
-              "name": "Extra Flame Grilled Chicken",
-              "price": 169
-            },
-            {
-              "id": "ext_tuna",
-              "name": "Extra Premium Tuna",
-              "price": 269
-            }
-          ],
-          "basePrice": 569,
-          "productId": "item_26",
-          "unitPrice": 1007,
-          "selections": {
-            "extras_addons": [
-              "ext_chicken",
-              "ext_tuna"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 1806,
-      "service": 0,
-      "total": 1806,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-1337",
-      "timestamp": "07:39 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792687142572,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Grilled Special Burger",
-          "note": "",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 799,
-          "extras": [],
-          "basePrice": 799,
-          "productId": "item_1",
-          "unitPrice": 799,
-          "selections": {},
-          "customizations": []
-        }
-      ],
-      "subtotal": 799,
-      "service": 0,
-      "total": 799,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-6219",
-      "timestamp": "07:37 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792687045514,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Beef Burger",
-          "note": "meeat",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 687,
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+          "total": 1048,
           "extras": [
             {
               "id": "ext_cheese",
               "name": "Extra Melted Cheese",
               "price": 149
-            },
-            {
-              "id": "ext_beef",
-              "name": "Extra Flame Grilled Beef Patty",
-              "price": 169
             }
           ],
-          "basePrice": 369,
-          "productId": "item_4",
-          "unitPrice": 687,
+          "basePrice": 899,
+          "productId": "item_6",
+          "unitPrice": 1048,
           "selections": {
             "extras_addons": [
-              "ext_cheese",
-              "ext_beef"
+              "ext_cheese"
             ]
           },
           "customizations": []
         }
       ],
-      "subtotal": 687,
+      "subtotal": 1048,
       "service": 0,
-      "total": 687,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
+      "total": 1048,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-4",
+      "tableName": "Table 4",
+      "tableToken": "4"
     },
     {
-      "id": "AG-4925",
-      "timestamp": "05:27 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792679222948,
+      "id": "AG-5806",
+      "timestamp": "03:05 PM",
+      "date": "2026-10-24",
+      "createdAt": 1792843527572,
       "orderType": "Dine-in",
       "items": [
         {
           "qty": 1,
-          "name": "Grilled Special Burger",
-          "note": "utdyrsrditfoyghiph",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 937,
-          "extras": [
-            {
-              "id": "ext_mayo",
-              "name": "Creamy Mayonnaise",
-              "price": 79
-            },
-            {
-              "id": "ext_honey",
-              "name": "Organic Pure Honey",
-              "price": 59
-            }
-          ],
-          "basePrice": 799,
-          "productId": "item_1",
-          "unitPrice": 937,
-          "selections": {
-            "extras_addons": [
-              "ext_mayo",
-              "ext_honey"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 937,
-      "service": 0,
-      "total": 937,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-7703",
-      "timestamp": "05:16 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792678603852,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Body Building",
-          "note": "fcvuubhubi",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-          "total": 666,
-          "extras": [
-            {
-              "id": "ext_tuna",
-              "name": "Extra Premium Tuna",
-              "price": 269
-            },
-            {
-              "id": "ext_mayo",
-              "name": "Creamy Mayonnaise",
-              "price": 79
-            },
-            {
-              "id": "ext_honey",
-              "name": "Organic Pure Honey",
-              "price": 59
-            }
-          ],
-          "basePrice": 259,
-          "productId": "item_57",
-          "unitPrice": 666,
-          "selections": {
-            "extras_addons": [
-              "ext_tuna",
-              "ext_mayo",
-              "ext_honey"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 666,
-      "service": 0,
-      "total": 666,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-4836",
-      "timestamp": "05:07 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792678074802,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "BBQ Burger",
-          "note": "sdfghjccudicjidjicjdijcijdijc",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 713,
-          "extras": [
-            {
-              "id": "ext_chicken",
-              "name": "Extra Flame Grilled Chicken",
-              "price": 169
-            },
-            {
-              "id": "ext_egg",
-              "name": "Extra Farm Egg",
-              "price": 45
-            }
-          ],
-          "basePrice": 499,
-          "productId": "item_5",
-          "unitPrice": 713,
-          "selections": {
-            "extras_addons": [
-              "ext_chicken",
-              "ext_egg"
-            ]
-          },
-          "customizations": []
-        }
-      ],
-      "subtotal": 713,
-      "service": 0,
-      "total": 713,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-1792",
-      "timestamp": "03:38 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792672689856,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Margarita Pizza",
-          "note": "qwertyuio",
+          "name": "Grilled Special Pizza",
+          "note": "",
           "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
-          "total": 699,
-          "basePrice": 699,
-          "productId": "item_7",
-          "unitPrice": 699,
-          "selections": {}
+          "total": 1048,
+          "extras": [
+            {
+              "id": "ext_cheese",
+              "name": "Extra Melted Cheese",
+              "price": 149
+            }
+          ],
+          "basePrice": 899,
+          "productId": "item_6",
+          "unitPrice": 1048,
+          "selections": {
+            "extras_addons": [
+              "ext_cheese"
+            ]
+          },
+          "customizations": []
         }
       ],
-      "subtotal": 699,
-      "service": 70,
-      "total": 769,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": null,
-      "tableName": null,
-      "tableToken": null
-    },
-    {
-      "id": "AG-9574",
-      "timestamp": "03:36 PM",
-      "date": "2026-10-22",
-      "createdAt": 1792672571164,
-      "orderType": "Dine-in",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Grilled Special Burger",
-          "note": "mcnnhjj",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 799,
-          "basePrice": 799,
-          "productId": "item_1",
-          "unitPrice": 799,
-          "selections": {}
-        }
-      ],
-      "subtotal": 799,
-      "service": 80,
-      "total": 879,
+      "subtotal": 1048,
+      "service": 0,
+      "total": 1048,
       "status": "completed",
       "statusLabel": "Completed",
       "tableId": null,

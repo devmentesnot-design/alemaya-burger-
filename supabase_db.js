@@ -231,22 +231,32 @@ async function deleteProduct(id) {
 async function getOrders() {
   const data = await supabaseFetch('orders?select=*&order=created_at.desc');
   if (Array.isArray(data) && data.length > 0) {
-    const mapped = data.map(o => ({
-      id: o.id,
-      timestamp: o.timestamp,
-      date: o.date,
-      createdAt: Number(o.created_at) || Date.now(),
-      orderType: o.order_type,
-      items: Array.isArray(o.items) ? o.items : [],
-      subtotal: Number(o.subtotal) || 0,
-      service: Number(o.service) || 0,
-      total: Number(o.total) || 0,
-      status: o.status || 'received',
-      statusLabel: o.status_label || 'Order Received',
-      tableId: o.table_id || o.tableId || null,
-      tableName: o.table_name || o.tableName || o.tableNumber || null,
-      tableToken: o.table_token || o.tableToken || null
-    }));
+    const mapped = data.map(o => {
+      let extractTable = null;
+      if (o.order_type && o.order_type.includes('(')) {
+        const m = o.order_type.match(/\(([^)]+)\)/);
+        if (m && m[1]) extractTable = m[1].trim();
+      }
+      const resolvedTable = o.table_name || o.tableName || o.tableNumber || extractTable;
+      const cleanNum = resolvedTable ? String(resolvedTable).replace(/^table[\s\-_]*/i, '').trim() : null;
+
+      return {
+        id: o.id,
+        timestamp: o.timestamp,
+        date: o.date,
+        createdAt: Number(o.created_at) || Date.now(),
+        orderType: o.order_type,
+        items: Array.isArray(o.items) ? o.items : [],
+        subtotal: Number(o.subtotal) || 0,
+        service: Number(o.service) || 0,
+        total: Number(o.total) || 0,
+        status: o.status || 'received',
+        statusLabel: o.status_label || 'Order Received',
+        tableId: o.table_id || o.tableId || (cleanNum ? `table-${cleanNum}` : null),
+        tableName: resolvedTable,
+        tableToken: o.table_token || o.tableToken || cleanNum
+      };
+    });
     const local = readLocalDb();
     local.orders = mapped;
     writeLocalDb(local);
@@ -256,12 +266,15 @@ async function getOrders() {
 }
 
 async function createOrder(order) {
+  const baseType = (order.orderType || 'Dine-in').replace(/\s*\(.*?\)\s*/g, '').trim();
+  const formattedOrderType = order.tableName ? `${baseType} (${order.tableName})` : (order.orderType || 'Dine-in');
+
   const payload = {
     id: order.id,
     timestamp: order.timestamp,
     date: order.date,
     created_at: Number(order.createdAt) || Date.now(),
-    order_type: order.orderType,
+    order_type: formattedOrderType,
     items: order.items || [],
     subtotal: Number(order.subtotal) || 0,
     service: Number(order.service) || 0,
@@ -281,7 +294,7 @@ async function createOrder(order) {
       timestamp: order.timestamp,
       date: order.date,
       created_at: Number(order.createdAt) || Date.now(),
-      order_type: order.tableName ? `${order.orderType || 'Dine-in'} (${order.tableName})` : (order.orderType || 'Dine-in'),
+      order_type: formattedOrderType,
       items: order.items || [],
       subtotal: Number(order.subtotal) || 0,
       service: Number(order.service) || 0,

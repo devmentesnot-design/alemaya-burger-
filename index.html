@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Alemaya Grill'd Healthy Burgers - Fresh grilled food made for your cravings with real-time kitchen & admin portals.">
   <title>Alemaya Grill'd - Healthy Burgers</title>
+  <base href="/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261023_1">
+  <link rel="stylesheet" href="/style.css?v=20261023_5">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
@@ -31,7 +32,7 @@
     <header class="top-nav-bar" id="customer-top-nav">
       <div class="top-nav-inner">
         <!-- Brand Logo -->
-        <div class="nav-brand" onclick="navigateTo('menu')" title="Alemaya Grill'd">
+        <div class="nav-brand" onclick="handleLogoClick()" title="Alemaya Grill'd">
           <img src="logo.png" alt="Alemaya Grill'd" class="nav-logo">
         </div>
 
@@ -477,50 +478,57 @@
         <div class="admin-mobile-orders-list" id="admin-mobile-orders-list"></div>
       </section>
 
-      <!-- ── SUB-PANE 6: TABLES & QR CODE MANAGEMENT ── -->
+      <!-- ── SUB-PANE 6: SIMPLE TABLE QR CODE GENERATOR ── -->
       <section id="admin-pane-tables" class="admin-subpane">
-        <div class="crud-header-row" style="flex-wrap:wrap; gap:10px;">
-          <div>
-            <h3 class="crud-pane-title">Table Management &amp; QR Codes</h3>
-            <p class="crud-pane-sub">Automatic table assignment, printable stand cards &amp; secure tokens</p>
+        <div class="qr-gen-container">
+          <div class="qr-gen-header">
+            <div class="qr-gen-icon">🪑</div>
+            <h3 class="qr-gen-title">Table QR Generator</h3>
+            <p class="qr-gen-desc">Enter your deployed link and a table number to generate a scannable QR code for customers.</p>
           </div>
-          <div class="crud-actions-wrap" style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn-crud-add" onclick="openAddTableModal()">
-              <i data-lucide="plus" class="lucide-icon"></i>
-              <span>Add Table</span>
+
+          <div class="qr-gen-form">
+            <div class="qr-gen-field">
+              <label for="qr-base-url">Restaurant Link</label>
+              <input type="url" id="qr-base-url" placeholder="https://alemaya-burger-5pig.vercel.app/" value="https://alemaya-burger-5pig.vercel.app/" onkeydown="if(event.key==='Enter') generateSimpleTableQr()" />
+            </div>
+
+            <div class="qr-gen-field">
+              <label for="qr-table-number">Table Number</label>
+              <input type="number" id="qr-table-number" min="1" max="999" placeholder="e.g. 4" onkeydown="if(event.key==='Enter') generateSimpleTableQr()" />
+            </div>
+
+            <button type="button" class="qr-gen-btn" onclick="generateSimpleTableQr()">
+              <i data-lucide="qr-code" class="lucide-icon"></i>
+              <span>Generate QR Code</span>
             </button>
-            <button class="btn-crud-action-sec" onclick="openBulkTablesModal()">
-              <i data-lucide="layers" class="lucide-icon"></i>
-              <span>Bulk Generate</span>
-            </button>
-            <button class="btn-crud-action-sec" onclick="openBulkPrintModal()">
-              <i data-lucide="printer" class="lucide-icon"></i>
-              <span>Bulk Print QRs</span>
-            </button>
+          </div>
+
+          <!-- QR Result (hidden until generated) -->
+          <div class="qr-gen-result hidden" id="qr-gen-result">
+            <div class="qr-result-card" id="qr-result-card">
+              <div class="qr-result-brand">
+                <img src="/logo.png" alt="Alemaya Grill'd" class="qr-result-logo" />
+                <span>Alemaya Grill'd</span>
+              </div>
+              <div class="qr-result-table-name" id="qr-result-table-name">Table 4</div>
+              <canvas id="qr-result-canvas" width="220" height="220"></canvas>
+              <p class="qr-result-hint">Scan to view menu &amp; order</p>
+              <div class="qr-result-url" id="qr-result-url"></div>
+            </div>
+
+            <div class="qr-result-actions">
+              <button type="button" class="qr-action-btn qr-download-btn" onclick="downloadSimpleQr()">
+                <i data-lucide="download" class="lucide-icon"></i>
+                <span>Download PNG</span>
+              </button>
+              <button type="button" class="qr-action-btn qr-print-btn" onclick="printSimpleQr()">
+                <i data-lucide="printer" class="lucide-icon"></i>
+                <span>Print Stand</span>
+              </button>
+            </div>
           </div>
         </div>
-
-        <div class="crud-filters-row">
-          <div class="admin-search-input-wrap" style="flex:1;">
-            <i data-lucide="search" class="lucide-icon"></i>
-            <input type="text" id="admin-table-search" placeholder="Search tables (e.g. VIP, Table 7)..." oninput="handleAdminTableSearch(this.value)">
-          </div>
-          <select id="admin-table-status-filter" onchange="handleAdminTableStatusFilter(this.value)" class="crud-select">
-            <option value="all">All Tables</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Deactivated</option>
-          </select>
-        </div>
-
-        <!-- Tables Metric Counts Bar -->
-        <div class="admin-tables-stats-bar">
-          <div class="stat-pill"><span class="stat-dot dot-all"></span> Total: <strong id="admin-tables-total-count">0</strong></div>
-          <div class="stat-pill"><span class="stat-dot dot-active"></span> Active: <strong id="admin-tables-active-count">0</strong></div>
-          <div class="stat-pill"><span class="stat-dot dot-inactive"></span> Deactivated: <strong id="admin-tables-inactive-count">0</strong></div>
-        </div>
-
-        <!-- Tables Cards Grid -->
-        <div class="admin-tables-crud-grid" id="admin-tables-crud-grid"></div>
       </section>
 
       <div class="scroll-bottom-spacer"></div>
@@ -929,7 +937,7 @@
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <!-- STAFF PASSWORD ACCESS MODAL (KITCHEN & ADMIN ROUTES)             -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="staff-auth-overlay"></div>
+    <div class="modal-overlay" id="staff-auth-overlay" onclick="cancelStaffAuth()"></div>
     <div class="staff-auth-modal" id="staff-auth-modal" role="dialog" aria-modal="true">
       <div class="staff-auth-card">
         <div class="staff-auth-icon-wrap">
@@ -946,7 +954,7 @@
             Incorrect passcode. Access denied.
           </div>
           <div class="staff-auth-actions">
-            <button type="button" class="staff-auth-cancel-btn" onclick="cancelStaffAuth()">Cancel (Back to Menu)</button>
+            <button type="button" class="staff-auth-cancel-btn" onclick="cancelStaffAuth()">Cancel</button>
             <button type="submit" class="staff-auth-submit-btn">Unlock Portal</button>
           </div>
         </form>
@@ -958,6 +966,6 @@
 
   </div>
 
-  <script src="app.js?v=20261023_1"></script>
+  <script src="/app.js?v=20261023_5"></script>
 </body>
 </html>
