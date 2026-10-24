@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/style.css?v=20261023_5">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
   <!-- SPLASH SCREEN -->
@@ -478,55 +479,77 @@
         <div class="admin-mobile-orders-list" id="admin-mobile-orders-list"></div>
       </section>
 
-      <!-- ── SUB-PANE 6: SIMPLE TABLE QR CODE GENERATOR ── -->
+      <!-- ── SUB-PANE 6: ALEMAYA GRILL'D QR POSTER GENERATOR ── -->
       <section id="admin-pane-tables" class="admin-subpane">
-        <div class="qr-gen-container">
-          <div class="qr-gen-header">
-            <div class="qr-gen-icon">🪑</div>
-            <h3 class="qr-gen-title">Table QR Generator</h3>
-            <p class="qr-gen-desc">Enter your deployed link and a table number to generate a scannable QR code for customers.</p>
+        <div class="qr-poster-gen-root">
+          <div class="qr-poster-gen-header">
+            <h2 class="qr-poster-title">Alemaya Grill’d QR Poster Generator</h2>
+            <p class="qr-poster-intro">Enter your menu/order link and table number. The QR code and table number will be placed on your poster, ready to export as a full-size 1024 × 1536 PNG.</p>
           </div>
 
-          <div class="qr-gen-form">
-            <div class="qr-gen-field">
-              <label for="qr-base-url">Restaurant Link</label>
-              <input type="url" id="qr-base-url" placeholder="https://alemaya-burger-5pig.vercel.app/" value="https://alemaya-burger-5pig.vercel.app/" onkeydown="if(event.key==='Enter') generateSimpleTableQr()" />
-            </div>
+          <div class="qr-poster-layout">
+            <!-- Left Panel: Form & Actions -->
+            <section class="qr-poster-panel">
+              <form id="generator" onsubmit="handlePosterFormSubmit(event)">
+                <div class="qr-form-field">
+                  <label for="menuUrl">Menu / order link</label>
+                  <input id="menuUrl" type="url" placeholder="https://alemaya-burger-5pig.vercel.app/" value="https://alemaya-burger-5pig.vercel.app/" required />
+                </div>
 
-            <div class="qr-gen-field">
-              <label for="qr-table-number">Table Number</label>
-              <input type="number" id="qr-table-number" min="1" max="999" placeholder="e.g. 4" onkeydown="if(event.key==='Enter') generateSimpleTableQr()" />
-            </div>
+                <div class="qr-form-field">
+                  <label for="tableNo">Table number</label>
+                  <input id="tableNo" type="text" placeholder="e.g. 01, 4" maxlength="8" value="4" required />
+                </div>
 
-            <button type="button" class="qr-gen-btn" onclick="generateSimpleTableQr()">
-              <i data-lucide="qr-code" class="lucide-icon"></i>
-              <span>Generate QR Code</span>
-            </button>
-          </div>
+                <button class="qr-btn-primary primary" type="submit" id="btn-generate-poster">
+                  <i data-lucide="sparkles" class="lucide-icon"></i>
+                  <span>Generate QR &amp; Preview</span>
+                </button>
+              </form>
 
-          <!-- QR Result (hidden until generated) -->
-          <div class="qr-gen-result hidden" id="qr-gen-result">
-            <div class="qr-result-card" id="qr-result-card">
-              <div class="qr-result-brand">
-                <img src="/logo.png" alt="Alemaya Grill'd" class="qr-result-logo" />
-                <span>Alemaya Grill'd</span>
-              </div>
-              <div class="qr-result-table-name" id="qr-result-table-name">Table 4</div>
-              <canvas id="qr-result-canvas" width="220" height="220"></canvas>
-              <p class="qr-result-hint">Scan to view menu &amp; order</p>
-              <div class="qr-result-url" id="qr-result-url"></div>
-            </div>
-
-            <div class="qr-result-actions">
-              <button type="button" class="qr-action-btn qr-download-btn" onclick="downloadSimpleQr()">
+              <button id="download" class="qr-btn-secondary secondary" onclick="downloadPosterPng()" disabled>
                 <i data-lucide="download" class="lucide-icon"></i>
-                <span>Download PNG</span>
+                <span>Download full poster PNG</span>
               </button>
-              <button type="button" class="qr-action-btn qr-print-btn" onclick="printSimpleQr()">
+
+              <button id="print-poster-btn" class="qr-btn-print" onclick="printPosterDirect()" disabled>
                 <i data-lucide="printer" class="lucide-icon"></i>
-                <span>Print Stand</span>
+                <span>Print Poster</span>
               </button>
-            </div>
+
+              <!-- Scannable link feedback & copy -->
+              <div class="qr-target-url-box" id="qr-target-url-box">
+                <span class="qr-target-label">Scannable Customer Link:</span>
+                <div class="qr-target-url-row">
+                  <code id="qr-target-url-text">https://alemaya-burger-5pig.vercel.app/?table=4</code>
+                  <button type="button" class="btn-copy-url" onclick="copyPosterUrl()" title="Copy Scannable Link">
+                    <i data-lucide="copy" class="lucide-icon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <p class="qr-poster-hint">
+                <i data-lucide="info" class="lucide-icon" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:2px;"></i>
+                Tip: Use the complete link including <b>https://</b>. The QR code opens that link and automatically seats the customer at this table for the chef. Download exports a crisp 1024 × 1536 PNG.
+              </p>
+
+              <div id="status" class="qr-poster-status" role="status">Enter your link and table number to begin.</div>
+            </section>
+
+            <!-- Right Panel: Live Poster Preview -->
+            <section class="qr-poster-panel">
+              <div class="preview-head">
+                <h2>Live poster preview</h2>
+                <span class="preview-badge">Portrait · 2:3</span>
+              </div>
+              <div class="preview-wrap">
+                <div class="poster" id="poster">
+                  <img class="poster-bg" id="posterBg" alt="Alemaya Grill’d poster background" src="/poster_bg.png" />
+                  <div class="table-no" id="tableOverlay">4</div>
+                  <div class="qr-slot" id="qrSlot"></div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </section>

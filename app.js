@@ -5868,15 +5868,28 @@ function getTableMenuUrl(tableToken) {
 }
 
 // ── Admin Tables Management Rendering ──
-// ── Simple Table QR Generator Setup ──
+// ── Alemaya Grill'd QR Poster Generator Setup ──
 function renderAdminTablesCrud() {
-  const baseUrlInput = document.getElementById('qr-base-url');
-  if (baseUrlInput && !baseUrlInput.value) {
-    baseUrlInput.value = window.location.origin.includes('localhost')
+  const menuUrlInput = document.getElementById('menuUrl');
+  const tableNoInput = document.getElementById('tableNo');
+
+  if (menuUrlInput && !menuUrlInput.value) {
+    menuUrlInput.value = window.location.origin.includes('localhost')
       ? 'https://alemaya-burger-5pig.vercel.app/'
       : (window.location.origin + '/');
   }
+
+  if (tableNoInput && !tableNoInput.value) {
+    tableNoInput.value = '4';
+  }
+
+  if (!_posterQrReady) {
+    setTimeout(() => {
+      generateTablePoster();
+    }, 60);
+  }
 }
+
 
 // ── Search & Filter Controls ──
 function handleAdminTableSearch(q) {
@@ -6299,148 +6312,302 @@ function executeBulkPrint() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// SIMPLE TABLE QR CODE GENERATOR (Admin → Tables tab)
+// ALEMAYA GRILL'D QR POSTER GENERATOR (Admin → Tables tab)
+// Generates live 2:3 preview & full-size 1024 × 1536 PNG export
 // ═══════════════════════════════════════════════════════════════════════
-let _lastSimpleQrUrl = '';
+let _posterQrReady = false;
+let _lastGeneratedPosterUrl = '';
 
-function generateSimpleTableQr() {
-  const baseUrlInput = document.getElementById('qr-base-url');
-  const tableNumInput = document.getElementById('qr-table-number');
-  const resultSection = document.getElementById('qr-gen-result');
+function getPosterTargetUrl(rawLink, tableNo) {
+  let link = (rawLink || '').trim();
+  if (!link.startsWith('http://') && !link.startsWith('https://')) {
+    link = 'https://' + link;
+  }
+  const cleanTable = String(tableNo || '').trim();
+  try {
+    const urlObj = new URL(link);
+    urlObj.searchParams.set('table', cleanTable);
+    return urlObj.toString();
+  } catch (e) {
+    const sep = link.includes('?') ? '&' : '?';
+    return `${link}${sep}table=${encodeURIComponent(cleanTable)}`;
+  }
+}
 
-  let baseUrl = (baseUrlInput?.value || '').trim();
-  const tableNum = parseInt(tableNumInput?.value || '', 10);
+async function generateTablePoster() {
+  const urlInput = document.getElementById('menuUrl');
+  const tableInput = document.getElementById('tableNo');
+  const qrSlot = document.getElementById('qrSlot');
+  const tableOverlay = document.getElementById('tableOverlay');
+  const status = document.getElementById('status');
+  const downloadBtn = document.getElementById('download');
+  const printBtn = document.getElementById('print-poster-btn');
+  const urlDisplay = document.getElementById('qr-target-url-text');
 
-  if (!baseUrl) {
-    toast('⚠️ Please enter your restaurant link', 3000);
-    baseUrlInput?.focus();
+  let link = (urlInput?.value || '').trim();
+  const table = (tableInput?.value || '').trim();
+
+  if (!link) {
+    link = window.location.origin.includes('localhost')
+      ? 'https://alemaya-burger-5pig.vercel.app/'
+      : (window.location.origin + '/');
+    if (urlInput) urlInput.value = link;
+  }
+
+  if (!table) {
+    toast('⚠️ Please enter a table number', 3000);
+    tableInput?.focus();
     return;
   }
-  if (!tableNum || tableNum < 1) {
-    toast('⚠️ Please enter a valid table number', 3000);
-    tableNumInput?.focus();
+
+  if (status) status.textContent = 'Generating QR code…';
+
+  const targetUrl = getPosterTargetUrl(link, table);
+  _lastGeneratedPosterUrl = targetUrl;
+
+  if (urlDisplay) {
+    urlDisplay.textContent = targetUrl;
+  }
+
+  // Clear previous QR element
+  if (qrSlot) {
+    qrSlot.innerHTML = '';
+  }
+
+  // Render QR code
+  try {
+    let rendered = false;
+    // Method A: QRCode.js
+    if (typeof QRCode !== 'undefined' && qrSlot) {
+      new QRCode(qrSlot, {
+        text: targetUrl,
+        width: 320,
+        height: 320,
+        colorDark: '#1b120d',
+        colorLight: '#ffffff',
+        correctLevel: (typeof QRCode.CorrectLevel !== 'undefined' ? QRCode.CorrectLevel.H : 2)
+      });
+      rendered = true;
+    }
+    
+    // Method B: QRious fallback
+    if (!rendered && typeof QRious !== 'undefined' && qrSlot) {
+      const canvas = document.createElement('canvas');
+      new QRious({
+        element: canvas,
+        value: targetUrl,
+        size: 320,
+        level: 'H',
+        background: '#ffffff',
+        foreground: '#1b120d'
+      });
+      qrSlot.appendChild(canvas);
+      rendered = true;
+    }
+
+    if (!rendered && qrSlot) {
+      // Method C: Canvas manual fallback
+      const canvas = document.createElement('canvas');
+      canvas.width = 320;
+      canvas.height = 320;
+      qrSlot.appendChild(canvas);
+      if (typeof renderQrToCanvas === 'function') {
+        renderQrToCanvas(canvas, targetUrl, 320);
+      }
+    }
+
+    if (tableOverlay) {
+      tableOverlay.textContent = table;
+    }
+
+    _posterQrReady = true;
+    if (downloadBtn) downloadBtn.disabled = false;
+    if (printBtn) printBtn.disabled = false;
+    if (status) status.textContent = 'QR code ready. Check the preview, then download your PNG.';
+
+    refreshLucideIcons();
+  } catch (err) {
+    console.error('Poster QR Generation Error:', err);
+    if (status) status.textContent = 'Error: ' + err.message;
+    _posterQrReady = false;
+    if (downloadBtn) downloadBtn.disabled = true;
+    if (printBtn) printBtn.disabled = true;
+  }
+}
+
+function handlePosterFormSubmit(e) {
+  if (e) e.preventDefault();
+  generateTablePoster();
+}
+
+async function downloadPosterPng() {
+  const tableInput = document.getElementById('tableNo');
+  const qrSlot = document.getElementById('qrSlot');
+  const status = document.getElementById('status');
+  const table = (tableInput?.value || '').trim() || '1';
+
+  if (!_posterQrReady || !qrSlot) {
+    toast('⚠️ Please generate the QR code first', 3000);
     return;
   }
 
-  // Ensure URL has protocol
-  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
-    baseUrl = 'https://' + baseUrl;
-  }
-  // Ensure trailing slash
-  if (!baseUrl.endsWith('/')) baseUrl += '/';
+  try {
+    if (status) status.textContent = 'Preparing full-size 1024 × 1536 PNG…';
+    const W = 1024, H = 1536;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
 
-  // Build the final URL: base + ?table=N
-  const finalUrl = `${baseUrl}?table=${tableNum}`;
-  _lastSimpleQrUrl = finalUrl;
-
-  // Update UI
-  document.getElementById('qr-result-table-name').textContent = `Table ${tableNum}`;
-  document.getElementById('qr-result-url').textContent = finalUrl;
-
-  // Render QR using QRious (already loaded globally)
-  const canvas = document.getElementById('qr-result-canvas');
-  if (canvas && typeof QRious !== 'undefined') {
-    new QRious({
-      element: canvas,
-      value: finalUrl,
-      size: 220,
-      level: 'M',
-      background: '#FFFFFF',
-      foreground: '#0F172A'
+    const bg = new Image();
+    bg.crossOrigin = 'anonymous';
+    bg.src = '/poster_bg.png';
+    await new Promise((resolve, reject) => {
+      if (bg.complete && bg.naturalWidth) resolve();
+      else {
+        bg.onload = resolve;
+        bg.onerror = () => reject(new Error('Failed to load poster background image'));
+      }
     });
-  } else if (canvas) {
-    // Fallback: try renderQrToCanvas if QRious isn't available
-    renderQrToCanvas(canvas, finalUrl, 220);
-  }
 
-  // Show result
-  if (resultSection) {
-    resultSection.classList.remove('hidden');
-    // Re-trigger animation
-    resultSection.style.animation = 'none';
-    resultSection.offsetHeight; // force reflow
-    resultSection.style.animation = '';
-  }
+    // 1. Draw high-res background
+    ctx.drawImage(bg, 0, 0, W, H);
 
-  refreshLucideIcons();
-  toast(`✅ QR code generated for Table ${tableNum}`, 2500);
+    // 2. Draw QR code
+    const qrEl = qrSlot.querySelector('canvas') || qrSlot.querySelector('img');
+    if (!qrEl) throw new Error('QR code element not found.');
+
+    const slotX = W * 0.301, slotY = H * 0.4755, slotW = W * 0.398, slotH = H * 0.252;
+    const qs = slotW * 0.82;
+    const qx = slotX + (slotW - qs) / 2;
+    const qy = slotY + (slotH - qs) / 2;
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(qx - 8, qy - 8, qs + 16, qy + 16);
+    ctx.drawImage(qrEl, qx, qy, qs, qs);
+
+    // 3. Draw Table Number text
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fffaf0';
+    ctx.font = '800 42px Arial, sans-serif';
+    ctx.fillText(table, W * 0.6235, H * 0.4155, W * 0.12);
+
+    // 4. Download PNG
+    const cleanTable = table.replace(/[^a-z0-9_-]/gi, '_');
+    const a = document.createElement('a');
+    a.download = `alemaya-table-${cleanTable}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+
+    if (status) status.textContent = 'PNG downloaded successfully.';
+    toast(`📥 Poster downloaded: Table ${table}`, 2500);
+  } catch (err) {
+    console.error('Download Poster Error:', err);
+    if (status) status.textContent = 'Could not create PNG: ' + err.message;
+    toast('⚠️ Download error: ' + err.message, 3500);
+  }
 }
 
-function downloadSimpleQr() {
-  const canvas = document.getElementById('qr-result-canvas');
-  const tableName = document.getElementById('qr-result-table-name')?.textContent || 'Table';
-  if (!canvas) return;
+async function printPosterDirect() {
+  const tableInput = document.getElementById('tableNo');
+  const qrSlot = document.getElementById('qrSlot');
+  const table = (tableInput?.value || '').trim() || '1';
 
-  const link = document.createElement('a');
-  link.download = `${tableName.replace(/\s+/g, '_')}_QR.png`;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-  toast('📥 QR code downloaded!', 2000);
-}
-
-function printSimpleQr() {
-  const card = document.getElementById('qr-result-card');
-  const canvas = document.getElementById('qr-result-canvas');
-  if (!card || !canvas) return;
-
-  const qrImgData = canvas.toDataURL('image/png');
-  const tableName = document.getElementById('qr-result-table-name')?.textContent || 'Table';
-
-  const printWin = window.open('', '_blank', 'width=420,height=600');
-  if (!printWin) {
-    toast('⚠️ Please allow popups to print', 3000);
+  if (!_posterQrReady || !qrSlot) {
+    toast('⚠️ Please generate the QR code first', 3000);
     return;
   }
 
-  printWin.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Print ${tableName} QR</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-          display: flex; align-items: center; justify-content: center;
-          min-height: 100vh; background: #fff;
-          font-family: 'Inter', -apple-system, sans-serif;
-          padding: 20px;
-        }
-        .card {
-          text-align: center; padding: 32px 28px;
-          border: 2px dashed #CBD5E1; border-radius: 20px;
-          max-width: 340px; width: 100%;
-        }
-        .brand { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px; }
-        .brand span { font-size:1.15rem; font-weight:800; color:#0F172A; }
-        .table-name { font-size:1.85rem; font-weight:800; color:#D97706; margin-bottom:16px; }
-        img.qr-img { display:block; margin:0 auto 16px; width:220px; height:220px; border-radius:8px; }
-        .hint { font-size:0.85rem; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
-        .subhint { font-size:0.8rem; color:#64748B; margin-bottom:12px; }
-        .url { font-size:0.7rem; color:#94A3B8; word-break:break-all; font-family:monospace; background:#F8FAFC; padding:4px 8px; border-radius:6px; }
-        .footer { margin-top:16px; font-size:0.75rem; color:#94A3B8; }
-        @media print {
-          body { padding: 0; }
-          .card { border-style: solid; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="card">
-        <div class="brand"><span>Alemaya Grill'd</span></div>
-        <div class="table-name">${tableName}</div>
-        <img src="${qrImgData}" class="qr-img" alt="${tableName} QR Code" />
-        <div class="hint">Scan with your phone camera</div>
-        <div class="subhint">Scan to view the live menu &amp; order directly to this table</div>
-        <div class="url">${_lastSimpleQrUrl}</div>
-        <div class="footer">Alemaya Grill'd • Fresh, Fast &amp; Healthy</div>
-      </div>
-      <script>
-        window.onload = function() {
-          setTimeout(function() { window.print(); }, 250);
-        };
-      <\/script>
-    </body>
-    </html>
-  `);
-  printWin.document.close();
+  try {
+    const W = 1024, H = 1536;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const bg = new Image();
+    bg.crossOrigin = 'anonymous';
+    bg.src = '/poster_bg.png';
+    await new Promise((resolve, reject) => {
+      if (bg.complete && bg.naturalWidth) resolve();
+      else {
+        bg.onload = resolve;
+        bg.onerror = () => reject(new Error('Failed to load poster background'));
+      }
+    });
+
+    ctx.drawImage(bg, 0, 0, W, H);
+
+    const qrEl = qrSlot.querySelector('canvas') || qrSlot.querySelector('img');
+    if (!qrEl) throw new Error('QR code not ready');
+
+    const slotX = W * 0.301, slotY = H * 0.4755, slotW = W * 0.398, slotH = H * 0.252;
+    const qs = slotW * 0.82;
+    const qx = slotX + (slotW - qs) / 2;
+    const qy = slotY + (slotH - qs) / 2;
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(qx - 8, qy - 8, qs + 16, qy + 16);
+    ctx.drawImage(qrEl, qx, qy, qs, qs);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fffaf0';
+    ctx.font = '800 42px Arial, sans-serif';
+    ctx.fillText(table, W * 0.6235, H * 0.4155, W * 0.12);
+
+    const posterDataUrl = canvas.toDataURL('image/png');
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      toast('⚠️ Please allow popups to print', 3000);
+      return;
+    }
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Alemaya Grill'd - Table ${table} Poster</title>
+        <style>
+          * { margin:0; padding:0; box-sizing:border-box; }
+          body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#fff; padding:10px; }
+          img { max-width:100%; max-height:98vh; height:auto; object-fit:contain; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
+          @media print {
+            body { padding:0; }
+            img { max-height:100vh; width:100%; height:auto; box-shadow:none; border-radius:0; }
+          }
+        </style>
+      </head>
+      <body>
+        <img src="${posterDataUrl}" alt="Alemaya Grill'd Table ${table} Poster" />
+        <script>
+          window.onload = function() {
+            setTimeout(function() { window.print(); }, 250);
+          };
+        <\/script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  } catch (err) {
+    console.error('Print Error:', err);
+    toast('⚠️ Error generating print poster: ' + err.message, 3000);
+  }
+}
+
+function copyPosterUrl() {
+  const url = _lastGeneratedPosterUrl || document.getElementById('qr-target-url-text')?.textContent || '';
+  if (!url) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      toast('📋 Table link copied to clipboard!', 2000);
+    }).catch(() => {
+      toast(`Copied: ${url}`, 2000);
+    });
+  } else {
+    toast(`Table link: ${url}`, 2500);
+  }
 }
