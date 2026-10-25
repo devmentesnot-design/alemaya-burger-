@@ -1722,6 +1722,67 @@ let APP_STATE = {
   }
 };
 
+// ══ EXTRACT TABLE FROM URL (QUERY PARAMS OR HASH) ══
+function extractTableFromUrl() {
+  try {
+    let token = null;
+
+    // 1. Direct window.location.search (?table=06, ?tableToken=06, ?tbl=06, ?t=06)
+    if (window.location.search) {
+      const sp = new URLSearchParams(window.location.search);
+      token = sp.get('table') || sp.get('tableToken') || sp.get('tbl') || sp.get('t');
+    }
+
+    // 2. Check window.location.hash (#menu?table=06 or #table=06 or #?table=06)
+    if (!token && window.location.hash) {
+      const h = window.location.hash;
+      if (h.includes('?')) {
+        const hp = new URLSearchParams(h.substring(h.indexOf('?') + 1));
+        token = hp.get('table') || hp.get('tableToken') || hp.get('tbl') || hp.get('t');
+      }
+      if (!token) {
+        const m = h.match(/[?&#](?:table|tabletoken|tbl|t)=([^&#]+)/i);
+        if (m && m[1]) token = decodeURIComponent(m[1]);
+      }
+    }
+
+    // 3. Fallback regex on complete window.location.href
+    if (!token && window.location.href) {
+      const m = window.location.href.match(/[?&](?:table|tableToken|tbl|t)=([^&#]+)/i);
+      if (m && m[1]) token = decodeURIComponent(m[1]);
+    }
+
+    if (token) {
+      token = token.trim();
+      const cleanNum = token.replace(/^(table|tbl)[\s\-_]*/i, '').trim();
+      const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : (token.toLowerCase().startsWith('table') ? token : `Table ${token}`);
+      const tableData = {
+        id: `table-${cleanNum || token}`,
+        name: displayName,
+        tableNumber: cleanNum || token,
+        token: token,
+        capacity: 4,
+        active: true,
+        fromUrl: true
+      };
+      APP_STATE.activeTable = tableData;
+      APP_STATE.orderType = 'Dine-in';
+      try {
+        localStorage.setItem('alemaya_active_table', JSON.stringify(tableData));
+        sessionStorage.setItem('alemaya_active_table', JSON.stringify(tableData));
+      } catch {}
+      console.log('[TABLE ASSIGNED FROM URL]', tableData);
+      return tableData;
+    }
+  } catch (e) {
+    console.warn('[TABLE EXTRACT WARNING]', e);
+  }
+  return null;
+}
+
+// Immediate extraction on script parse
+extractTableFromUrl();
+
 
 // ══ CATEGORY ICON SVG MAPPINGS (LUCIDE BLACK STROKE) ══
 const ICON_SVGS = {
@@ -2107,16 +2168,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (splash) splash.classList.add('hidden');
   }, 900);
 
-  // Restore saved cart, stock, and orders from localStorage
+  // 1. Initialize table token from URL (?table=... or ?tableToken=...) or localStorage FIRST before route handling
+  await initTableFromUrlOrStorage();
+
+  // 2. Restore saved cart, stock, and orders from localStorage
   restoreFromStorage();
 
-  // Route check IMMEDIATELY so the correct portal is shown before async data loads
+  // 3. Route check IMMEDIATELY so the correct portal is shown before async data loads
   handleHashRouting();
   window.addEventListener('hashchange', handleHashRouting);
   window.addEventListener('popstate', handleHashRouting);
-
-  // Initialize table token from URL (?table=... or ?tableToken=...) or localStorage
-  await initTableFromUrlOrStorage();
 
   // Populate dropdowns and build initial UI
   populateAdminCategoryDropdowns();
@@ -2494,9 +2555,21 @@ function navigateTo(tab) {
     appEl.classList.add('portal-customer');
   }
 
-  // Update hash safely without triggering loop
-  if (window.location.hash !== '#' + tab) {
-    history.replaceState(null, '', '#' + tab);
+  // Update hash safely without triggering loop, while PRESERVING query parameters (e.g. ?table=06)
+  let search = window.location.search;
+  if (!search && APP_STATE.activeTable && APP_STATE.activeTable.tableNumber) {
+    search = `?table=${encodeURIComponent(APP_STATE.activeTable.tableNumber)}`;
+  }
+  const cleanPath = window.location.pathname || '/';
+  const targetHash = '#' + tab;
+  const targetUrl = cleanPath + search + targetHash;
+
+  if (window.location.hash !== targetHash || (search && !window.location.search)) {
+    try {
+      history.replaceState(null, '', targetUrl);
+    } catch (e) {
+      window.location.hash = targetHash;
+    }
   }
 
   // View visibility
@@ -3139,7 +3212,21 @@ async function placeOrder() {
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dateStr = now.toISOString().split('T')[0];
 
-  // Resolve table assignment with multi-tier fallback (memory -> quick input -> URL -> localStorage)
+  // Resolve table assignment with multi-tier fallback (memory -> URL -> localStorage -> quick input)
+  if (!APP_STATE.activeTable) {
+    extractTableFromUrl();
+    if (!APP_STATE.activeTable) {
+      const saved = localStorage.getItem('alemaya_active_table') || sessionStorage.getItem('alemaya_active_table');
+      if (saved) {
+        try {
+          APP_STATE.activeTable = JSON.parse(saved);
+          APP_STATE.orderType = 'Dine-in';
+        } catch {}
+      }
+    }
+  }
+
+  // If still not resolved, check quick input
   if (!APP_STATE.activeTable) {
     const quickIn = document.getElementById('checkout-table-quick-input');
     const quickVal = (quickIn?.value || '').trim();
@@ -3156,49 +3243,19 @@ async function placeOrder() {
       };
       APP_STATE.orderType = 'Dine-in';
       try { localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable)); } catch {}
-    } else {
-      const urlP = new URLSearchParams(window.location.search);
-      let uToken = urlP.get('table') || urlP.get('tableToken') || urlP.get('tbl');
-      if (!uToken && window.location.hash.includes('?')) {
-        const hQuery = window.location.hash.split('?')[1];
-        if (hQuery) {
-          const hp = new URLSearchParams(hQuery);
-          uToken = hp.get('table') || hp.get('tableToken') || hp.get('tbl');
-        }
-      }
-      if (uToken) {
-        const cleanNum = uToken.replace(/^table[\s\-_]*/i, '').trim();
-        const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : (uToken.toLowerCase().startsWith('table') ? uToken : `Table ${uToken}`);
-        APP_STATE.activeTable = {
-          id: `table-${cleanNum || uToken}`,
-          name: displayName,
-          tableNumber: cleanNum || uToken,
-          token: uToken,
-          capacity: 4,
-          active: true
-        };
-        APP_STATE.orderType = 'Dine-in';
-        try { localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable)); } catch {}
-      } else {
-        const saved = localStorage.getItem('alemaya_active_table');
-        if (saved) {
-          try {
-            APP_STATE.activeTable = JSON.parse(saved);
-            APP_STATE.orderType = 'Dine-in';
-          } catch {}
-        }
-      }
     }
   }
 
   let tableId = null;
   let tableName = null;
   let tableToken = null;
+  let tableNumber = null;
 
   if (APP_STATE.activeTable) {
-    tableId = APP_STATE.activeTable.id;
-    tableName = APP_STATE.activeTable.name;
-    tableToken = APP_STATE.activeTable.token || APP_STATE.activeTable.tableNumber || APP_STATE.activeTable.name;
+    tableId = APP_STATE.activeTable.id || `table-${APP_STATE.activeTable.tableNumber || APP_STATE.activeTable.token}`;
+    tableName = APP_STATE.activeTable.name || `Table ${APP_STATE.activeTable.tableNumber || APP_STATE.activeTable.token}`;
+    tableToken = APP_STATE.activeTable.token || APP_STATE.activeTable.tableNumber;
+    tableNumber = APP_STATE.activeTable.tableNumber || APP_STATE.activeTable.token;
     APP_STATE.orderType = 'Dine-in';
   } else if (APP_STATE.orderType === 'Dine-in') {
     const manualSelect = document.getElementById('checkout-manual-table-select');
@@ -3208,6 +3265,7 @@ async function placeOrder() {
         tableId = found.id;
         tableName = found.name;
         tableToken = found.token;
+        tableNumber = found.number || found.tableNumber || found.name;
         APP_STATE.activeTable = found;
       }
     }
@@ -3224,7 +3282,7 @@ async function placeOrder() {
     tableId: tableId,
     tableName: tableName,
     tableToken: tableToken,
-    tableNumber: APP_STATE.activeTable ? (APP_STATE.activeTable.tableNumber || tableName) : null,
+    tableNumber: tableNumber || (APP_STATE.activeTable ? (APP_STATE.activeTable.tableNumber || tableName) : null),
     items: JSON.parse(JSON.stringify(APP_STATE.cart)),
     subtotal: subtotal,
     service: service,
@@ -4788,7 +4846,7 @@ function restoreFromStorage() {
     if (savedStock) APP_STATE.stockStatus = JSON.parse(savedStock);
 
     const savedTable = localStorage.getItem('alemaya_active_table');
-    if (savedTable) {
+    if (savedTable && !APP_STATE.activeTable) {
       try { APP_STATE.activeTable = JSON.parse(savedTable); } catch {}
     }
   } catch (e) {
@@ -5030,7 +5088,7 @@ function renderAdminOrdersSubpane() {
         <div class="admin-moc-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div style="display:flex; align-items:center; gap:8px;">
             <strong style="font-size:0.95rem; color:#0F172A;">#${ord.id}</strong>
-            ${ord.tableName ? `<span class="admin-table-chip">🍽️ ${escapeHtml(ord.tableName)}</span>` : ''}
+            ${(getOrderTableName(ord) || ord.tableName) ? `<span class="admin-table-chip">🍽️ ${escapeHtml(getOrderTableName(ord) || ord.tableName)}</span>` : ''}
           </div>
           <span class="status-chip chip-${normStatus}">${statusLabel}</span>
         </div>
@@ -5629,63 +5687,52 @@ async function toggleExtraStock(id) {
 // ── URL Table Token & Active Table Resolution ──
 async function initTableFromUrlOrStorage() {
   try {
-    // 1. Check URL parameters: ?table=... or ?tableToken=... or ?tbl=...
-    const urlParams = new URLSearchParams(window.location.search);
-    let token = urlParams.get('table') || urlParams.get('tableToken') || urlParams.get('tbl');
+    // 1. Extract from URL first (highest priority)
+    let tableData = extractTableFromUrl();
 
-    // Also check hash query params if user bookmarked #menu?table=...
-    if (!token && window.location.hash.includes('?')) {
-      const hashQuery = window.location.hash.split('?')[1];
-      if (hashQuery) {
-        const hashParams = new URLSearchParams(hashQuery);
-        token = hashParams.get('table') || hashParams.get('tableToken') || hashParams.get('tbl');
-      }
-    }
-
-    if (token) {
-      token = token.trim();
-      const cleanNum = token.replace(/^table[\s\-_]*/i, '').trim();
-      const displayName = /^\d+$/.test(cleanNum) ? `Table ${cleanNum}` : (token.toLowerCase().startsWith('table') ? token : `Table ${token}`);
-      const tableData = {
-        id: `table-${cleanNum || token}`,
-        name: displayName,
-        tableNumber: cleanNum || token,
-        token: token,
-        capacity: 4,
-        active: true
-      };
-
-      APP_STATE.activeTable = tableData;
-      APP_STATE.orderType = 'Dine-in';
-      try {
-        localStorage.setItem('alemaya_active_table', JSON.stringify(tableData));
-      } catch {}
-
-      toast(`🍽️ Welcome! Seated at ${tableData.name}`, 3800);
-
-      // Background check if custom table exists in database
-      API.getTableByToken(token).then(res => {
-        if (res && res.success && res.data) {
-          APP_STATE.activeTable = { ...tableData, ...res.data };
-          try {
-            localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable));
-          } catch {}
-          renderCustomerActiveTableBanner();
-          renderCartCheckoutTableSlot();
-        }
-      }).catch(() => {});
-    } else {
-      // 2. Restore active table from localStorage if customer previously scanned
-      const saved = localStorage.getItem('alemaya_active_table');
+    // 2. If not in URL, restore active table from storage
+    if (!tableData && !APP_STATE.activeTable) {
+      const saved = localStorage.getItem('alemaya_active_table') || sessionStorage.getItem('alemaya_active_table');
       if (saved) {
         try {
-          APP_STATE.activeTable = JSON.parse(saved);
+          tableData = JSON.parse(saved);
+          APP_STATE.activeTable = tableData;
           APP_STATE.orderType = 'Dine-in';
         } catch {}
       }
+    } else if (APP_STATE.activeTable) {
+      tableData = APP_STATE.activeTable;
     }
 
-    renderCustomerActiveTableBanner();
+    if (tableData) {
+      APP_STATE.orderType = 'Dine-in';
+      document.querySelectorAll('.ot-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('ot-dinein')?.classList.add('active');
+
+      renderCustomerActiveTableBanner();
+      renderCartCheckoutTableSlot();
+
+      // Show welcome toast if arriving with a table in URL
+      if (tableData.fromUrl) {
+        toast(`🍽️ Welcome! Seated at ${tableData.name}`, 3800);
+      }
+
+      // Background check if custom table exists in database
+      if (tableData.token) {
+        API.getTableByToken(tableData.token).then(res => {
+          if (res && res.success && res.data) {
+            APP_STATE.activeTable = { ...tableData, ...res.data };
+            try {
+              localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable));
+            } catch {}
+            renderCustomerActiveTableBanner();
+            renderCartCheckoutTableSlot();
+          }
+        }).catch(() => {});
+      }
+    } else {
+      renderCustomerActiveTableBanner();
+    }
   } catch (e) {
     console.warn('initTableFromUrlOrStorage warning:', e);
   }
@@ -5700,14 +5747,16 @@ function renderCustomerActiveTableBanner() {
     const t = APP_STATE.activeTable;
     banner.classList.remove('hidden');
     banner.innerHTML = `
-      <div class="customer-active-table-banner-inner">
-        <div class="customer-table-info-group">
-          <span class="customer-table-banner-badge">🍽️ ${escapeHtml(t.name)}</span>
-          <span class="customer-table-banner-text">Seated for Dine-in • Capacity: ${t.capacity || 4} Seats</span>
+      <div class="active-table-info">
+        <div class="table-icon-pill">🪑</div>
+        <div>
+          <div class="active-table-title">${escapeHtml(t.name)}</div>
+          <div class="active-table-sub">Dine-in Order • Assigned via QR link</div>
         </div>
-        <button type="button" class="customer-table-clear-btn" onclick="clearActiveTable()" title="Unlink or switch table">
-          Change Table &times;
-        </button>
+      </div>
+      <div class="table-badge-actions">
+        <span class="table-verified-badge">✓ Active Table</span>
+        <button type="button" class="table-clear-btn" onclick="clearActiveTable()" title="Unlink or switch table">&times;</button>
       </div>
     `;
   } else {
@@ -5721,10 +5770,22 @@ function clearActiveTable() {
   APP_STATE.activeTable = null;
   try {
     localStorage.removeItem('alemaya_active_table');
+    sessionStorage.removeItem('alemaya_active_table');
   } catch {}
+  // Also clean the URL query parameter if present
+  if (window.location.search && window.location.search.includes('table')) {
+    const sp = new URLSearchParams(window.location.search);
+    sp.delete('table');
+    sp.delete('tableToken');
+    sp.delete('tbl');
+    sp.delete('t');
+    const s = sp.toString() ? '?' + sp.toString() : '';
+    history.replaceState(null, '', (window.location.pathname || '/') + s + (window.location.hash || '#menu'));
+  }
   renderCustomerActiveTableBanner();
+  renderCartCheckoutTableSlot();
   updateCartUI();
-  toast('Dining table cleared');
+  toast('Dining table unlinked');
 }
 
 // ── Manual Table Selection in Cart Checkout ──
@@ -5740,6 +5801,7 @@ function handleManualTableSelect(tableId) {
       localStorage.setItem('alemaya_active_table', JSON.stringify(found));
     } catch {}
     renderCustomerActiveTableBanner();
+    renderCartCheckoutTableSlot();
     updateCartUI();
     toast(`Seated at ${found.name}`);
   }
@@ -5757,6 +5819,20 @@ function renderCartCheckoutTableSlot() {
 
   wrap.style.display = 'block';
 
+  // Ensure table is assigned if available in URL or storage
+  if (!APP_STATE.activeTable) {
+    extractTableFromUrl();
+    if (!APP_STATE.activeTable) {
+      const saved = localStorage.getItem('alemaya_active_table') || sessionStorage.getItem('alemaya_active_table');
+      if (saved) {
+        try {
+          APP_STATE.activeTable = JSON.parse(saved);
+          APP_STATE.orderType = 'Dine-in';
+        } catch {}
+      }
+    }
+  }
+
   if (APP_STATE.activeTable) {
     wrap.innerHTML = `
       <div style="display:flex; align-items:center; justify-content:space-between; background:#FEF3C7; border:1.5px solid #FDE68A; padding:10px 14px; border-radius:12px; margin-top:8px;">
@@ -5764,7 +5840,7 @@ function renderCartCheckoutTableSlot() {
           <span style="font-size:1.2rem;">🪑</span>
           <div>
             <strong style="font-size:0.92rem; color:#92400E; display:block;">Seated at ${escapeHtml(APP_STATE.activeTable.name)}</strong>
-            <span style="font-size:0.75rem; color:#B45309;">Dine-in Order</span>
+            <span style="font-size:0.75rem; color:#B45309;">Dine-in Order (Auto-assigned from QR link)</span>
           </div>
         </div>
         <button type="button" onclick="clearActiveTable()" style="background:#FFFFFF; border:1px solid #FCD34D; color:#92400E; font-size:0.75rem; font-weight:700; padding:5px 10px; border-radius:8px; cursor:pointer;">Change</button>

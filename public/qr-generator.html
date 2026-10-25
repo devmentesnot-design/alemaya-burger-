@@ -89,9 +89,30 @@ form.addEventListener('submit', async e=>{
   e.preventDefault();
   const baseLink=urlInput.value.trim(), table=tableInput.value.trim();
   if(!baseLink||!table)return;
-  // Build the scannable URL: base + ?table=X (avoid double ?)
-  const sep = baseLink.includes('?') ? '&' : '?';
-  const link = baseLink.replace(/\/?$/, '') + sep + 'table=' + encodeURIComponent(table);
+  // Build the scannable URL: base + /?table=X (guarantee proper slash and clean params)
+  let cleanBase = baseLink.trim();
+  let hashPart = '';
+  if (cleanBase.includes('#')) {
+    const parts = cleanBase.split('#');
+    cleanBase = parts[0];
+    hashPart = '#' + parts.slice(1).join('#');
+  }
+  try {
+    const u = new URL(cleanBase);
+    if (!u.pathname || u.pathname === '') u.pathname = '/';
+    cleanBase = u.origin + u.pathname;
+    if (u.search) {
+      const sp = new URLSearchParams(u.search);
+      sp.set('table', table);
+      cleanBase = cleanBase + '?' + sp.toString();
+    } else {
+      cleanBase = cleanBase + '?table=' + encodeURIComponent(table);
+    }
+  } catch (err) {
+    const sep = cleanBase.includes('?') ? '&' : (cleanBase.endsWith('/') ? '?' : '/?');
+    cleanBase = cleanBase + sep + 'table=' + encodeURIComponent(table);
+  }
+  const link = cleanBase + hashPart;
   try{
     status.textContent='Generating QR code…';
     await loadQrLib();
