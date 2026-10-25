@@ -6377,8 +6377,14 @@ async function generateTablePoster() {
   // Render QR code
   try {
     let rendered = false;
+    console.log('[QR Gen] Starting QR generation for:', targetUrl);
+    console.log('[QR Gen] QRCode available:', typeof QRCode !== 'undefined');
+    console.log('[QR Gen] QRious available:', typeof QRious !== 'undefined');
+    console.log('[QR Gen] qrSlot element:', qrSlot);
+    
     // Method A: QRCode.js
     if (typeof QRCode !== 'undefined' && qrSlot) {
+      console.log('[QR Gen] Using QRCode.js');
       new QRCode(qrSlot, {
         text: targetUrl,
         width: 320,
@@ -6388,10 +6394,12 @@ async function generateTablePoster() {
         correctLevel: (typeof QRCode.CorrectLevel !== 'undefined' ? QRCode.CorrectLevel.H : 2)
       });
       rendered = true;
+      console.log('[QR Gen] QRCode.js rendered successfully');
     }
     
     // Method B: QRious fallback
     if (!rendered && typeof QRious !== 'undefined' && qrSlot) {
+      console.log('[QR Gen] Using QRious fallback');
       const canvas = document.createElement('canvas');
       new QRious({
         element: canvas,
@@ -6403,9 +6411,11 @@ async function generateTablePoster() {
       });
       qrSlot.appendChild(canvas);
       rendered = true;
+      console.log('[QR Gen] QRious rendered successfully');
     }
 
     if (!rendered && qrSlot) {
+      console.log('[QR Gen] Using manual canvas fallback');
       // Method C: Canvas manual fallback
       const canvas = document.createElement('canvas');
       canvas.width = 320;
@@ -6413,7 +6423,15 @@ async function generateTablePoster() {
       qrSlot.appendChild(canvas);
       if (typeof renderQrToCanvas === 'function') {
         renderQrToCanvas(canvas, targetUrl, 320);
+        console.log('[QR Gen] Manual canvas rendered');
+      } else {
+        console.warn('[QR Gen] renderQrToCanvas function not available');
       }
+    }
+    
+    if (!rendered) {
+      console.error('[QR Gen] Failed to render QR code - no methods available');
+      throw new Error('QR code libraries not loaded');
     }
 
     if (tableOverlay) {
@@ -6425,6 +6443,7 @@ async function generateTablePoster() {
     if (printBtn) printBtn.disabled = false;
     if (status) status.textContent = 'QR code ready. Check the preview, then download your PNG.';
 
+    toast(`✅ QR Code generated for Table ${table}`, 2500);
     refreshLucideIcons();
   } catch (err) {
     console.error('Poster QR Generation Error:', err);
