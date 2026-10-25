@@ -212,6 +212,7 @@ async function handleRequest(req, res) {
             description: body.description || '',
             ingredients: Array.isArray(body.ingredients) ? body.ingredients : (body.ingredients ? body.ingredients.split(',').map(s=>s.trim()) : []),
             basePrice: Number(body.basePrice) || 0,
+            discountPrice: Number(body.discountPrice) || 0,
             image: body.image || 'burger_classic.jpg',
             available: body.available !== false,
             customizations: []

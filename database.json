@@ -1622,7 +1622,48 @@
       "customizations": []
     }
   ],
-  "orders": [],
+  "orders": [
+    {
+      "id": "AG-1094",
+      "timestamp": "10:28 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792956495793,
+      "orderType": "Dine-in",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Margarita Pizza",
+          "note": "234567890-",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+          "total": 848,
+          "extras": [
+            {
+              "id": "ext_cheese",
+              "name": "Extra Melted Cheese",
+              "price": 149
+            }
+          ],
+          "basePrice": 699,
+          "productId": "item_7",
+          "unitPrice": 848,
+          "selections": {
+            "extras_addons": [
+              "ext_cheese"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 848,
+      "service": 0,
+      "total": 848,
+      "status": "ready",
+      "statusLabel": "Ready",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    }
+  ],
   "extras": [
     {
       "id": "ext_cheese",

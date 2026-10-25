@@ -163,6 +163,7 @@ async function getProducts() {
       description: p.description || '',
       ingredients: Array.isArray(p.ingredients) ? p.ingredients : [],
       basePrice: Number(p.base_price) || 0,
+      discountPrice: Number(p.discount_price) || 0,
       image: p.image || 'burger_classic.jpg',
       available: p.available !== false,
       customizations: []
@@ -186,6 +187,7 @@ async function saveProduct(prod, isEdit = false) {
     description: prod.description || '',
     ingredients: prod.ingredients || [],
     base_price: Number(prod.basePrice) || 0,
+    discount_price: Number(prod.discountPrice) || 0,
     image: prod.image || 'burger_classic.jpg',
     available: prod.available !== false
   };

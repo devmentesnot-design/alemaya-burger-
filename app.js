@@ -2587,16 +2587,28 @@ function createVerticalCard(p) {
   const ratingVal = p.rating || 4.8;
   const reviewsCount = p.reviewsCount || 120;
 
+  const hasDiscount = p.discountPrice > 0 && p.discountPrice < p.basePrice;
+  const priceHtml = hasDiscount
+    ? `<div class="vert-price-wrap">
+         <span class="vert-price-original">${formatMoney(p.basePrice)}</span>
+         <span class="vert-price-discounted">${formatMoney(p.discountPrice)}<span class="vert-sale-badge">SALE</span></span>
+       </div>`
+    : `<span class="vert-price">${formatMoney(p.basePrice)}</span>`;
+
+  const saleBadgeHtml = hasDiscount
+    ? `<span class="vert-badge" style="background:#FEF2F2;color:#EF4444;border-color:#FCA5A5;">SALE</span>`
+    : (p.badge ? `<span class="vert-badge">${escapeHtml(p.badge)}</span>` : '');
+
   card.innerHTML = `
     <img src="${p.image}" alt="${escapeHtml(p.name)}" class="vert-thumb" loading="lazy" onerror="this.src='logo.png'">
     <div class="vert-details">
       <div class="vert-badge-row">
-        ${badgeHtml}
+        ${!isAvailable ? `<span class="vert-badge sold-out-badge">SOLD OUT</span>` : saleBadgeHtml}
         <span class="vert-rating"><span class="vert-star">★</span> ${ratingVal} (${reviewsCount})</span>
       </div>
       <h3 class="vert-name">${escapeHtml(p.name)}</h3>
       <p class="vert-desc">${escapeHtml(p.description || '')}</p>
-      <span class="vert-price">${formatMoney(p.basePrice)}</span>
+      ${priceHtml}
     </div>
     <div class="vert-action">
       ${isAvailable ? `
@@ -2853,11 +2865,20 @@ function renderSheetContent() {
   const isEdit = APP_STATE.sheet.editCartIndex >= 0;
   const buttonActionLabel = isEdit ? 'Update Order' : 'Add to Order';
 
+  const sheetHasDiscount = p.discountPrice > 0 && p.discountPrice < p.basePrice;
+  const sheetPriceHtml = sheetHasDiscount
+    ? `<div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin:6px 0;">
+         <span class="sheet-prod-price-original">${formatMoney(p.basePrice)}</span>
+         <span class="sheet-prod-price-discounted" id="sheet-single-price">${formatMoney(calculateUnitItemPrice())}</span>
+         <span class="sheet-sale-badge">SALE</span>
+       </div>`
+    : `<div class="sheet-prod-price" id="sheet-single-price">${formatMoney(calculateUnitItemPrice())}</div>`;
+
   body.innerHTML = `
     <img src="${p.image}" alt="${escapeHtml(p.name)}" class="sheet-prod-img" onerror="this.src='logo.png'">
     <div class="sheet-header-content">
       <h2 class="sheet-prod-title">${escapeHtml(p.name)}</h2>
-      <div class="sheet-prod-price" id="sheet-single-price">${formatMoney(calculateUnitItemPrice())}</div>
+      ${sheetPriceHtml}
       <p class="sheet-prod-desc">${escapeHtml(p.description || '')}</p>
       ${ingredientsHtml}
     </div>
@@ -2914,6 +2935,10 @@ function changeSheetQty(delta) {
 function calculateUnitItemPrice() {
   const p = APP_STATE.sheet.product;
   if (!p) return 0;
+  // Use discountPrice if it is valid (> 0 and less than basePrice)
+  const basePrice = (p.discountPrice > 0 && p.discountPrice < p.basePrice)
+    ? Number(p.discountPrice)
+    : Number(p.basePrice) || 0;
   let extras = 0;
   const activeGroups = getActiveGroupsForProduct(p);
   activeGroups.forEach(g => {
@@ -2928,7 +2953,7 @@ function calculateUnitItemPrice() {
       if (opt) extras += (Number(opt.priceAdd) || 0);
     }
   });
-  return (Number(p.basePrice) || 0) + extras;
+  return basePrice + extras;
 }
 
 function calculateSheetTotal() {
@@ -3074,6 +3099,8 @@ function submitSheetToCart() {
     name: p.name,
     image: p.image,
     basePrice: Number(p.basePrice) || 0,
+    discountPrice: Number(p.discountPrice) || 0,
+    originalBasePrice: Number(p.basePrice) || 0,
     unitPrice: uPrice,
     qty: q,
     selections: JSON.parse(JSON.stringify(APP_STATE.sheet.selections)),
@@ -3231,6 +3258,15 @@ function renderCart() {
     const noteStr = item.note ? `<div class="cart-item-kitchen-note">“${escapeHtml(item.note)}”</div>` : '';
     const itemTotal = Number(item.total) || ((Number(item.unitPrice) || Number(item.basePrice) || 0) * (Number(item.qty) || 1));
 
+    // Discount display in cart
+    const origUnitPrice = Number(item.originalBasePrice) || 0;
+    const unitPrice2 = Number(item.unitPrice) || Number(item.basePrice) || 0;
+    const wasDiscounted = origUnitPrice > 0 && origUnitPrice > unitPrice2;
+    const origTotal = wasDiscounted ? origUnitPrice * (Number(item.qty) || 1) : 0;
+    const cartPriceHtml = wasDiscounted
+      ? `<span class="cart-item-price-original">${formatMoney(origTotal)}</span><span class="cart-item-price-discounted">${formatMoney(itemTotal)}</span>`
+      : `<span class="cart-item-price">${formatMoney(itemTotal)}</span>`;
+
     itemsHtml += `
       <div class="cart-item-card">
         <img src="${item.image}" alt="${escapeHtml(item.name)}" class="cart-item-img" onerror="this.src='logo.png'">
@@ -3239,7 +3275,7 @@ function renderCart() {
           ${optionsStr ? `<div class="cart-item-options">${escapeHtml(optionsStr)}</div>` : ''}
           ${noteStr}
           <div class="cart-item-bottom">
-            <span class="cart-item-price">${formatMoney(itemTotal)}</span>
+            <div style="display:flex;align-items:baseline;gap:4px;">${cartPriceHtml}</div>
             <div style="display: flex; align-items: center;">
               <div class="cart-qty-ctrl">
                 <button class="cart-qty-btn" onclick="updateCartItemQty(${index}, -1)" aria-label="Decrease quantity">
@@ -5315,6 +5351,7 @@ function openCreateItemModal() {
   document.getElementById('crud-item-id').value = '';
   document.getElementById('crud-item-name').value = '';
   document.getElementById('crud-item-price').value = '';
+  document.getElementById('crud-item-discount-price').value = '';
   document.getElementById('crud-item-badge').value = '';
   document.getElementById('crud-item-desc').value = '';
   document.getElementById('crud-item-ingredients').value = '';
@@ -5346,6 +5383,7 @@ function openEditItemModal(productId) {
   document.getElementById('crud-item-id').value = prod.id;
   document.getElementById('crud-item-name').value = prod.name || '';
   document.getElementById('crud-item-price').value = prod.basePrice || '';
+  document.getElementById('crud-item-discount-price').value = prod.discountPrice > 0 ? prod.discountPrice : '';
   document.getElementById('crud-item-badge').value = prod.badge || '';
   document.getElementById('crud-item-desc').value = prod.description || '';
   document.getElementById('crud-item-ingredients').value = Array.isArray(prod.ingredients)
@@ -5398,6 +5436,8 @@ async function handleSaveItem(event) {
 
   const name = document.getElementById('crud-item-name').value.trim();
   const basePrice = parseFloat(document.getElementById('crud-item-price').value);
+  const discountPriceRaw = document.getElementById('crud-item-discount-price').value.trim();
+  const discountPrice = discountPriceRaw !== '' ? parseFloat(discountPriceRaw) : 0;
   const categoryId = document.getElementById('crud-item-category').value;
   const badge = document.getElementById('crud-item-badge').value.trim();
   const description = document.getElementById('crud-item-desc').value.trim();
@@ -5417,6 +5457,7 @@ async function handleSaveItem(event) {
     id: isEdit ? id : undefined,
     name,
     basePrice,
+    discountPrice: (discountPrice > 0 && discountPrice < basePrice) ? discountPrice : 0,
     categoryId,
     badge,
     description,
