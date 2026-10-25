@@ -2340,8 +2340,12 @@ function handleHashRouting() {
   } else if (isOrdersRoute) {
     navigateTo('orders');
   } else {
-    // Only navigate to menu if we're not in a staff portal (or pending auth)
-    if (APP_STATE.portal === 'customer' || hash === 'menu' || (!hash && !path.includes('/admin') && !path.includes('/kitchen') && !path.includes('/chef'))) {
+    // Only navigate to menu if we're genuinely on a customer route (not staff portals or pending auth)
+    const isStaffPortal = APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || 
+                          APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen';
+    const shouldShowMenu = hash === 'menu' || (!hash && !path.includes('/admin') && !path.includes('/kitchen') && !path.includes('/chef'));
+    
+    if (!isStaffPortal && shouldShowMenu) {
       navigateTo('menu');
     }
   }
