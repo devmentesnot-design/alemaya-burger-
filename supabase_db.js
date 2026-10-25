@@ -631,47 +631,70 @@ async function getTableByToken(token) {
   return null;
 }
 
-// ── SETTINGS ──
+// ── SETTINGS (TAKEAWAY FEE & PORTAL PASSWORDS) ──
 async function getSettings() {
   try {
     const data = await supabaseFetch('settings?select=*');
     if (Array.isArray(data) && data.length > 0) {
       const settings = data[0];
       const mapped = {
-        takeawayFee: Number(settings.takeaway_fee) || 0
+        takeawayFee: Number(settings.takeaway_fee) || 0,
+        adminPassword: settings.admin_password || 'admin',
+        kitchenPassword: settings.kitchen_password || 'kitchen'
       };
       const local = readLocalDb();
-      local.settings = mapped;
+      local.settings = { ...(local.settings || {}), ...mapped };
       writeLocalDb(local);
-      return mapped;
+      return local.settings;
     }
   } catch (e) {
     console.warn('Supabase getSettings warning:', e.message);
   }
   const local = readLocalDb();
-  return local.settings || { takeawayFee: 0 };
+  return local.settings || { takeawayFee: 0, adminPassword: 'admin', kitchenPassword: 'kitchen' };
 }
 
 async function updateSettings(settings) {
-  const takeawayFee = Number(settings.takeawayFee) || 0;
+  const local = readLocalDb();
+  const current = local.settings || {};
+
+  const takeawayFee = settings.takeawayFee !== undefined ? Number(settings.takeawayFee) : (Number(current.takeawayFee) || 0);
+  const adminPassword = settings.adminPassword !== undefined ? String(settings.adminPassword).trim() : (current.adminPassword || 'admin');
+  const kitchenPassword = settings.kitchenPassword !== undefined ? String(settings.kitchenPassword).trim() : (current.kitchenPassword || 'kitchen');
+
+  const updatedSettings = {
+    takeawayFee,
+    adminPassword,
+    kitchenPassword
+  };
+
   const payload = {
-    takeaway_fee: takeawayFee
+    takeaway_fee: takeawayFee,
+    admin_password: adminPassword,
+    kitchen_password: kitchenPassword
   };
 
   try {
-    // First try to fetch existing settings from Supabase
     const existing = await supabaseFetch('settings?select=*');
     if (Array.isArray(existing) && existing.length > 0) {
-      await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
+      try {
+        await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
+      } catch (errPayload) {
+        // Fallback if password columns are missing in Supabase schema cache
+        await supabaseFetch('settings?id=eq.1', 'PATCH', { takeaway_fee: takeawayFee });
+      }
     } else {
-      await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
+      try {
+        await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
+      } catch (errPost) {
+        await supabaseFetch('settings', 'POST', { takeaway_fee: takeawayFee, id: 1 });
+      }
     }
   } catch (e) {
     console.warn('Supabase updateSettings warning:', e.message);
   }
 
-  const local = readLocalDb();
-  local.settings = { takeawayFee };
+  local.settings = updatedSettings;
   writeLocalDb(local);
   return { success: true, data: local.settings };
 }

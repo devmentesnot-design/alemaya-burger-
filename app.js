@@ -1713,7 +1713,7 @@ let APP_STATE = {
   adminStatusFilter: 'all',     // 'all', 'received', 'preparing', 'ready', 'completed', 'cancelled'
   adminSearchQuery: '',
   audioEnabled: true,
-  settings: { takeawayFee: 0 }, // Global settings from backend
+  settings: { takeawayFee: 0, adminPassword: 'admin', kitchenPassword: 'kitchen' }, // Global settings from backend
   sheet: {
     product: null,
     selections: {},
@@ -2271,10 +2271,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   await syncDataFromBackend(false);
 
   // Fast auto-refresh orders every 3s for live kitchen and order tracking
+  let PREV_KITCHEN_ORDER_IDS = null;
+
   setInterval(() => {
     if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.currentTab === 'orders') {
       API.getOrders().then(orders => {
         if (Array.isArray(orders)) {
+          // Detect brand new incoming orders for the kitchen terminal & trigger notification sound!
+          if (APP_STATE.portal === 'chef') {
+            const currentActiveOrders = orders.filter(o => o.status === 'received' || o.status === 'cooking' || o.status === 'preparing');
+            const currentActiveIds = currentActiveOrders.map(o => String(o.id));
+
+            if (PREV_KITCHEN_ORDER_IDS !== null) {
+              const newIncomingIds = currentActiveIds.filter(id => !PREV_KITCHEN_ORDER_IDS.has(id));
+              if (newIncomingIds.length > 0) {
+                console.log('[KITCHEN SOUND] New incoming order(s) detected via polling:', newIncomingIds);
+                playKitchenChime('new_order');
+                toast(`🔔 New Kitchen Order #${newIncomingIds.join(', #')} received!`, 4000);
+              }
+            }
+            PREV_KITCHEN_ORDER_IDS = new Set(currentActiveIds);
+          }
+
           MASTER_ORDERS = orders;
           updateKitchenCounters();
           if (APP_STATE.portal === 'chef') renderKdsTickets();
@@ -2304,9 +2322,17 @@ function handleHashRouting() {
   const isOrdersRoute = hash === 'orders' || hash.startsWith('orders') || path === '/orders' || path.endsWith('/orders') || path.includes('/orders');
 
   if (isKitchenRoute) {
-    switchPortal('chef');
+    if (!sessionStorage.getItem('staff_auth_kitchen')) {
+      promptStaffPassword('kitchen');
+    } else {
+      switchPortal('chef');
+    }
   } else if (isAdminRoute) {
-    switchPortal('admin');
+    if (!sessionStorage.getItem('staff_auth_admin')) {
+      promptStaffPassword('admin');
+    } else {
+      switchPortal('admin');
+    }
   } else if (isOrdersRoute) {
     navigateTo('orders');
   } else {
@@ -2322,6 +2348,23 @@ function handleHashRouting() {
 // ══ STAFF AUTHENTICATION & SECURE ROUTES (/kitchen & /admin) ══
 let PENDING_STAFF_PORTAL = null;
 
+function unlockKitchenAudio() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!KITCHEN_AUDIO_CTX && AudioCtx) {
+      KITCHEN_AUDIO_CTX = new AudioCtx();
+    }
+    if (KITCHEN_AUDIO_CTX && KITCHEN_AUDIO_CTX.state === 'suspended') {
+      KITCHEN_AUDIO_CTX.resume().catch(() => {});
+    }
+  } catch (e) {}
+}
+
+// User interactions unlock audio context for modern browser autoplay policy
+window.addEventListener('click', unlockKitchenAudio, { passive: true });
+window.addEventListener('touchstart', unlockKitchenAudio, { passive: true });
+window.addEventListener('keydown', unlockKitchenAudio, { passive: true });
+
 function promptStaffPassword(portal) {
   console.log('[AUTH DEBUG] promptStaffPassword called for portal:', portal);
   PENDING_STAFF_PORTAL = portal;
@@ -2331,8 +2374,6 @@ function promptStaffPassword(portal) {
   const desc = document.getElementById('staff-auth-desc');
   const input = document.getElementById('staff-auth-input');
   const err = document.getElementById('staff-auth-error');
-
-  console.log('[AUTH DEBUG] Modal element:', modal, 'Overlay:', overlay);
 
   if (!modal) {
     console.error('[AUTH DEBUG] Modal element not found!');
@@ -2353,23 +2394,31 @@ function promptStaffPassword(portal) {
 
   overlay?.classList.add('open');
   modal?.classList.add('open');
-  
-  console.log('[AUTH DEBUG] Modal classes after adding open:', modal.className);
-  console.log('[AUTH DEBUG] Overlay classes after adding open:', overlay?.className);
 }
 
 function handleStaffAuthSubmit(event) {
   event.preventDefault();
+  unlockKitchenAudio();
+
   const input = document.getElementById('staff-auth-input');
   const err = document.getElementById('staff-auth-error');
   const entered = (input?.value || '').trim();
 
   const isKitchen = PENDING_STAFF_PORTAL === 'kitchen' || PENDING_STAFF_PORTAL === 'chef';
-  const validPasscodes = isKitchen
-    ? ['kitchen', 'kitchen123', 'alemaya123', '1234']
-    : ['admin', 'admin123', 'alemaya123', '1234'];
+  const customPass = isKitchen
+    ? (APP_STATE.settings?.kitchenPassword || 'kitchen')
+    : (APP_STATE.settings?.adminPassword || 'admin');
 
-  if (validPasscodes.includes(entered.toLowerCase())) {
+  // Accept configured password (case-insensitive) as well as default fallbacks
+  const validPasscodes = [
+    String(customPass).toLowerCase(),
+    String(customPass),
+    isKitchen ? 'kitchen' : 'admin',
+    isKitchen ? 'kitchen123' : 'admin123',
+    'alemaya123'
+  ];
+
+  if (validPasscodes.includes(entered.toLowerCase()) || entered === customPass) {
     sessionStorage.setItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'), '1');
     closeStaffAuthModal();
     const target = isKitchen ? 'chef' : 'admin';
@@ -2389,10 +2438,29 @@ function cancelStaffAuth() {
   const portal = PENDING_STAFF_PORTAL;
   PENDING_STAFF_PORTAL = null;
   
-  // Don't force navigate to menu - just close the modal
-  // If user was trying to access admin/kitchen, they'll stay on the route
-  // The portal will remain as customer (default)
-  console.log(`Authentication cancelled for ${portal} portal`);
+  const isKitchen = portal === 'kitchen' || portal === 'chef';
+  const isAuth = sessionStorage.getItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'));
+  if (!isAuth) {
+    APP_STATE.portal = 'customer';
+    const appEl = document.getElementById('app');
+    if (appEl) {
+      appEl.classList.remove('portal-chef', 'portal-admin');
+      appEl.classList.add('portal-customer');
+    }
+    const bottomNav = document.getElementById('bottom-nav');
+    if (bottomNav) bottomNav.style.display = 'flex';
+    navigateTo('menu');
+    if (window.location.hash === '#kitchen' || window.location.hash === '#chef' || window.location.hash === '#admin') {
+      history.replaceState(null, '', '#menu');
+    }
+  }
+}
+
+function lockStaffPortal(portal) {
+  const isKitchen = portal === 'kitchen' || portal === 'chef';
+  sessionStorage.removeItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'));
+  toast(`${isKitchen ? 'Kitchen' : 'Admin'} locked. Passcode required.`);
+  switchPortal('customer');
 }
 
 function closeStaffAuthModal() {
@@ -3701,6 +3769,19 @@ function renderHistory() {
 
 // ══ PORTAL SWITCHER & NAVIGATION (CUSTOMER, CHEF, ADMIN) ══
 function switchPortal(portal) {
+  // Enforce passcode security for staff portals
+  if (portal === 'chef' || portal === 'kitchen') {
+    if (!sessionStorage.getItem('staff_auth_kitchen')) {
+      promptStaffPassword('kitchen');
+      return;
+    }
+  } else if (portal === 'admin') {
+    if (!sessionStorage.getItem('staff_auth_admin')) {
+      promptStaffPassword('admin');
+      return;
+    }
+  }
+
   APP_STATE.portal = portal;
   const customerTopNav = document.getElementById('customer-top-nav');
   if (customerTopNav) {
@@ -4777,34 +4858,53 @@ function playKitchenChime(type = 'new_order') {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
     if (!KITCHEN_AUDIO_CTX) KITCHEN_AUDIO_CTX = new AudioCtx();
-    if (KITCHEN_AUDIO_CTX.state === 'suspended') KITCHEN_AUDIO_CTX.resume();
+    if (KITCHEN_AUDIO_CTX.state === 'suspended') {
+      KITCHEN_AUDIO_CTX.resume().catch(() => {});
+    }
 
     const now = KITCHEN_AUDIO_CTX.currentTime;
-    const osc = KITCHEN_AUDIO_CTX.createOscillator();
-    const gain = KITCHEN_AUDIO_CTX.createGain();
-
-    osc.connect(gain);
-    gain.connect(KITCHEN_AUDIO_CTX.destination);
 
     if (type === 'ready') {
       // 3-tone cheerful ascending chime (Do - Mi - Sol)
+      const osc = KITCHEN_AUDIO_CTX.createOscillator();
+      const gain = KITCHEN_AUDIO_CTX.createGain();
+      osc.connect(gain);
+      gain.connect(KITCHEN_AUDIO_CTX.destination);
+
       osc.type = 'sine';
       osc.frequency.setValueAtTime(523.25, now);
       osc.frequency.setValueAtTime(659.25, now + 0.12);
       osc.frequency.setValueAtTime(783.99, now + 0.24);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
       osc.start(now);
-      osc.stop(now + 0.65);
+      osc.stop(now + 0.75);
     } else {
-      // 2-tone pleasant kitchen ticket chime
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(587.33, now);
-      osc.frequency.setValueAtTime(880.00, now + 0.14);
-      gain.gain.setValueAtTime(0.22, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-      osc.start(now);
-      osc.stop(now + 0.5);
+      // High-audibility restaurant service ticket chime (Ding-Dong)
+      // Bell 1: 784 Hz (G5)
+      const osc1 = KITCHEN_AUDIO_CTX.createOscillator();
+      const gain1 = KITCHEN_AUDIO_CTX.createGain();
+      osc1.connect(gain1);
+      gain1.connect(KITCHEN_AUDIO_CTX.destination);
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(783.99, now);
+      gain1.gain.setValueAtTime(0.35, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc1.start(now);
+      osc1.stop(now + 0.4);
+
+      // Bell 2: 1046.5 Hz (C6) with crisp sustain
+      const osc2 = KITCHEN_AUDIO_CTX.createOscillator();
+      const gain2 = KITCHEN_AUDIO_CTX.createGain();
+      osc2.connect(gain2);
+      gain2.connect(KITCHEN_AUDIO_CTX.destination);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1046.50, now + 0.16);
+      gain2.gain.setValueAtTime(0.001, now);
+      gain2.gain.setValueAtTime(0.4, now + 0.16);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+      osc2.start(now + 0.16);
+      osc2.stop(now + 0.9);
     }
   } catch (e) {
     console.warn('Audio chime warning:', e);
@@ -6824,6 +6924,111 @@ function renderAdminSettings() {
   const input = document.getElementById('takeaway-fee-input');
   if (input) {
     input.value = APP_STATE.settings?.takeawayFee || 0;
+  }
+  const adminPassInput = document.getElementById('admin-password-input');
+  if (adminPassInput) {
+    adminPassInput.value = APP_STATE.settings?.adminPassword || 'admin';
+  }
+  const kitchenPassInput = document.getElementById('kitchen-password-input');
+  if (kitchenPassInput) {
+    kitchenPassInput.value = APP_STATE.settings?.kitchenPassword || 'kitchen';
+  }
+}
+
+// ── Toggle Password Visibility Helper ──
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  const icon = btn?.querySelector('i');
+  if (icon) {
+    icon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+    refreshLucideIcons();
+  }
+}
+
+// ── Save Staff Passwords ──
+async function saveStaffPasswords(event) {
+  if (event) event.preventDefault();
+
+  const adminPassInput = document.getElementById('admin-password-input');
+  const kitchenPassInput = document.getElementById('kitchen-password-input');
+  const statusEl = document.getElementById('passwords-save-status');
+
+  const adminPassword = (adminPassInput?.value || '').trim() || 'admin';
+  const kitchenPassword = (kitchenPassInput?.value || '').trim() || 'kitchen';
+
+  try {
+    APP_STATE.settings = APP_STATE.settings || {};
+    APP_STATE.settings.adminPassword = adminPassword;
+    APP_STATE.settings.kitchenPassword = kitchenPassword;
+    saveToStorage();
+
+    await API.updateSettings({
+      takeawayFee: APP_STATE.settings.takeawayFee || 0,
+      adminPassword,
+      kitchenPassword
+    });
+
+    if (statusEl) {
+      statusEl.style.display = 'inline';
+      statusEl.textContent = '✓ Passwords updated successfully';
+      statusEl.style.color = '#059669';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
+    }
+    toast('Security passcodes updated successfully');
+
+    if (SYNC_CHANNEL) {
+      try {
+        SYNC_CHANNEL.postMessage({ type: 'SETTINGS_UPDATE', settings: APP_STATE.settings });
+      } catch (e) {}
+    }
+  } catch (err) {
+    console.warn('Error saving passwords:', err);
+    toast('Error updating passwords');
+  }
+}
+
+// ── Reset Staff Passwords to Defaults ──
+async function resetStaffPasswords() {
+  if (!confirm('Are you sure you want to reset Admin and Kitchen passcodes to factory defaults ("admin" and "kitchen")?')) return;
+
+  const adminPassInput = document.getElementById('admin-password-input');
+  const kitchenPassInput = document.getElementById('kitchen-password-input');
+  const statusEl = document.getElementById('passwords-save-status');
+
+  if (adminPassInput) adminPassInput.value = 'admin';
+  if (kitchenPassInput) kitchenPassInput.value = 'kitchen';
+
+  try {
+    APP_STATE.settings = APP_STATE.settings || {};
+    APP_STATE.settings.adminPassword = 'admin';
+    APP_STATE.settings.kitchenPassword = 'kitchen';
+    saveToStorage();
+
+    await API.updateSettings({
+      takeawayFee: APP_STATE.settings.takeawayFee || 0,
+      adminPassword: 'admin',
+      kitchenPassword: 'kitchen'
+    });
+
+    if (statusEl) {
+      statusEl.style.display = 'inline';
+      statusEl.textContent = '✓ Passcodes reset to defaults';
+      statusEl.style.color = '#059669';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3500);
+    }
+    toast('Passcodes reset to defaults (admin / kitchen)');
+
+    if (SYNC_CHANNEL) {
+      try {
+        SYNC_CHANNEL.postMessage({ type: 'SETTINGS_UPDATE', settings: APP_STATE.settings });
+      } catch (e) {}
+    }
+  } catch (err) {
+    console.warn('Error resetting passwords:', err);
+    toast('Error resetting passwords');
   }
 }
 

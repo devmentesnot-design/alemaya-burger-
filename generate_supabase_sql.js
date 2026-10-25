@@ -68,10 +68,12 @@ sql += '-- 4. CREATE SETTINGS TABLE\n';
 sql += 'CREATE TABLE IF NOT EXISTS public.settings (\n';
 sql += '  id INTEGER PRIMARY KEY DEFAULT 1,\n';
 sql += '  takeaway_fee NUMERIC(10,2) DEFAULT 0,\n';
+sql += '  admin_password TEXT DEFAULT \'admin\',\n';
+sql += '  kitchen_password TEXT DEFAULT \'kitchen\',\n';
 sql += '  updated_at TIMESTAMPTZ DEFAULT NOW(),\n';
 sql += '  CONSTRAINT single_settings_row CHECK (id = 1)\n';
 sql += ');\n';
-sql += 'INSERT INTO public.settings (id, takeaway_fee) VALUES (1, 0) ON CONFLICT (id) DO NOTHING;\n\n';
+sql += 'INSERT INTO public.settings (id, takeaway_fee, admin_password, kitchen_password) VALUES (1, 0, \'admin\', \'kitchen\') ON CONFLICT (id) DO NOTHING;\n\n';
 
 sql += '-- 5. CREATE EXTRAS TABLE\n';
 sql += 'CREATE TABLE IF NOT EXISTS public.extras (\n';

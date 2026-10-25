@@ -14,16 +14,24 @@ ALTER TABLE public.orders
   ADD COLUMN IF NOT EXISTS table_token  TEXT,
   ADD COLUMN IF NOT EXISTS takeaway_fee NUMERIC(10,2) DEFAULT 0;
 
--- 3. CREATE settings TABLE (GLOBAL RESTAURANT SETTINGS)
+-- 3. CREATE settings TABLE (GLOBAL RESTAURANT SETTINGS & PORTAL PASSWORDS)
 CREATE TABLE IF NOT EXISTS public.settings (
-  id           INTEGER PRIMARY KEY DEFAULT 1,
-  takeaway_fee NUMERIC(10,2) DEFAULT 0,
-  updated_at   TIMESTAMPTZ DEFAULT NOW(),
+  id               INTEGER PRIMARY KEY DEFAULT 1,
+  takeaway_fee     NUMERIC(10,2) DEFAULT 0,
+  admin_password   TEXT DEFAULT 'admin',
+  kitchen_password TEXT DEFAULT 'kitchen',
+  updated_at       TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT single_settings_row CHECK (id = 1)
 );
 
-INSERT INTO public.settings (id, takeaway_fee)
-VALUES (1, 0)
+-- Ensure columns exist if table was already created
+ALTER TABLE public.settings
+  ADD COLUMN IF NOT EXISTS takeaway_fee     NUMERIC(10,2) DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS admin_password   TEXT DEFAULT 'admin',
+  ADD COLUMN IF NOT EXISTS kitchen_password TEXT DEFAULT 'kitchen';
+
+INSERT INTO public.settings (id, takeaway_fee, admin_password, kitchen_password)
+VALUES (1, 0, 'admin', 'kitchen')
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. CREATE extras TABLE

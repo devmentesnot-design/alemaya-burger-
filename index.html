@@ -206,6 +206,9 @@
             <button class="kds-icon-tool" id="kds-sound-btn" onclick="toggleKitchenAudio()" title="Sound alert">
               <i data-lucide="volume-2" class="lucide-icon" id="kds-sound-icon"></i>
             </button>
+            <button class="kds-icon-tool" onclick="lockStaffPortal('kitchen')" title="Lock Kitchen Terminal">
+              <i data-lucide="lock" class="lucide-icon"></i>
+            </button>
           </div>
         </div>
 
@@ -250,9 +253,14 @@
       <header class="staff-mobile-nav">
         <div class="staff-mobile-nav-top">
           <span class="admin-top-badge"><i data-lucide="shield-check" class="lucide-icon" style="width:13px;height:13px;margin-right:4px;"></i>ADMIN CONSOLE</span>
-          <button class="kds-icon-tool" onclick="syncDataFromBackend(true)" title="Refresh Data from DB">
-            <i data-lucide="refresh-cw" class="lucide-icon"></i>
-          </button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="kds-icon-tool" onclick="syncDataFromBackend(true)" title="Refresh Data from DB">
+              <i data-lucide="refresh-cw" class="lucide-icon"></i>
+            </button>
+            <button class="kds-icon-tool" onclick="lockStaffPortal('admin')" title="Lock Admin Console">
+              <i data-lucide="lock" class="lucide-icon"></i>
+            </button>
+          </div>
         </div>
 
         <div class="staff-header-info">
@@ -613,6 +621,91 @@
                 </button>
                 <span id="settings-save-status" style="font-size: 14px; color: #059669; display: none;">
                   ✓ Settings saved successfully
+                </span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Card 2: Security & Portal Passwords Configuration -->
+        <div class="admin-card-block" style="margin-top: 20px;">
+          <div class="chart-box-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h3 class="chart-box-title" style="display:flex; align-items:center; gap:8px;">
+                <i data-lucide="key-round" class="lucide-icon" style="color:#ff650c; width:18px; height:18px;"></i>
+                Portal Passwords &amp; Security
+              </h3>
+              <p class="chart-box-sub">Configure and reset access passcodes for Admin Console and Kitchen Terminal</p>
+            </div>
+            <button 
+              type="button" 
+              class="btn-outline-danger" 
+              onclick="resetStaffPasswords()"
+              style="padding: 7px 12px; font-size: 13px; display:inline-flex; align-items:center; gap:6px; border:1px solid #FCA5A5; color:#DC2626; background:#FEF2F2; border-radius:6px; cursor:pointer; font-weight:600;"
+              title="Reset both passcodes to factory defaults"
+            >
+              <i data-lucide="rotate-ccw" class="lucide-icon" style="width:13px; height:13px;"></i>
+              <span>Reset to Defaults</span>
+            </button>
+          </div>
+          
+          <div style="padding: 20px;">
+            <form id="passwords-form" onsubmit="saveStaffPasswords(event)" style="max-width: 460px;">
+              <!-- Admin Password Field -->
+              <div style="margin-bottom: 18px;">
+                <label for="admin-password-input" style="display: block; font-weight: 600; margin-bottom: 6px; color: #1F2937; font-size:14px;">
+                  Admin Console Passcode
+                </label>
+                <div style="position:relative; display:flex; align-items:center;">
+                  <input 
+                    type="password" 
+                    id="admin-password-input" 
+                    placeholder="Enter admin passcode (default: admin)"
+                    style="width: 100%; padding: 11px 40px 11px 12px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 15px; font-family: inherit;"
+                    required
+                  />
+                  <button type="button" onclick="togglePasswordVisibility('admin-password-input', this)" style="position:absolute; right:10px; background:none; border:none; color:#6B7280; cursor:pointer; padding:4px;" title="Toggle visibility">
+                    <i data-lucide="eye" class="lucide-icon" style="width:16px;height:16px;"></i>
+                  </button>
+                </div>
+                <p style="margin-top: 5px; font-size: 12px; color: #6B7280;">
+                  Required to access <code>/admin</code> (revenue, items, categories, extras, tables, and settings).
+                </p>
+              </div>
+
+              <!-- Kitchen Password Field -->
+              <div style="margin-bottom: 22px;">
+                <label for="kitchen-password-input" style="display: block; font-weight: 600; margin-bottom: 6px; color: #1F2937; font-size:14px;">
+                  Kitchen Terminal (KDS) Passcode
+                </label>
+                <div style="position:relative; display:flex; align-items:center;">
+                  <input 
+                    type="password" 
+                    id="kitchen-password-input" 
+                    placeholder="Enter kitchen passcode (default: kitchen)"
+                    style="width: 100%; padding: 11px 40px 11px 12px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 15px; font-family: inherit;"
+                    required
+                  />
+                  <button type="button" onclick="togglePasswordVisibility('kitchen-password-input', this)" style="position:absolute; right:10px; background:none; border:none; color:#6B7280; cursor:pointer; padding:4px;" title="Toggle visibility">
+                    <i data-lucide="eye" class="lucide-icon" style="width:16px;height:16px;"></i>
+                  </button>
+                </div>
+                <p style="margin-top: 5px; font-size: 12px; color: #6B7280;">
+                  Required for kitchen staff to open <code>/kitchen</code> or <code>/chef</code> grill station.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap:wrap;">
+                <button 
+                  type="submit" 
+                  class="btn-add-primary"
+                  style="flex-shrink: 0;"
+                >
+                  <i data-lucide="check" class="lucide-icon"></i>
+                  <span>Save Passwords</span>
+                </button>
+                <span id="passwords-save-status" style="font-size: 14px; color: #059669; display: none; font-weight:600;">
+                  ✓ Passwords updated successfully
                 </span>
               </div>
             </form>
