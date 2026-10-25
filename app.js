@@ -5,7 +5,7 @@
 
 // ══ CONFIGURATION ══
 const CFG = {
-  restaurantName: "Alemaya Grill'd",
+  restaurantName: "Grill'd",
   currencySymbol: 'Br',
   serviceCharge: 0.00,
   estimatedTime: '15-25 min'

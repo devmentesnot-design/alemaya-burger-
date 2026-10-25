@@ -143,7 +143,7 @@ downloadBtn.addEventListener('click',async()=>{
     ctx.font='800 42px Arial, sans-serif';
     ctx.fillText(table,W*.6235,H*.4155, W*.12);
     const a=document.createElement('a');
-    a.download='alemaya-table-'+table.replace(/[^a-z0-9_-]/gi,'_')+'.png';
+    a.download='table-'+table.replace(/[^a-z0-9_-]/gi,'_')+'.png';
     a.href=canvas.toDataURL('image/png');a.click();
     status.textContent='PNG downloaded successfully.';
   }catch(err){status.textContent='Could not create PNG: '+err.message}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alemaya Grill’d — Table QR Generator</title>
+<title>Table QR Generator</title>
 <style>
 :root{--brown:#4b1d0b;--orange:#ff650c;--cream:#fff8e7;--muted:#735342}
 *{box-sizing:border-box}body{margin:0;background:#f4eee5;color:var(--brown);font-family:Inter,Arial,sans-serif}
@@ -34,7 +34,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 </head>
 <body>
 <main>
-  <h1>Alemaya Grill’d QR Poster Generator</h1>
+  <h1>Table QR Poster Generator</h1>
   <p class="intro">Enter your menu/order link and table number. The QR code and table number will be placed on your poster, ready to export as a PNG.</p>
   <div class="layout">
     <section class="panel">
@@ -57,7 +57,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
       <div class="preview-head"><h2>Live poster preview</h2><span style="font-size:12px;color:#8a7465">Portrait · 2:3</span></div>
       <div class="preview-wrap">
         <div class="poster" id="poster">
-          <img class="poster-bg" id="posterBg" alt="Alemaya Grill’d poster background">
+          <img class="poster-bg" id="posterBg" alt="Restaurant poster background">
           <div class="table-no" id="tableOverlay"></div>
           <div class="qr-slot" id="qrSlot"></div>
         </div>
@@ -150,7 +150,7 @@ downloadBtn.addEventListener('click',async()=>{
     ctx.font='800 42px Arial, sans-serif';
     ctx.fillText(table,W*.6235,H*.4155, W*.12);
     const a=document.createElement('a');
-    a.download='alemaya-table-'+table.replace(/[^a-z0-9_-]/gi,'_')+'.png';
+    a.download='table-'+table.replace(/[^a-z0-9_-]/gi,'_')+'.png';
     a.href=canvas.toDataURL('image/png');a.click();
     status.textContent='PNG downloaded successfully.';
   }catch(err){status.textContent='Could not create PNG: '+err.message}
