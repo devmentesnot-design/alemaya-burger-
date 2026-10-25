@@ -2078,7 +2078,7 @@ async function syncDataFromBackend(showToast = false) {
     if (prods && prods.length > 0) {
       PRODUCTS = prods;
     }
-    if (orders && orders.length > 0) {
+    if (Array.isArray(orders)) {
       MASTER_ORDERS = orders;
     }
     if (extrasData && extrasData.length > 0) {
@@ -2188,7 +2188,9 @@ try {
             renderCurrentOrders();
           }
         }
-        syncDataFromBackend(false);
+        if (data.type !== 'ORDER_DELETED' && data.type !== 'ALL_ORDERS_CLEARED') {
+          syncDataFromBackend(false);
+        }
       }
     };
   }
@@ -2254,7 +2256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setInterval(() => {
     if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.currentTab === 'orders') {
       API.getOrders().then(orders => {
-        if (orders && orders.length > 0) {
+        if (Array.isArray(orders)) {
           MASTER_ORDERS = orders;
           updateKitchenCounters();
           if (APP_STATE.portal === 'chef') renderKdsTickets();
@@ -3674,7 +3676,7 @@ function switchPortal(portal) {
     if (floatBar) floatBar.classList.add('hidden');
     const adminView = document.getElementById('view-admin');
     if (adminView) adminView.classList.add('active');
-    switchAdminSubTab(APP_STATE.adminSubTab || 'items');
+    switchAdminSubTab(APP_STATE.adminSubTab || 'overview');
     const isCleanAdmin = window.location.pathname.endsWith('/admin');
     if (isCleanAdmin) {
       if (window.location.hash) history.replaceState(null, '', window.location.pathname);
@@ -6787,6 +6789,12 @@ async function customerCancelOrder(orderId) {
 
   toast(`Order #${orderId} was cancelled`, 3000);
 
+  try {
+    await API.deleteOrder(orderId);
+  } catch (e) {
+    console.warn('Delete order error:', e);
+  }
+
   if (SYNC_CHANNEL) {
     try {
       SYNC_CHANNEL.postMessage({
@@ -6795,8 +6803,6 @@ async function customerCancelOrder(orderId) {
       });
     } catch {}
   }
-
-  API.deleteOrder(orderId).catch(e => console.warn('Delete order error:', e));
 }
 
 // ══ CUSTOMER: EDIT & UPDATE PRE-COOKING ORDER ══

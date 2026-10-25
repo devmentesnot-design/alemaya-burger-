@@ -230,7 +230,7 @@ async function deleteProduct(id) {
 // ── ORDERS ──
 async function getOrders() {
   const data = await supabaseFetch('orders?select=*&order=created_at.desc');
-  if (Array.isArray(data) && data.length > 0) {
+  if (Array.isArray(data)) {
     const mapped = data.map(o => {
       let extractTable = null;
       if (o.order_type && o.order_type.includes('(')) {

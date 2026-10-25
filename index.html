@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=20261023_5">
+  <link rel="stylesheet" href="/style.css?v=20261025_admin_fix">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -242,46 +242,157 @@
     <!-- VIEW 4: ADMIN CONSOLE                                             -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <main id="view-admin" class="view">
-      <!-- Admin Top Bar -->
-      <header class="admin-top-bar">
-        <div class="admin-top-bar-inner">
-          <div class="admin-brand-pill">
-            <i data-lucide="shield-check" class="lucide-icon"></i>
-            <span>ADMIN CONSOLE</span>
-          </div>
-          <button class="admin-refresh-btn" onclick="loadAllData()" title="Refresh all data">
+      <!-- Admin Mobile Header -->
+      <header class="staff-mobile-nav">
+        <div class="staff-mobile-nav-top">
+          <span class="admin-top-badge"><i data-lucide="shield-check" class="lucide-icon" style="width:13px;height:13px;margin-right:4px;"></i>ADMIN CONSOLE</span>
+          <button class="kds-icon-tool" onclick="syncDataFromBackend(true)" title="Refresh Data from DB">
             <i data-lucide="refresh-cw" class="lucide-icon"></i>
           </button>
         </div>
-        <h2 class="admin-console-title">Store Management &amp; Real DB</h2>
+
+        <div class="staff-header-info">
+          <h2 class="staff-header-title">Store Management &amp; Real DB</h2>
+        </div>
+
+        <!-- Admin Sub-Navigation Tabs (Overview, Items CRUD, Categories CRUD, Extras CRUD, Orders, Tables & QR) -->
+        <div class="admin-mobile-subnav" role="tablist" id="admin-subnav">
+          <button class="admin-subtab active" id="asub-overview" data-pane="overview" onclick="switchAdminSubTab('overview')">
+            <i data-lucide="bar-chart-3" class="lucide-icon"></i>
+            <span>Overview</span>
+          </button>
+          <button class="admin-subtab" id="asub-items" data-pane="items" onclick="switchAdminSubTab('items')">
+            <i data-lucide="utensils" class="lucide-icon"></i>
+            <span>Items</span>
+          </button>
+          <button class="admin-subtab" id="asub-categories" data-pane="categories" onclick="switchAdminSubTab('categories')">
+            <i data-lucide="tags" class="lucide-icon"></i>
+            <span>Categories</span>
+          </button>
+          <button class="admin-subtab" id="asub-extras" data-pane="extras" onclick="switchAdminSubTab('extras')">
+            <i data-lucide="sparkles" class="lucide-icon"></i>
+            <span>Extras</span>
+          </button>
+          <button class="admin-subtab" id="asub-orders" data-pane="orders" onclick="switchAdminSubTab('orders')">
+            <i data-lucide="clipboard-list" class="lucide-icon"></i>
+            <span>Orders</span>
+          </button>
+          <button class="admin-subtab" id="asub-tables" data-pane="tables" onclick="switchAdminSubTab('tables')">
+            <i data-lucide="qr-code" class="lucide-icon"></i>
+            <span>QR &amp; Tables</span>
+          </button>
+        </div>
       </header>
 
-      <!-- Admin Sub-nav Tabs -->
-      <nav class="admin-subnav" id="admin-subnav">
-        <button class="admin-tab active" data-pane="items" onclick="switchAdminPane('items')">
-          <i data-lucide="utensils" class="lucide-icon"></i>
-          <span>Items</span>
-        </button>
-        <button class="admin-tab" data-pane="categories" onclick="switchAdminPane('categories')">
-          <i data-lucide="tag" class="lucide-icon"></i>
-          <span>Categories</span>
-        </button>
-        <button class="admin-tab" data-pane="extras" onclick="switchAdminPane('extras')">
-          <i data-lucide="plus-circle" class="lucide-icon"></i>
-          <span>Extras</span>
-        </button>
-        <button class="admin-tab" data-pane="orders" onclick="switchAdminPane('orders')">
-          <i data-lucide="clipboard-list" class="lucide-icon"></i>
-          <span>Orders</span>
-        </button>
-        <button class="admin-tab" data-pane="tables" onclick="switchAdminPane('tables')">
-          <i data-lucide="qr-code" class="lucide-icon"></i>
-          <span>QR</span>
-        </button>
-      </nav>
+      <!-- ── SUB-PANE 1: ADMIN OVERVIEW & REVENUE ANALYTICS ── -->
+      <section id="admin-pane-overview" class="admin-subpane active">
+        <!-- Date Selector & CSV Export -->
+        <div class="admin-overview-tools">
+          <div class="admin-time-select">
+            <i data-lucide="calendar" class="lucide-icon" style="width:14px; height:14px;"></i>
+            <select id="admin-date-filter" onchange="handleAdminDateFilter(this.value)">
+              <option value="today" selected>Today's Shift</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="2days">2 Days Ago</option>
+              <option value="3days">3 Days Ago</option>
+              <option value="week">Past 7 Days</option>
+              <option value="14days">Past 14 Days</option>
+              <option value="30days">Past 30 Days</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+              <option value="custom">📅 Pick Specific Date...</option>
+            </select>
+          </div>
+          <button class="admin-btn-action" onclick="exportOrdersCsv()" title="Export CSV spreadsheet">
+            <i data-lucide="download" class="lucide-icon"></i>
+            <span>CSV</span>
+          </button>
+        </div>
+
+        <!-- Custom Date Picker Field -->
+        <div id="admin-custom-date-box" class="admin-custom-date-box hidden">
+          <div class="custom-date-inner">
+            <span class="custom-date-label"><i data-lucide="calendar-days" class="lucide-icon" style="width:14px;height:14px;"></i> Choose Date:</span>
+            <input type="date" id="admin-custom-date-input" class="admin-date-picker-input" onchange="handleAdminCustomDate(this.value)">
+          </div>
+        </div>
+
+        <!-- Active Analytics Period Banner -->
+        <div class="admin-period-banner" id="admin-period-banner">
+          <div class="period-banner-content" id="admin-period-text">
+            <span>Viewing: <strong>Today's Shift</strong></span>
+          </div>
+        </div>
+
+        <!-- 2x2 KPI Cards for Mobile Phone -->
+        <div class="admin-kpi-grid">
+          <div class="kpi-card revenue-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">REVENUE</span>
+              <div class="kpi-icon-wrap icon-rev"><i data-lucide="banknote" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-revenue">Br 0</div>
+            <div class="kpi-subtext" id="kpi-revenue-sub">Filtered period</div>
+          </div>
+
+          <div class="kpi-card orders-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">ORDERS</span>
+              <div class="kpi-icon-wrap icon-orders"><i data-lucide="shopping-bag" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-orders-count">0</div>
+            <div class="kpi-subtext" id="kpi-orders-sub">Filtered period</div>
+          </div>
+
+          <div class="kpi-card active-card">
+            <div class="kpi-card-header">
+              <span class="kpi-label">KITCHEN</span>
+              <div class="kpi-icon-wrap icon-kitchen"><i data-lucide="flame" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-kitchen-active">0</div>
+            <div class="kpi-subtext">Active cooking</div>
+          </div>
+
+          <div class="kpi-card tables-card" onclick="switchAdminSubTab('tables')" style="cursor:pointer;" title="Click to manage restaurant tables & QR codes">
+            <div class="kpi-card-header">
+              <span class="kpi-label">TABLES &amp; QR</span>
+              <div class="kpi-icon-wrap" style="background:#FEF2F2; color:var(--brand-terracotta);"><i data-lucide="qr-code" class="lucide-icon"></i></div>
+            </div>
+            <div class="kpi-value" id="kpi-tables-count">Manage</div>
+            <div class="kpi-subtext" style="color:var(--brand-terracotta); font-weight:700;">Tap to view QR codes →</div>
+          </div>
+        </div>
+
+        <!-- 7-Day Revenue Trend Chart -->
+        <div class="admin-card-block">
+          <div class="chart-box-header">
+            <div>
+              <h3 class="chart-box-title">7-Day Revenue Trend</h3>
+              <p class="chart-box-sub">Daily sales performance</p>
+            </div>
+          </div>
+          <div class="chart-bars-wrap" id="admin-revenue-bars"></div>
+        </div>
+
+        <!-- Category Sales Breakdown -->
+        <div class="admin-card-block">
+          <div class="chart-box-header">
+            <h3 class="chart-box-title">Category Revenue Share</h3>
+          </div>
+          <div class="category-breakdown-list" id="admin-category-breakdown"></div>
+        </div>
+
+        <!-- Top Bestsellers -->
+        <div class="admin-card-block">
+          <div class="chart-box-header">
+            <h3 class="chart-box-title">Top-Selling Dishes</h3>
+          </div>
+          <div class="bestsellers-table-wrap" id="admin-bestsellers-wrap"></div>
+        </div>
+      </section>
 
       <!-- ── SUB-PANE 2: ITEMS CRUD ── -->
-      <section id="admin-pane-items" class="admin-subpane active">
+      <section id="admin-pane-items" class="admin-subpane">
         <div class="crud-header-row">
           <div>
             <h3 class="crud-pane-title">Menu Items (<span id="admin-items-total-count">0</span>)</h3>

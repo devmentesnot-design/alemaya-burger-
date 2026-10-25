@@ -1817,7 +1817,8 @@ i[data-lucide] {
 /* =====================================================================
    ADMIN SUB-NAVIGATION & MOBILE PANES
 ===================================================================== */
-.admin-mobile-subnav {
+.admin-mobile-subnav,
+.admin-subnav {
   display: flex;
   background: var(--bg-subtle);
   border: 1px solid var(--border-warm);
@@ -1830,10 +1831,12 @@ i[data-lucide] {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.admin-mobile-subnav::-webkit-scrollbar {
+.admin-mobile-subnav::-webkit-scrollbar,
+.admin-subnav::-webkit-scrollbar {
   display: none;
 }
-.admin-subtab {
+.admin-subtab,
+.admin-tab {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -1850,13 +1853,18 @@ i[data-lucide] {
   transition: all 0.2s ease;
   white-space: nowrap;
 }
-.admin-subtab.active {
+.admin-subtab.active,
+.admin-tab.active {
   background: var(--brand-terracotta);
   color: #FFFFFF;
   box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
 }
-.admin-subtab.active svg {
+.admin-subtab.active svg,
+.admin-tab.active svg,
+.admin-subtab.active [data-lucide],
+.admin-tab.active [data-lucide] {
   stroke: #FFFFFF !important;
+  color: #FFFFFF !important;
 }
 
 
@@ -4358,10 +4366,18 @@ i[data-lucide] {
 
 /* Two-column responsive layout */
 .qr-poster-layout {
-  display: grid;
-  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
-  gap: 24px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+@media (min-width: 900px) {
+  #app.portal-admin .qr-poster-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 380px) minmax(340px, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
 }
 .qr-poster-panel {
   background: #fffdf8;
@@ -4369,6 +4385,8 @@ i[data-lucide] {
   border-radius: 18px;
   padding: 22px;
   box-shadow: 0 8px 28px rgba(75, 29, 11, 0.05);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Form inputs */
@@ -4644,12 +4662,15 @@ i[data-lucide] {
   z-index: 2;
 }
 
-@media (max-width: 780px) {
+@media (max-width: 899px) {
   .qr-poster-layout {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: column !important;
   }
   .preview-wrap {
-    width: min(100%, 380px);
+    width: 100% !important;
+    max-width: 380px !important;
+    margin: 0 auto !important;
   }
 }
 /* Hide Customer Table Banner & Checkout Table Slot Completely (Handled in background) */
