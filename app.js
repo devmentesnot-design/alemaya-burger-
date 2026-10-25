@@ -2585,11 +2585,13 @@ function navigateTo(tab) {
   updateCartUI();
 
   if (tab === 'orders') {
+    renderCurrentOrders();
     renderCart();
     renderHistory();
   }
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Instant scroll without animation lag
+  window.scrollTo(0, 0);
   refreshLucideIcons();
 }
 
@@ -3099,12 +3101,13 @@ function updateCartUI() {
     return (o.status || '').toLowerCase() === 'completed';
   }).length;
 
-  // Bottom Nav Orders Badge
+  // Bottom Nav Orders Badge: show cart items when cart > 0, else active placed orders
   const bnavBadge = document.getElementById('bnav-orders-badge');
   if (bnavBadge) {
-    if (activeOrdersCount > 0) {
+    const badgeNum = count > 0 ? count : activeOrdersCount;
+    if (badgeNum > 0) {
       bnavBadge.style.display = 'flex';
-      bnavBadge.textContent = activeOrdersCount;
+      bnavBadge.textContent = badgeNum;
     } else {
       bnavBadge.style.display = 'none';
     }
@@ -3126,6 +3129,8 @@ function renderCart() {
   const wrap = document.getElementById('cart-items-wrap');
   const summary = document.getElementById('cart-summary-card');
   const actions = document.getElementById('cart-checkout-actions');
+  const pendingSection = document.getElementById('pending-cart-section');
+  if (pendingSection) pendingSection.style.display = 'block';
   if (!wrap) return;
 
   const { subtotal, service, total, count } = getCartCalculations();
@@ -3295,21 +3300,16 @@ async function placeOrder() {
   // Add to Master Orders Store (Shared with Chef & Admin)
   MASTER_ORDERS.unshift(newOrder);
 
-  // Add to Customer's Local Order History
+  // Add to Customer's In-Memory Order History
   APP_STATE.orderHistory.unshift(newOrder);
 
-  // Clear cart
+  // Clear cart and update UI INSTANTLY (0 delay)
   APP_STATE.cart = [];
   saveToStorage();
   updateCartUI();
+  renderCart();
+  renderCurrentOrders();
   updateKitchenCounters();
-
-  // Persist directly to real database (database.json) via REST API
-  try {
-    await API.createOrder(newOrder);
-  } catch (e) {
-    console.warn('Order sync to database error:', e);
-  }
 
   // Play audio chime if enabled
   playKitchenChime('new_order');
@@ -3325,9 +3325,14 @@ async function placeOrder() {
     } catch (e) {}
   }
 
-  // Switch to current orders tab to track preparation live
-  toast(`Order #${orderId} placed! Live kitchen tracking started`, 3800);
+  // Instant notification & tab switch
+  toast(`Order #${orderId} placed! Live kitchen tracking started`, 3000);
   switchOrdersTab('current');
+
+  // Persist to real database asynchronously in background without blocking UI
+  API.createOrder(newOrder).catch(e => {
+    console.warn('Order sync to database error:', e);
+  });
 }
 
 // ══ RENDER CURRENT ORDERS (PENDING CART + ACTIVE LIVE TRACKING) ══
@@ -4818,14 +4823,15 @@ function seedSampleData() {
 function saveToStorage() {
   try {
     localStorage.setItem('alemaya_cart', JSON.stringify(APP_STATE.cart));
-    localStorage.setItem('alemaya_history', JSON.stringify(APP_STATE.orderHistory));
-    localStorage.setItem('alemaya_master_orders', JSON.stringify(MASTER_ORDERS));
     localStorage.setItem('alemaya_stock', JSON.stringify(APP_STATE.stockStatus));
     if (APP_STATE.activeTable) {
       localStorage.setItem('alemaya_active_table', JSON.stringify(APP_STATE.activeTable));
     } else {
       localStorage.removeItem('alemaya_active_table');
     }
+    // Explicitly do not save customer order history in local storage
+    localStorage.removeItem('alemaya_history');
+    localStorage.removeItem('alemaya_master_orders');
   } catch (e) {
     console.warn('Storage save failed:', e);
   }
@@ -4836,11 +4842,10 @@ function restoreFromStorage() {
     const savedCart = localStorage.getItem('alemaya_cart');
     if (savedCart) APP_STATE.cart = JSON.parse(savedCart);
 
-    const savedHist = localStorage.getItem('alemaya_history');
-    if (savedHist) APP_STATE.orderHistory = JSON.parse(savedHist);
-
-    const savedOrders = localStorage.getItem('alemaya_master_orders');
-    if (savedOrders) MASTER_ORDERS = JSON.parse(savedOrders);
+    // Clean up stale orders from local storage so customer does not see old orders
+    localStorage.removeItem('alemaya_history');
+    localStorage.removeItem('alemaya_master_orders');
+    APP_STATE.orderHistory = [];
 
     const savedStock = localStorage.getItem('alemaya_stock');
     if (savedStock) APP_STATE.stockStatus = JSON.parse(savedStock);
@@ -5712,10 +5717,7 @@ async function initTableFromUrlOrStorage() {
       renderCustomerActiveTableBanner();
       renderCartCheckoutTableSlot();
 
-      // Show welcome toast if arriving with a table in URL
-      if (tableData.fromUrl) {
-        toast(`🍽️ Welcome! Seated at ${tableData.name}`, 3800);
-      }
+      // Table assigned silently in background (no notification to customer)
 
       // Background check if custom table exists in database
       if (tableData.token) {
@@ -5738,29 +5740,12 @@ async function initTableFromUrlOrStorage() {
   }
 }
 
-// ── Customer Active Table Banner Rendering ──
+// ── Customer Active Table Banner Rendering (SILENT IN BACKGROUND) ──
 function renderCustomerActiveTableBanner() {
   const banner = document.getElementById('customer-active-table-banner');
-  if (!banner) return;
-
-  if (APP_STATE.orderType === 'Dine-in' && APP_STATE.activeTable) {
-    const t = APP_STATE.activeTable;
-    banner.classList.remove('hidden');
-    banner.innerHTML = `
-      <div class="active-table-info">
-        <div class="table-icon-pill">🪑</div>
-        <div>
-          <div class="active-table-title">${escapeHtml(t.name)}</div>
-          <div class="active-table-sub">Dine-in Order • Assigned via QR link</div>
-        </div>
-      </div>
-      <div class="table-badge-actions">
-        <span class="table-verified-badge">✓ Active Table</span>
-        <button type="button" class="table-clear-btn" onclick="clearActiveTable()" title="Unlink or switch table">&times;</button>
-      </div>
-    `;
-  } else {
+  if (banner) {
     banner.classList.add('hidden');
+    banner.style.display = 'none';
     banner.innerHTML = '';
   }
 }
@@ -5803,62 +5788,16 @@ function handleManualTableSelect(tableId) {
     renderCustomerActiveTableBanner();
     renderCartCheckoutTableSlot();
     updateCartUI();
-    toast(`Seated at ${found.name}`);
+    // Table assigned in background
   }
 }
 
-// ── Cart Summary Table Slot Renderer ──
+// ── Cart Summary Table Slot Renderer (SILENT IN BACKGROUND) ──
 function renderCartCheckoutTableSlot() {
   const wrap = document.getElementById('checkout-table-info-wrap');
   if (!wrap) return;
-
-  if (APP_STATE.orderType === 'Takeaway') {
-    wrap.style.display = 'none';
-    return;
-  }
-
-  wrap.style.display = 'block';
-
-  // Ensure table is assigned if available in URL or storage
-  if (!APP_STATE.activeTable) {
-    extractTableFromUrl();
-    if (!APP_STATE.activeTable) {
-      const saved = localStorage.getItem('alemaya_active_table') || sessionStorage.getItem('alemaya_active_table');
-      if (saved) {
-        try {
-          APP_STATE.activeTable = JSON.parse(saved);
-          APP_STATE.orderType = 'Dine-in';
-        } catch {}
-      }
-    }
-  }
-
-  if (APP_STATE.activeTable) {
-    wrap.innerHTML = `
-      <div style="display:flex; align-items:center; justify-content:space-between; background:#FEF3C7; border:1.5px solid #FDE68A; padding:10px 14px; border-radius:12px; margin-top:8px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.2rem;">🪑</span>
-          <div>
-            <strong style="font-size:0.92rem; color:#92400E; display:block;">Seated at ${escapeHtml(APP_STATE.activeTable.name)}</strong>
-            <span style="font-size:0.75rem; color:#B45309;">Dine-in Order (Auto-assigned from QR link)</span>
-          </div>
-        </div>
-        <button type="button" onclick="clearActiveTable()" style="background:#FFFFFF; border:1px solid #FCD34D; color:#92400E; font-size:0.75rem; font-weight:700; padding:5px 10px; border-radius:8px; cursor:pointer;">Change</button>
-      </div>
-    `;
-  } else {
-    wrap.innerHTML = `
-      <div style="display:flex; align-items:center; justify-content:space-between; background:#F8FAFC; border:1px dashed #CBD5E1; padding:8px 12px; border-radius:10px; margin-top:8px;">
-        <div style="display:flex; align-items:center; gap:6px;">
-          <span style="font-size:1rem;">🪑</span>
-          <span style="font-size:0.82rem; font-weight:600; color:#475569;">Table Number:</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:6px;">
-          <input type="text" id="checkout-table-quick-input" placeholder="e.g. 4" style="width:70px; padding:5px 8px; border:1.5px solid #CBD5E1; border-radius:8px; font-size:0.85rem; font-weight:700; text-align:center;" oninput="handleQuickTableInput(this.value)" />
-        </div>
-      </div>
-    `;
-  }
+  wrap.style.display = 'none';
+  wrap.innerHTML = '';
 }
 
 function handleQuickTableInput(val) {

@@ -85,7 +85,7 @@
       </section>
 
       <!-- ACTIVE TABLE BANNER (WHEN QR SCANNED) - Content rendered by JS -->
-      <div id="customer-active-table-banner" class="customer-active-table-banner hidden"></div>
+      <div id="customer-active-table-banner" class="customer-active-table-banner hidden" style="display:none !important;"></div>
 
       <!-- ORDER TYPE TABS (Dine-in / Takeaway) -->
       <section class="order-type-section">
@@ -145,7 +145,7 @@
       <!-- TAB 1: CURRENT ORDERS (PENDING ITEMS + LIVE ACTIVE KITCHEN TRACKER) -->
       <div id="orders-tab-current" class="orders-tab-pane active">
         <!-- Pending Order Items (if customer added dishes to cart) -->
-        <div id="pending-cart-section">
+        <div id="pending-cart-section" style="display:block;">
           <div id="cart-items-wrap"></div>
           
           <div id="cart-summary-card" class="summary-card hidden">
@@ -160,7 +160,7 @@
             </div>
             <div class="sum-ordertype-note">
               <div>Order Type: <strong id="sum-ordertype-label">Dine-in</strong></div>
-              <div id="checkout-table-info-wrap" class="checkout-table-info-wrap" style="margin-top:6px;"></div>
+              <div id="checkout-table-info-wrap" class="checkout-table-info-wrap" style="display:none !important;"></div>
             </div>
           </div>
 

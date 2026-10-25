@@ -4652,3 +4652,10 @@ i[data-lucide] {
     width: min(100%, 380px);
   }
 }
+/* Hide Customer Table Banner & Checkout Table Slot Completely (Handled in background) */
+#customer-active-table-banner,
+.customer-active-table-banner,
+#checkout-table-info-wrap,
+.checkout-table-info-wrap {
+  display: none !important;
+}
