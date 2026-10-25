@@ -235,7 +235,12 @@ async function handleRequest(req, res) {
 
         if (req.method === 'PUT') {
           const body = await parseJsonBody(req);
-          const prod = { id: prodId, ...body };
+          const prod = {
+            id: prodId,
+            ...body,
+            basePrice: body.basePrice !== undefined ? Number(body.basePrice) : undefined,
+            discountPrice: body.discountPrice !== undefined ? Number(body.discountPrice) : 0
+          };
           const result = await supabaseDb.saveProduct(prod, true);
           return sendJson(res, 200, result);
         }

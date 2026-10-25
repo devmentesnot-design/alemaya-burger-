@@ -39,12 +39,13 @@ sql += '  reviews_count INTEGER DEFAULT 100,\n';
 sql += '  description TEXT,\n';
 sql += '  ingredients JSONB DEFAULT \'[]\'::jsonb,\n';
 sql += '  base_price NUMERIC(10,2) NOT NULL,\n';
+sql += '  discount_price NUMERIC(10,2) DEFAULT 0,\n';
 sql += '  image TEXT,\n';
 sql += '  available BOOLEAN DEFAULT TRUE,\n';
 sql += '  created_at TIMESTAMPTZ DEFAULT NOW()\n';
 sql += ');\n\n';
 
-sql += '-- 3. CREATE ORDERS TABLE (WITH TABLE LINKAGE)\n';
+sql += '-- 3. CREATE ORDERS TABLE (WITH TABLE LINKAGE & TAKEAWAY FEE)\n';
 sql += 'CREATE TABLE IF NOT EXISTS public.orders (\n';
 sql += '  id TEXT PRIMARY KEY,\n';
 sql += '  timestamp TEXT,\n';
@@ -59,10 +60,20 @@ sql += '  status TEXT DEFAULT \'received\',\n';
 sql += '  status_label TEXT DEFAULT \'Order Received\',\n';
 sql += '  table_id TEXT,\n';
 sql += '  table_name TEXT,\n';
-sql += '  table_token TEXT\n';
+sql += '  table_token TEXT,\n';
+sql += '  takeaway_fee NUMERIC(10,2) DEFAULT 0\n';
 sql += ');\n\n';
 
-sql += '-- 4. CREATE EXTRAS TABLE\n';
+sql += '-- 4. CREATE SETTINGS TABLE\n';
+sql += 'CREATE TABLE IF NOT EXISTS public.settings (\n';
+sql += '  id INTEGER PRIMARY KEY DEFAULT 1,\n';
+sql += '  takeaway_fee NUMERIC(10,2) DEFAULT 0,\n';
+sql += '  updated_at TIMESTAMPTZ DEFAULT NOW(),\n';
+sql += '  CONSTRAINT single_settings_row CHECK (id = 1)\n';
+sql += ');\n';
+sql += 'INSERT INTO public.settings (id, takeaway_fee) VALUES (1, 0) ON CONFLICT (id) DO NOTHING;\n\n';
+
+sql += '-- 5. CREATE EXTRAS TABLE\n';
 sql += 'CREATE TABLE IF NOT EXISTS public.extras (\n';
 sql += '  id TEXT PRIMARY KEY,\n';
 sql += '  name TEXT NOT NULL,\n';

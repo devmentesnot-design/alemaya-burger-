@@ -99,66 +99,6 @@
   ],
   "products": [
     {
-      "id": "item_57",
-      "categoryId": "protein",
-      "name": "Body Building",
-      "badge": "FITNESS",
-      "rating": 4.9,
-      "reviewsCount": 258,
-      "description": "Avocado, mango, papaya, peanut, banana, flax and honey.",
-      "ingredients": [
-        "Avocado",
-        "mango",
-        "papaya",
-        "peanut",
-        "banana",
-        "flax and honey"
-      ],
-      "basePrice": 259,
-      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-      "available": true,
-      "customizations": []
-    },
-    {
-      "id": "item_58",
-      "categoryId": "protein",
-      "name": "Muscle Building",
-      "badge": "POWER",
-      "rating": 4.9,
-      "reviewsCount": 266,
-      "description": "Avocado, papaya, banana, peanut and honey.",
-      "ingredients": [
-        "Avocado",
-        "papaya",
-        "banana",
-        "peanut and honey"
-      ],
-      "basePrice": 259,
-      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-      "available": true,
-      "customizations": []
-    },
-    {
-      "id": "item_59",
-      "categoryId": "protein",
-      "name": "Vegitable Special",
-      "badge": "WELLNESS",
-      "rating": 4.8,
-      "reviewsCount": 224,
-      "description": "Avocado, mango, papaya, flax, cucumber and honey.",
-      "ingredients": [
-        "Avocado",
-        "mango",
-        "papaya",
-        "flax",
-        "cucumber and honey"
-      ],
-      "basePrice": 259,
-      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-      "available": true,
-      "customizations": []
-    },
-    {
       "id": "item_60",
       "categoryId": "superjuice",
       "name": "Energy Booster",
@@ -592,20 +532,41 @@
       "customizations": []
     },
     {
-      "id": "item_1",
-      "categoryId": "burger",
-      "name": "Grilled Special Burger",
-      "badge": "CHEF'S SPECIAL",
-      "rating": 4.9,
-      "reviewsCount": 227,
-      "description": "Fresh, grilled-to-order grilled special burger prepared daily with quality local ingredients.",
+      "id": "item_58",
+      "categoryId": "protein",
+      "name": "Muscle Building",
+      "badge": "POWER",
+      "rating": 4.8,
+      "reviewsCount": 10,
+      "description": "Avocado, papaya, banana, peanut and honey.",
       "ingredients": [
-        "Grilled Special Burger",
-        "House Seasoning",
-        "Fresh Ingredients"
+        "Avocado",
+        "papaya",
+        "banana",
+        "peanut and honey"
       ],
-      "basePrice": 799,
-      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+      "basePrice": 259,
+      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+      "available": true,
+      "customizations": []
+    },
+    {
+      "id": "item_59",
+      "categoryId": "protein",
+      "name": "Vegitable Special",
+      "badge": "WELLNESS",
+      "rating": 4.8,
+      "reviewsCount": 10,
+      "description": "Avocado, mango, papaya, flax, cucumber and honey.",
+      "ingredients": [
+        "Avocado",
+        "mango",
+        "papaya",
+        "flax",
+        "cucumber and honey"
+      ],
+      "basePrice": 250,
+      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
     },
@@ -732,6 +693,24 @@
       ],
       "basePrice": 799,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+      "available": true,
+      "customizations": []
+    },
+    {
+      "id": "item_1",
+      "categoryId": "burger",
+      "name": "Grilled Special Burger",
+      "badge": "CHEF'S SPECIAL",
+      "rating": 4.8,
+      "reviewsCount": 10,
+      "description": "Fresh, grilled-to-order grilled special burger prepared daily with quality local ingredients.",
+      "ingredients": [
+        "Grilled Special Burger",
+        "House Seasoning",
+        "Fresh Ingredients"
+      ],
+      "basePrice": 799,
+      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792959026/alemaya-burger/qwog7by3m0qidafhbe4y.jpg",
       "available": true,
       "customizations": []
     },
@@ -1620,6 +1599,27 @@
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
       "available": true,
       "customizations": []
+    },
+    {
+      "id": "item_57",
+      "categoryId": "protein",
+      "name": "Body Building",
+      "badge": "FITNESS",
+      "rating": 4.8,
+      "reviewsCount": 10,
+      "description": "Avocado, mango, papaya, peanut, banana, flax and honey.",
+      "ingredients": [
+        "Avocado",
+        "mango",
+        "papaya",
+        "peanut",
+        "banana",
+        "flax and honey"
+      ],
+      "basePrice": 259,
+      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+      "available": true,
+      "customizations": []
     }
   ],
   "orders": [
@@ -1656,6 +1656,7 @@
       ],
       "subtotal": 848,
       "service": 0,
+      "takeawayFee": 0,
       "total": 848,
       "status": "ready",
       "statusLabel": "Ready",
@@ -1855,6 +1856,6 @@
     }
   ],
   "settings": {
-    "takeawayFee": 0
+    "takeawayFee": 76
   }
 }

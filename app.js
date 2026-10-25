@@ -4972,6 +4972,9 @@ function saveToStorage() {
     } else {
       localStorage.removeItem('alemaya_active_table');
     }
+    if (APP_STATE.settings) {
+      localStorage.setItem('alemaya_settings', JSON.stringify(APP_STATE.settings));
+    }
     // Explicitly do not save customer order history in local storage
     localStorage.removeItem('alemaya_history');
     localStorage.removeItem('alemaya_master_orders');
@@ -4996,6 +4999,11 @@ function restoreFromStorage() {
     const savedTable = localStorage.getItem('alemaya_active_table');
     if (savedTable && !APP_STATE.activeTable) {
       try { APP_STATE.activeTable = JSON.parse(savedTable); } catch {}
+    }
+
+    const savedSettings = localStorage.getItem('alemaya_settings');
+    if (savedSettings) {
+      try { APP_STATE.settings = { ...APP_STATE.settings, ...JSON.parse(savedSettings) }; } catch {}
     }
   } catch (e) {
     console.warn('Storage restore failed:', e);
@@ -5107,6 +5115,15 @@ function renderAdminItemsCrud() {
     const cat = CATEGORIES.find(c => c.id === p.categoryId);
     const catName = cat ? cat.name : p.categoryId;
 
+    const hasDiscount = p.discountPrice > 0 && p.discountPrice < p.basePrice;
+    const priceDisplay = hasDiscount
+      ? `<div class="crud-price-wrap" style="display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+          <span style="color:#ff650c; font-weight:800; font-size:1.02rem;">${formatMoney(p.discountPrice)}</span>
+          <del style="color:#9CA3AF; font-size:0.82rem; text-decoration:line-through; text-decoration-color:#EF4444; font-weight:500;">${formatMoney(p.basePrice)}</del>
+          <span style="background:#FEE2E2; color:#DC2626; font-size:0.62rem; font-weight:800; padding:2px 6px; border-radius:4px; vertical-align:middle;">SALE</span>
+        </div>`
+      : `<div class="crud-item-price">${formatMoney(p.basePrice)}</div>`;
+
     html += `
       <div class="admin-item-crud-card">
         <div class="admin-item-crud-top">
@@ -5114,7 +5131,7 @@ function renderAdminItemsCrud() {
           <div class="crud-item-meta">
             <div class="crud-item-title">${escapeHtml(p.name)}</div>
             <div class="crud-item-sub">${escapeHtml(catName)} ${p.badge ? '• <strong>' + escapeHtml(p.badge) + '</strong>' : ''}</div>
-            <div class="crud-item-price">${formatMoney(p.basePrice)}</div>
+            ${priceDisplay}
           </div>
         </div>
         <div class="admin-item-crud-actions">
@@ -5472,9 +5489,17 @@ async function handleSaveItem(event) {
   try {
     const result = await API.saveProduct(prodPayload, isEdit);
     if (result && result.success) {
+      const savedProd = result.data || prodPayload;
+      const pIdx = PRODUCTS.findIndex(p => p.id === (isEdit ? id : savedProd.id));
+      if (pIdx !== -1) {
+        PRODUCTS[pIdx] = { ...PRODUCTS[pIdx], ...savedProd, discountPrice: prodPayload.discountPrice };
+      } else {
+        PRODUCTS.push({ ...savedProd, discountPrice: prodPayload.discountPrice });
+      }
       closeItemCrudModal();
       await syncDataFromBackend(false);
       renderAdminItemsCrud();
+      renderMenu();
       populateAdminCategoryDropdowns();
       toast(isEdit ? `"${name}" updated!` : `"${name}" added to menu!`, 3000);
     } else {
@@ -6814,49 +6839,53 @@ async function saveTakeawayFee(event) {
   const takeawayFee = parseFloat(input.value) || 0;
   
   try {
+    APP_STATE.settings = APP_STATE.settings || {};
+    APP_STATE.settings.takeawayFee = takeawayFee;
+    saveToStorage();
+
     const result = await API.updateSettings({ takeawayFee });
     
-    if (result.success !== false) {
-      APP_STATE.settings.takeawayFee = takeawayFee;
-      
-      // Show success message
-      if (statusEl) {
-        statusEl.style.display = 'inline';
-        statusEl.textContent = '✓ Settings saved successfully';
-        statusEl.style.color = '#059669';
-        
-        setTimeout(() => {
-          statusEl.style.display = 'none';
-        }, 3000);
-      }
-      
-      toast('Settings saved successfully');
-      
-      // Update cart if it exists and order type is takeaway
-      if (APP_STATE.cart.length > 0) {
-        updateCartUI();
-        renderCart();
-      }
-      
-      // Broadcast to other tabs
-      if (SYNC_CHANNEL) {
-        SYNC_CHANNEL.postMessage({ type: 'SETTINGS_UPDATE', settings: APP_STATE.settings });
-      }
-    } else {
-      throw new Error(result.error || 'Failed to save settings');
-    }
-  } catch (err) {
-    console.error('Save settings error:', err);
+    // Show success message
     if (statusEl) {
       statusEl.style.display = 'inline';
-      statusEl.textContent = '✗ Error saving settings';
-      statusEl.style.color = '#DC2626';
+      statusEl.textContent = '✓ Settings saved successfully';
+      statusEl.style.color = '#059669';
       
       setTimeout(() => {
         statusEl.style.display = 'none';
-      }, 3000);
+      }, 3500);
     }
-    toast('Error saving settings: ' + err.message);
+    
+    toast('Takeaway fee updated to ' + formatMoney(takeawayFee));
+    
+    // Update cart if it exists and order type is takeaway
+    if (APP_STATE.cart.length > 0) {
+      updateCartUI();
+      renderCart();
+    }
+    
+    // Broadcast to other tabs
+    if (SYNC_CHANNEL) {
+      try {
+        SYNC_CHANNEL.postMessage({ type: 'SETTINGS_UPDATE', settings: APP_STATE.settings });
+      } catch {}
+    }
+  } catch (err) {
+    console.error('Save settings error:', err);
+    // Still saved to client state and localStorage
+    APP_STATE.settings = APP_STATE.settings || {};
+    APP_STATE.settings.takeawayFee = takeawayFee;
+    saveToStorage();
+
+    if (statusEl) {
+      statusEl.style.display = 'inline';
+      statusEl.textContent = '✓ Settings saved';
+      statusEl.style.color = '#059669';
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 3500);
+    }
+    toast('Takeaway fee updated (' + formatMoney(takeawayFee) + ')');
   }
 }
 

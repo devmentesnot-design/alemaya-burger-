@@ -151,29 +151,39 @@ async function deleteCategory(id) {
 
 // ── PRODUCTS ──
 async function getProducts() {
+  const local = readLocalDb();
+  const localMap = new Map((local.products || []).map(p => [p.id, p]));
+
   const data = await supabaseFetch('products?select=*&order=created_at.asc');
   if (Array.isArray(data) && data.length > 0) {
-    const mapped = data.map(p => ({
-      id: p.id,
-      categoryId: p.category_id,
-      name: p.name,
-      badge: p.badge || '',
-      rating: Number(p.rating) || 4.8,
-      reviewsCount: Number(p.reviews_count) || 100,
-      description: p.description || '',
-      ingredients: Array.isArray(p.ingredients) ? p.ingredients : [],
-      basePrice: Number(p.base_price) || 0,
-      discountPrice: Number(p.discount_price) || 0,
-      image: p.image || 'burger_classic.jpg',
-      available: p.available !== false,
-      customizations: []
-    }));
-    const local = readLocalDb();
+    const mapped = data.map(p => {
+      const existing = localMap.get(p.id);
+      // If Supabase does not have discount_price column yet, preserve local discountPrice
+      const disc = (p.discount_price !== undefined && p.discount_price !== null)
+        ? (Number(p.discount_price) || 0)
+        : (existing?.discountPrice || 0);
+
+      return {
+        id: p.id,
+        categoryId: p.category_id,
+        name: p.name,
+        badge: p.badge || '',
+        rating: Number(p.rating) || 4.8,
+        reviewsCount: Number(p.reviews_count) || 100,
+        description: p.description || '',
+        ingredients: Array.isArray(p.ingredients) ? p.ingredients : [],
+        basePrice: Number(p.base_price) || 0,
+        discountPrice: disc,
+        image: p.image || 'burger_classic.jpg',
+        available: p.available !== false,
+        customizations: []
+      };
+    });
     local.products = mapped;
     writeLocalDb(local);
     return mapped;
   }
-  return readLocalDb().products || [];
+  return local.products || [];
 }
 
 async function saveProduct(prod, isEdit = false) {
@@ -192,10 +202,22 @@ async function saveProduct(prod, isEdit = false) {
     available: prod.available !== false
   };
 
+  let res = null;
   if (isEdit) {
-    await supabaseFetch(`products?id=eq.${encodeURIComponent(prod.id)}`, 'PATCH', payload);
+    res = await supabaseFetch(`products?id=eq.${encodeURIComponent(prod.id)}`, 'PATCH', payload);
+    if (!res) {
+      // If Supabase schema does not have discount_price column, retry without it
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.discount_price;
+      res = await supabaseFetch(`products?id=eq.${encodeURIComponent(prod.id)}`, 'PATCH', fallbackPayload);
+    }
   } else {
-    await supabaseFetch('products', 'POST', payload);
+    res = await supabaseFetch('products', 'POST', payload);
+    if (!res) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.discount_price;
+      res = await supabaseFetch('products', 'POST', fallbackPayload);
+    }
   }
 
   const local = readLocalDb();
@@ -611,38 +633,45 @@ async function getTableByToken(token) {
 
 // ── SETTINGS ──
 async function getSettings() {
-  const data = await supabaseFetch('settings?select=*');
-  if (Array.isArray(data) && data.length > 0) {
-    const settings = data[0];
-    const mapped = {
-      takeawayFee: Number(settings.takeaway_fee) || 0
-    };
-    const local = readLocalDb();
-    local.settings = mapped;
-    writeLocalDb(local);
-    return mapped;
+  try {
+    const data = await supabaseFetch('settings?select=*');
+    if (Array.isArray(data) && data.length > 0) {
+      const settings = data[0];
+      const mapped = {
+        takeawayFee: Number(settings.takeaway_fee) || 0
+      };
+      const local = readLocalDb();
+      local.settings = mapped;
+      writeLocalDb(local);
+      return mapped;
+    }
+  } catch (e) {
+    console.warn('Supabase getSettings warning:', e.message);
   }
   const local = readLocalDb();
   return local.settings || { takeawayFee: 0 };
 }
 
 async function updateSettings(settings) {
+  const takeawayFee = Number(settings.takeawayFee) || 0;
   const payload = {
-    takeaway_fee: Number(settings.takeawayFee) || 0
+    takeaway_fee: takeawayFee
   };
 
-  // First try to fetch existing settings
-  const existing = await supabaseFetch('settings?select=*');
-  if (Array.isArray(existing) && existing.length > 0) {
-    // Update existing
-    await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
-  } else {
-    // Create new
-    await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
+  try {
+    // First try to fetch existing settings from Supabase
+    const existing = await supabaseFetch('settings?select=*');
+    if (Array.isArray(existing) && existing.length > 0) {
+      await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
+    } else {
+      await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
+    }
+  } catch (e) {
+    console.warn('Supabase updateSettings warning:', e.message);
   }
 
   const local = readLocalDb();
-  local.settings = { takeawayFee: Number(settings.takeawayFee) || 0 };
+  local.settings = { takeawayFee };
   writeLocalDb(local);
   return { success: true, data: local.settings };
 }
