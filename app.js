@@ -3674,7 +3674,7 @@ function switchPortal(portal) {
     if (floatBar) floatBar.classList.add('hidden');
     const adminView = document.getElementById('view-admin');
     if (adminView) adminView.classList.add('active');
-    switchAdminSubTab(APP_STATE.adminSubTab || 'overview');
+    switchAdminSubTab(APP_STATE.adminSubTab || 'items');
     const isCleanAdmin = window.location.pathname.endsWith('/admin');
     if (isCleanAdmin) {
       if (window.location.hash) history.replaceState(null, '', window.location.pathname);
@@ -4965,9 +4965,12 @@ function toast(msg, duration = 2400) {
 function switchAdminSubTab(subTab) {
   APP_STATE.adminSubTab = subTab;
 
-  // Update tab buttons
-  document.querySelectorAll('.admin-subtab').forEach(btn => btn.classList.remove('active'));
+  // Update tab buttons — support both .admin-subtab (legacy) and .admin-tab (current HTML)
+  document.querySelectorAll('.admin-subtab, .admin-tab').forEach(btn => btn.classList.remove('active'));
+  // Legacy id-based highlight
   document.getElementById(`asub-${subTab}`)?.classList.add('active');
+  // Current HTML: buttons have data-pane attribute
+  document.querySelector(`.admin-tab[data-pane="${subTab}"]`)?.classList.add('active');
 
   // Update sub-pane visibility
   document.querySelectorAll('.admin-subpane').forEach(p => p.classList.remove('active'));
@@ -4990,6 +4993,11 @@ function switchAdminSubTab(subTab) {
   }
 
   refreshLucideIcons();
+}
+
+// Alias used by HTML onclick="switchAdminPane(...)"
+function switchAdminPane(pane) {
+  switchAdminSubTab(pane);
 }
 
 // ── Render Items CRUD List ──
