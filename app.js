@@ -1713,6 +1713,7 @@ let APP_STATE = {
   adminStatusFilter: 'all',     // 'all', 'received', 'preparing', 'ready', 'completed', 'cancelled'
   adminSearchQuery: '',
   audioEnabled: true,
+  settings: { takeawayFee: 0 }, // Global settings from backend
   sheet: {
     product: null,
     selections: {},
@@ -2054,6 +2055,19 @@ const API = (() => {
       try {
         return await req('DELETE', `/tables/${encodeURIComponent(id)}`);
       } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    // ── Settings ──
+    async getSettings() {
+      try {
+        const r = await req('GET', '/settings');
+        return r.data || { takeawayFee: 0 };
+      } catch { return { takeawayFee: 0 }; }
+    },
+    async updateSettings(settings) {
+      try {
+        return await req('PUT', '/settings', settings);
+      } catch (e) { return { success: false, error: e.message }; }
     }
   };
 })();
@@ -2061,12 +2075,13 @@ const API = (() => {
 // ══ SYNC LIVE DATA FROM REAL DATABASE ══
 async function syncDataFromBackend(showToast = false) {
   try {
-    const [cats, prods, orders, extrasData, tablesData] = await Promise.all([
+    const [cats, prods, orders, extrasData, tablesData, settingsData] = await Promise.all([
       API.getCategories(),
       API.getProducts(),
       API.getOrders(),
       API.getExtras(),
-      API.getTables()
+      API.getTables(),
+      API.getSettings()
     ]);
 
     if (cats && cats.length > 0) {
@@ -2094,6 +2109,9 @@ async function syncDataFromBackend(showToast = false) {
           try { localStorage.setItem('alemaya_active_table', JSON.stringify(refreshed)); } catch {}
         }
       }
+    }
+    if (settingsData) {
+      APP_STATE.settings = settingsData;
     }
 
     populateAdminCategoryDropdowns();
@@ -3115,8 +3133,9 @@ function getCartCalculations() {
     count += q;
   });
   const service = 0; // No service fee
-  const total = subtotal + service;
-  return { subtotal, service, total, count };
+  const takeawayFee = (APP_STATE.orderType === 'Takeaway') ? (Number(APP_STATE.settings?.takeawayFee) || 0) : 0;
+  const total = subtotal + service + takeawayFee;
+  return { subtotal, service, takeawayFee, total, count };
 }
 
 function updateCartUI() {
@@ -3189,7 +3208,7 @@ function renderCart() {
   if (pendingSection) pendingSection.style.display = 'block';
   if (!wrap) return;
 
-  const { subtotal, service, total, count } = getCartCalculations();
+  const { subtotal, service, takeawayFee, total, count } = getCartCalculations();
 
   if (APP_STATE.cart.length === 0) {
     wrap.innerHTML = `
@@ -3250,6 +3269,17 @@ function renderCart() {
     document.getElementById('sum-subtotal').textContent = formatMoney(subtotal);
     document.getElementById('sum-total').textContent = formatMoney(total);
     document.getElementById('sum-ordertype-label').textContent = APP_STATE.orderType;
+    
+    // Show/hide takeaway fee row
+    const takeawayRow = document.getElementById('sum-takeaway-row');
+    const takeawayFeeEl = document.getElementById('sum-takeaway-fee');
+    if (takeawayFee > 0 && APP_STATE.orderType === 'Takeaway') {
+      if (takeawayRow) takeawayRow.style.display = 'flex';
+      if (takeawayFeeEl) takeawayFeeEl.textContent = formatMoney(takeawayFee);
+    } else {
+      if (takeawayRow) takeawayRow.style.display = 'none';
+    }
+    
     renderCartCheckoutTableSlot();
   }
 
@@ -3267,7 +3297,7 @@ async function placeOrder() {
     return;
   }
 
-  const { total, subtotal, service, count } = getCartCalculations();
+  const { total, subtotal, service, takeawayFee, count } = getCartCalculations();
   const orderId = 'AG-' + Math.floor(1000 + Math.random() * 9000);
   const now = new Date();
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -3347,6 +3377,7 @@ async function placeOrder() {
     items: JSON.parse(JSON.stringify(APP_STATE.cart)),
     subtotal: subtotal,
     service: service,
+    takeawayFee: takeawayFee || 0,
     total: total,
     status: 'orders',         // 'orders' (placed) -> 'cooking' -> 'ready' -> 'completed'
     statusLabel: 'Order Placed',
@@ -4992,6 +5023,8 @@ function switchAdminSubTab(subTab) {
     renderAdminOrdersSubpane();
   } else if (subTab === 'tables') {
     renderAdminTablesCrud();
+  } else if (subTab === 'settings') {
+    renderAdminSettings();
   }
 
   refreshLucideIcons();
@@ -6713,6 +6746,76 @@ async function printPosterDirect() {
   } catch (err) {
     console.error('Print Error:', err);
     toast('⚠️ Error generating print poster: ' + err.message, 3000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ADMIN SETTINGS MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════
+
+// ── Render Settings Pane ──
+function renderAdminSettings() {
+  const input = document.getElementById('takeaway-fee-input');
+  if (input) {
+    input.value = APP_STATE.settings?.takeawayFee || 0;
+  }
+}
+
+// ── Save Takeaway Fee ──
+async function saveTakeawayFee(event) {
+  if (event) event.preventDefault();
+  
+  const input = document.getElementById('takeaway-fee-input');
+  const statusEl = document.getElementById('settings-save-status');
+  
+  if (!input) return;
+  
+  const takeawayFee = parseFloat(input.value) || 0;
+  
+  try {
+    const result = await API.updateSettings({ takeawayFee });
+    
+    if (result.success !== false) {
+      APP_STATE.settings.takeawayFee = takeawayFee;
+      
+      // Show success message
+      if (statusEl) {
+        statusEl.style.display = 'inline';
+        statusEl.textContent = '✓ Settings saved successfully';
+        statusEl.style.color = '#059669';
+        
+        setTimeout(() => {
+          statusEl.style.display = 'none';
+        }, 3000);
+      }
+      
+      toast('Settings saved successfully');
+      
+      // Update cart if it exists and order type is takeaway
+      if (APP_STATE.cart.length > 0) {
+        updateCartUI();
+        renderCart();
+      }
+      
+      // Broadcast to other tabs
+      if (SYNC_CHANNEL) {
+        SYNC_CHANNEL.postMessage({ type: 'SETTINGS_UPDATE', settings: APP_STATE.settings });
+      }
+    } else {
+      throw new Error(result.error || 'Failed to save settings');
+    }
+  } catch (err) {
+    console.error('Save settings error:', err);
+    if (statusEl) {
+      statusEl.style.display = 'inline';
+      statusEl.textContent = '✗ Error saving settings';
+      statusEl.style.color = '#DC2626';
+      
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 3000);
+    }
+    toast('Error saving settings: ' + err.message);
   }
 }
 

@@ -139,6 +139,7 @@ async function handleRequest(req, res) {
             "/api/extras",
             "/api/tables",
             "/api/stats",
+            "/api/settings",
             "/api/cloudinary-config"
           ]
         });
@@ -345,6 +346,7 @@ async function handleRequest(req, res) {
             items: body.items || [],
             subtotal: Number(body.subtotal) || 0,
             service: Number(body.service) || 0,
+            takeawayFee: Number(body.takeawayFee) || 0,
             total: Number(body.total) || 0,
             status: body.status || 'received',
             statusLabel: body.statusLabel || 'Order Received',
@@ -506,6 +508,18 @@ async function handleRequest(req, res) {
           await supabaseDb.deleteTable(id);
           return sendJson(res, 200, { success: true, message: 'Table deleted' });
         }
+      }
+
+      // ── 3.6 SETTINGS (TAKEAWAY FEE) ──
+      if (pathname === '/api/settings' && req.method === 'GET') {
+        const settings = await supabaseDb.getSettings();
+        return sendJson(res, 200, { success: true, data: settings });
+      }
+
+      if (pathname === '/api/settings' && req.method === 'PUT') {
+        const body = await parseJsonBody(req);
+        const result = await supabaseDb.updateSettings(body);
+        return sendJson(res, 200, result);
       }
 
       // ── 4. ANALYTICS & STATS (REAL SUPABASE LIVE METRICS) ──

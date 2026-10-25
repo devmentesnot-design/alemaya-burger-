@@ -1812,5 +1812,8 @@
       "capacity": 4,
       "createdAt": 1792688700000
     }
-  ]
+  ],
+  "settings": {
+    "takeawayFee": 0
+  }
 }

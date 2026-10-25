@@ -48,9 +48,9 @@ function readLocalDb() {
     if (fs.existsSync(altPath)) {
       return JSON.parse(fs.readFileSync(altPath, 'utf-8'));
     }
-    return bundledDb || { categories: [], products: [], orders: [], extras: [] };
+    return bundledDb || { categories: [], products: [], orders: [], extras: [], settings: { takeawayFee: 0 } };
   } catch (err) {
-    return bundledDb || { categories: [], products: [], orders: [], extras: [] };
+    return bundledDb || { categories: [], products: [], orders: [], extras: [], settings: { takeawayFee: 0 } };
   }
 }
 
@@ -249,6 +249,7 @@ async function getOrders() {
         items: Array.isArray(o.items) ? o.items : [],
         subtotal: Number(o.subtotal) || 0,
         service: Number(o.service) || 0,
+        takeawayFee: Number(o.takeaway_fee) || 0,
         total: Number(o.total) || 0,
         status: o.status || 'received',
         statusLabel: o.status_label || 'Order Received',
@@ -278,6 +279,7 @@ async function createOrder(order) {
     items: order.items || [],
     subtotal: Number(order.subtotal) || 0,
     service: Number(order.service) || 0,
+    takeaway_fee: Number(order.takeawayFee) || 0,
     total: Number(order.total) || 0,
     status: order.status || 'received',
     status_label: order.statusLabel || 'Order Received',
@@ -298,6 +300,7 @@ async function createOrder(order) {
       items: order.items || [],
       subtotal: Number(order.subtotal) || 0,
       service: Number(order.service) || 0,
+      takeaway_fee: Number(order.takeawayFee) || 0,
       total: Number(order.total) || 0,
       status: order.status || 'received',
       status_label: order.statusLabel || 'Order Received'
@@ -604,6 +607,44 @@ async function getTableByToken(token) {
   return null;
 }
 
+// ── SETTINGS ──
+async function getSettings() {
+  const data = await supabaseFetch('settings?select=*');
+  if (Array.isArray(data) && data.length > 0) {
+    const settings = data[0];
+    const mapped = {
+      takeawayFee: Number(settings.takeaway_fee) || 0
+    };
+    const local = readLocalDb();
+    local.settings = mapped;
+    writeLocalDb(local);
+    return mapped;
+  }
+  const local = readLocalDb();
+  return local.settings || { takeawayFee: 0 };
+}
+
+async function updateSettings(settings) {
+  const payload = {
+    takeaway_fee: Number(settings.takeawayFee) || 0
+  };
+
+  // First try to fetch existing settings
+  const existing = await supabaseFetch('settings?select=*');
+  if (Array.isArray(existing) && existing.length > 0) {
+    // Update existing
+    await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
+  } else {
+    // Create new
+    await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
+  }
+
+  const local = readLocalDb();
+  local.settings = { takeawayFee: Number(settings.takeawayFee) || 0 };
+  writeLocalDb(local);
+  return { success: true, data: local.settings };
+}
+
 module.exports = {
   getCategories,
   saveCategory,
@@ -628,5 +669,7 @@ module.exports = {
   patchTable,
   regenerateTableToken,
   deleteTable,
-  getTableByToken
+  getTableByToken,
+  getSettings,
+  updateSettings
 };
