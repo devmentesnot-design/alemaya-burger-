@@ -2591,12 +2591,12 @@ function createVerticalCard(p) {
   const priceHtml = hasDiscount
     ? `<div class="vert-price-wrap">
          <span class="vert-price-original">${formatMoney(p.basePrice)}</span>
-         <span class="vert-price-discounted">${formatMoney(p.discountPrice)}<span class="vert-sale-badge">SALE</span></span>
+         <span class="vert-price-discounted">${formatMoney(p.discountPrice)}<span class="vert-sale-badge">DISCOUNT</span></span>
        </div>`
     : `<span class="vert-price">${formatMoney(p.basePrice)}</span>`;
 
   const saleBadgeHtml = hasDiscount
-    ? `<span class="vert-badge" style="background:#FEF2F2;color:#EF4444;border-color:#FCA5A5;">SALE</span>`
+    ? '' // No top badge for discounted items
     : (p.badge ? `<span class="vert-badge">${escapeHtml(p.badge)}</span>` : '');
 
   card.innerHTML = `
@@ -2870,7 +2870,7 @@ function renderSheetContent() {
     ? `<div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin:6px 0;">
          <span class="sheet-prod-price-original">${formatMoney(p.basePrice)}</span>
          <span class="sheet-prod-price-discounted" id="sheet-single-price">${formatMoney(calculateUnitItemPrice())}</span>
-         <span class="sheet-sale-badge">SALE</span>
+         <span class="sheet-sale-badge">DISCOUNT</span>
        </div>`
     : `<div class="sheet-prod-price" id="sheet-single-price">${formatMoney(calculateUnitItemPrice())}</div>`;
 

@@ -99,24 +99,6 @@
   ],
   "products": [
     {
-      "id": "item_60",
-      "categoryId": "superjuice",
-      "name": "Energy Booster",
-      "badge": "REVITALIZE",
-      "rating": 4.8,
-      "reviewsCount": 263,
-      "description": "Carrot, beetroot, apple and ginger.",
-      "ingredients": [
-        "Carrot",
-        "beetroot",
-        "apple and ginger"
-      ],
-      "basePrice": 239,
-      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
-      "available": true,
-      "customizations": []
-    },
-    {
       "id": "item_61",
       "categoryId": "superjuice",
       "name": "Cool Refresh",
@@ -129,6 +111,7 @@
         "mint and lemon"
       ],
       "basePrice": 219,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -147,6 +130,7 @@
         "mint and honey"
       ],
       "basePrice": 219,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -165,6 +149,7 @@
         "milk and honey"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -183,6 +168,7 @@
         "strawberry and honey"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -201,6 +187,7 @@
         "apple and honey"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -221,6 +208,7 @@
         "mint and honey"
       ],
       "basePrice": 259,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -238,6 +226,7 @@
         "carrot and orange"
       ],
       "basePrice": 229,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -257,6 +246,7 @@
         "and honey"
       ],
       "basePrice": 259,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -275,6 +265,7 @@
         "mango and honey"
       ],
       "basePrice": 229,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -293,6 +284,7 @@
         "avocado and honey"
       ],
       "basePrice": 269,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -311,6 +303,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 229,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -329,6 +322,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -347,6 +341,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -365,6 +360,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -383,6 +379,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -401,6 +398,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -419,6 +417,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 229,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -437,6 +436,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -455,6 +455,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 199,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -473,6 +474,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 249,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -491,6 +493,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 199,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -509,6 +512,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 239,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -527,6 +531,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 199,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -546,6 +551,7 @@
         "peanut and honey"
       ],
       "basePrice": 259,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -566,6 +572,26 @@
         "cucumber and honey"
       ],
       "basePrice": 250,
+      "discountPrice": 0,
+      "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+      "available": true,
+      "customizations": []
+    },
+    {
+      "id": "item_60",
+      "categoryId": "superjuice",
+      "name": "Energy Booster",
+      "badge": "REVITALIZE",
+      "rating": 4.8,
+      "reviewsCount": 10,
+      "description": "Carrot, beetroot, apple and ginger.",
+      "ingredients": [
+        "Carrot",
+        "beetroot",
+        "apple and ginger"
+      ],
+      "basePrice": 239,
+      "discountPrice": 200,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -584,6 +610,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 809,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -602,6 +629,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 569,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -620,6 +648,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 369,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -638,6 +667,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 499,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -656,6 +686,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 899,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
       "available": true,
       "customizations": []
@@ -674,6 +705,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 699,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
       "available": true,
       "customizations": []
@@ -692,6 +724,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 799,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
       "available": true,
       "customizations": []
@@ -710,6 +743,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 799,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792959026/alemaya-burger/qwog7by3m0qidafhbe4y.jpg",
       "available": true,
       "customizations": []
@@ -728,6 +762,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 869,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
       "available": true,
       "customizations": []
@@ -746,6 +781,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 689,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
       "available": true,
       "customizations": []
@@ -764,6 +800,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 599,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
       "available": true,
       "customizations": []
@@ -782,6 +819,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 649,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
       "available": true,
       "customizations": []
@@ -800,6 +838,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 469,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
       "available": true,
       "customizations": []
@@ -818,6 +857,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 449,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -836,6 +876,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 799,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -854,6 +895,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 309,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -872,6 +914,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 409,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -890,6 +933,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 709,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -908,6 +952,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 1066,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -926,6 +971,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 966,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -944,6 +990,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 899,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -962,6 +1009,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 1099,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -980,6 +1028,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 566,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -998,6 +1047,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 569,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1016,6 +1066,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 659,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1034,6 +1085,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 500,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1052,6 +1104,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 579,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1070,6 +1123,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 449,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1088,6 +1142,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 229,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1106,6 +1161,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 329,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1124,6 +1180,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 379,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1142,6 +1199,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 1379,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1160,6 +1218,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 999,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1178,6 +1237,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 789,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
       "available": true,
       "customizations": []
@@ -1196,6 +1256,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 439,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1214,6 +1275,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 309,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1233,6 +1295,7 @@
         "and yogurt"
       ],
       "basePrice": 469,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1251,6 +1314,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 369,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1269,6 +1333,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 399,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1287,6 +1352,7 @@
         "and jalapeño peppers"
       ],
       "basePrice": 369,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1305,6 +1371,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 399,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1323,6 +1390,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 449,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1342,6 +1410,7 @@
         "and melted cheese"
       ],
       "basePrice": 799,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656240/alemaya-burger/burrito_bowl.jpg",
       "available": true,
       "customizations": []
@@ -1360,6 +1429,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 249,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -1377,6 +1447,7 @@
         "served with maple drizzle and fresh fruit"
       ],
       "basePrice": 299,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -1395,6 +1466,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 199,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
       "available": true,
       "customizations": []
@@ -1413,6 +1485,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 149,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1431,6 +1504,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 169,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1449,6 +1523,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 45,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1467,6 +1542,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 269,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1485,6 +1561,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 79,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1503,6 +1580,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 59,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1521,6 +1599,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 149,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
       "available": true,
       "customizations": []
@@ -1541,6 +1620,7 @@
         "banana and honey"
       ],
       "basePrice": 259,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -1559,6 +1639,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 269,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -1578,6 +1659,7 @@
         "and Guava)"
       ],
       "basePrice": 279,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -1596,6 +1678,7 @@
         "Fresh Ingredients"
       ],
       "basePrice": 419,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656234/alemaya-burger/pasta_carbonara.jpg",
       "available": true,
       "customizations": []
@@ -1617,6 +1700,7 @@
         "flax and honey"
       ],
       "basePrice": 259,
+      "discountPrice": 0,
       "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
       "available": true,
       "customizations": []
@@ -1856,6 +1940,6 @@
     }
   ],
   "settings": {
-    "takeawayFee": 76
+    "takeawayFee": 50
   }
 }
