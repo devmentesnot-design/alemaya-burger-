@@ -1624,6 +1624,36 @@
   ],
   "orders": [
     {
+      "id": "AG-9650",
+      "timestamp": "08:16 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792948613095,
+      "orderType": "Dine-in",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Grilled Special Burger",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+          "total": 799,
+          "extras": [],
+          "basePrice": 799,
+          "productId": "item_1",
+          "unitPrice": 799,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 799,
+      "service": 0,
+      "total": 799,
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    },
+    {
       "id": "AG-6500",
       "timestamp": "07:42 PM",
       "date": "2026-10-25",
