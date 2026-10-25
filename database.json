@@ -1624,6 +1624,176 @@
   ],
   "orders": [
     {
+      "id": "AG-2758",
+      "timestamp": "06:56 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792943780162,
+      "orderType": "Dine-in (Table 08)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Pan Cake",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+          "total": 249,
+          "extras": [],
+          "basePrice": 249,
+          "productId": "item_46",
+          "unitPrice": 249,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 249,
+      "service": 0,
+      "total": 249,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-08",
+      "tableName": "Table 08",
+      "tableToken": "08"
+    },
+    {
+      "id": "AG-5311",
+      "timestamp": "06:54 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792943661805,
+      "orderType": "Dine-in",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Muscle Building",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+          "total": 259,
+          "extras": [],
+          "basePrice": 259,
+          "productId": "item_58",
+          "unitPrice": 259,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 259,
+      "service": 0,
+      "total": 259,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": null,
+      "tableName": null,
+      "tableToken": null
+    },
+    {
+      "id": "AG-9106",
+      "timestamp": "06:53 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792943604283,
+      "orderType": "Dine-in (Table 08)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Grilled Special Burger",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+          "total": 968,
+          "extras": [
+            {
+              "id": "ext_beef",
+              "name": "Extra Flame Grilled Beef Patty",
+              "price": 169
+            }
+          ],
+          "basePrice": 799,
+          "productId": "item_1",
+          "unitPrice": 968,
+          "selections": {
+            "extras_addons": [
+              "ext_beef"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 968,
+      "service": 0,
+      "total": 968,
+      "status": "ready",
+      "statusLabel": "Ready",
+      "tableId": "table-08",
+      "tableName": "Table 08",
+      "tableToken": "08"
+    },
+    {
+      "id": "AG-3538",
+      "timestamp": "06:52 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792943541171,
+      "orderType": "Dine-in (Table 08)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Grilled Special Burger",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+          "total": 799,
+          "extras": [],
+          "basePrice": 799,
+          "productId": "item_1",
+          "unitPrice": 799,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 799,
+      "service": 0,
+      "total": 799,
+      "status": "cooking",
+      "statusLabel": "Cooking",
+      "tableId": "table-08",
+      "tableName": "Table 08",
+      "tableToken": "08"
+    },
+    {
+      "id": "AG-3900",
+      "timestamp": "06:49 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792943375064,
+      "orderType": "Dine-in (Table 08)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Apple Burst",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+          "total": 318,
+          "extras": [
+            {
+              "id": "ext_honey",
+              "name": "Organic Pure Honey",
+              "price": 59
+            }
+          ],
+          "basePrice": 259,
+          "productId": "item_66",
+          "unitPrice": 318,
+          "selections": {
+            "extras_addons": [
+              "ext_honey"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 318,
+      "service": 0,
+      "total": 318,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-08",
+      "tableName": "Table 08",
+      "tableToken": "08"
+    },
+    {
       "id": "AG-7022",
       "timestamp": "06:43 PM",
       "date": "2026-10-25",
