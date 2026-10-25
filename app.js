@@ -2323,12 +2323,16 @@ function handleHashRouting() {
 
   if (isKitchenRoute) {
     if (!sessionStorage.getItem('staff_auth_kitchen')) {
+      // Block navigateTo while auth modal is open
+      APP_STATE.portal = 'pending_kitchen';
       promptStaffPassword('kitchen');
     } else {
       switchPortal('chef');
     }
   } else if (isAdminRoute) {
     if (!sessionStorage.getItem('staff_auth_admin')) {
+      // Block navigateTo while auth modal is open
+      APP_STATE.portal = 'pending_admin';
       promptStaffPassword('admin');
     } else {
       switchPortal('admin');
@@ -2336,8 +2340,8 @@ function handleHashRouting() {
   } else if (isOrdersRoute) {
     navigateTo('orders');
   } else {
-    // Only navigate to menu if we're not in a staff portal
-    if (APP_STATE.portal === 'customer' || hash === 'menu' || !hash) {
+    // Only navigate to menu if we're not in a staff portal (or pending auth)
+    if (APP_STATE.portal === 'customer' || hash === 'menu' || (!hash && !path.includes('/admin') && !path.includes('/kitchen') && !path.includes('/chef'))) {
       navigateTo('menu');
     }
   }
@@ -2441,18 +2445,25 @@ function cancelStaffAuth() {
   const isKitchen = portal === 'kitchen' || portal === 'chef';
   const isAuth = sessionStorage.getItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'));
   if (!isAuth) {
+    // Reset to customer portal (was pending_admin or pending_kitchen)
     APP_STATE.portal = 'customer';
     const appEl = document.getElementById('app');
     if (appEl) {
-      appEl.classList.remove('portal-chef', 'portal-admin');
+      appEl.classList.remove('portal-chef', 'portal-admin', 'portal-pending_admin', 'portal-pending_kitchen');
       appEl.classList.add('portal-customer');
     }
     const bottomNav = document.getElementById('bottom-nav');
     if (bottomNav) bottomNav.style.display = 'flex';
-    navigateTo('menu');
-    if (window.location.hash === '#kitchen' || window.location.hash === '#chef' || window.location.hash === '#admin') {
+    // Redirect away from the staff path so navigation works properly
+    const staffPaths = ['/admin', '/kitchen', '/chef'];
+    const currentPath = window.location.pathname || '/';
+    const isStaffPath = staffPaths.some(p => currentPath.endsWith(p) || currentPath.includes(p));
+    if (isStaffPath) {
+      history.replaceState(null, '', '/#menu');
+    } else if (window.location.hash === '#kitchen' || window.location.hash === '#chef' || window.location.hash === '#admin') {
       history.replaceState(null, '', '#menu');
     }
+    navigateTo('menu');
   }
 }
 
@@ -2693,8 +2704,9 @@ function createVerticalCard(p) {
 
 // ══ NAVIGATION (BOTTOM NAV: MENU & ORDERS TABS) ══
 function navigateTo(tab) {
-  // Don't navigate customer tabs if we're in a staff portal (prevents syncDataFromBackend from resetting portal)
-  if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.portal === 'kitchen') {
+  // Don't navigate customer tabs if we're in a staff portal or pending auth (prevents resetting portal)
+  if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.portal === 'kitchen' ||
+      APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen') {
     return;
   }
 

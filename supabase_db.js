@@ -480,7 +480,10 @@ function generateSecureToken() {
 }
 
 async function getTables() {
-  const data = await supabaseFetch('tables?select=*&order=number.asc');
+  // Try ordering by number first (if column exists), fall back to name
+  let data = await supabaseFetch('tables?select=*&order=name.asc').catch(() => null);
+  if (!data) data = await supabaseFetch('tables?select=*').catch(() => null);
+
   if (Array.isArray(data) && data.length > 0) {
     const mapped = data.map(t => ({
       id: t.id,
