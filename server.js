@@ -644,6 +644,12 @@ async function handleRequest(req, res) {
       const rootAsset = path.join(__dirname, baseName);
       if (fs.existsSync(rootAsset) && fs.statSync(rootAsset).isFile()) {
         filePath = rootAsset;
+      } else {
+        // Also check public/ subfolder (e.g. /qr-generator.html -> public/qr-generator.html)
+        const publicAsset = path.join(__dirname, 'public', baseName);
+        if (fs.existsSync(publicAsset) && fs.statSync(publicAsset).isFile()) {
+          filePath = publicAsset;
+        }
       }
     }
 

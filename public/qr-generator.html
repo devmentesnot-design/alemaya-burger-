@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alemaya Grill’d — Table QR Generator</title>
+<style>
+:root{--brown:#4b1d0b;--orange:#ff650c;--cream:#fff8e7;--muted:#735342}
+*{box-sizing:border-box}body{margin:0;background:#f4eee5;color:var(--brown);font-family:Inter,Arial,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:28px 18px 40px}
+h1{font-size:clamp(24px,3vw,36px);margin:0 0 8px;letter-spacing:-.7px}
+.intro{margin:0 0 24px;color:#795d4b;line-height:1.5}
+.layout{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:24px;align-items:start}
+.panel{background:#fffdf8;border:1px solid #e8d9c8;border-radius:18px;padding:22px;box-shadow:0 8px 28px #4b1d0b0c}
+label{display:block;font-weight:750;font-size:14px;margin:16px 0 7px}
+input{width:100%;border:1px solid #d9c7b7;border-radius:10px;padding:13px 12px;font:inherit;color:var(--brown);background:#fff}
+input:focus{outline:3px solid #ff650c30;border-color:var(--orange)}
+button{border:0;border-radius:11px;padding:13px 16px;font-weight:750;font-size:14px;cursor:pointer}
+.primary{background:var(--orange);color:white;width:100%;margin-top:18px}
+.secondary{background:var(--brown);color:white}
+button:disabled{opacity:.55;cursor:not-allowed}
+.hint{font-size:12px;color:#8a7465;line-height:1.5;margin:9px 0 0}
+.status{font-size:13px;min-height:20px;margin-top:12px;color:#7b3514}
+.preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.preview-head h2{font-size:17px;margin:0}
+.preview-wrap{width:min(100%,520px);margin:0 auto;background:white;border-radius:10px;overflow:hidden;box-shadow:0 12px 34px #4b1d0b1c}
+.poster{position:relative;width:100%;aspect-ratio:2/3;background:#fff8e7}
+.poster-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+.qr-slot{position:absolute;left:30.1%;top:47.55%;width:39.8%;height:25.2%;display:flex;align-items:center;justify-content:center}
+.qr-slot img,.qr-slot canvas{width:82%;height:auto;aspect-ratio:1;image-rendering:pixelated}
+.table-no{position:absolute;left:56.2%;top:39.1%;width:12.3%;height:4.9%;display:flex;align-items:center;justify-content:center;text-align:center;color:#fffaf0;font-weight:800;font-size:clamp(12px,2.3vw,22px);letter-spacing:.5px;white-space:nowrap;overflow:hidden}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.preview-wrap{width:min(100%,440px)}main{padding-top:20px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Alemaya Grill’d QR Poster Generator</h1>
+  <p class="intro">Enter your menu/order link and table number. The QR code and table number will be placed on your poster, ready to export as a PNG.</p>
+  <div class="layout">
+    <section class="panel">
+      <form id="generator">
+        <label for="menuUrl">Menu / order link</label>
+        <input id="menuUrl" type="url" placeholder="https://example.com/menu" required>
+        <label for="tableNo">Table number</label>
+        <input id="tableNo" type="text" placeholder="e.g. 01" maxlength="8" required>
+        <button class="primary" type="submit">Generate QR &amp; Preview</button>
+      </form>
+      <button id="download" class="secondary" style="width:100%;margin-top:10px" disabled>Download full poster PNG</button>
+      <p class="hint">Tip: use the complete link including <b>https://</b>. The QR code encodes <b>your link + ?table=X</b> so the chef sees the table when a customer scans and orders. Download is a full-size 1024 × 1536 PNG.</p>
+      <div id="scannable-box" style="display:none;margin-top:10px;background:#fff8e7;border:1px solid #e8d9c8;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.05em;color:#4b1d0b;margin-bottom:4px;">SCANNABLE CUSTOMER LINK:</div>
+        <code id="scannable-url" style="color:#ff650c;font-size:13px;word-break:break-all;"></code>
+      </div>
+      <div id="status" class="status" role="status">Enter your link and table number to begin.</div>
+    </section>
+    <section class="panel">
+      <div class="preview-head"><h2>Live poster preview</h2><span style="font-size:12px;color:#8a7465">Portrait · 2:3</span></div>
+      <div class="preview-wrap">
+        <div class="poster" id="poster">
+          <img class="poster-bg" id="posterBg" alt="Alemaya Grill’d poster background">
+          <div class="table-no" id="tableOverlay"></div>
+          <div class="qr-slot" id="qrSlot"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+const bgData = '/poster_bg.png';
+document.getElementById('posterBg').src = bgData;
+const form = document.getElementById('generator');
+const urlInput = document.getElementById('menuUrl');
+const tableInput = document.getElementById('tableNo');
+const qrSlot = document.getElementById('qrSlot');
+const tableOverlay = document.getElementById('tableOverlay');
+const status = document.getElementById('status');
+const downloadBtn = document.getElementById('download');
+let qrReady = false;
+function loadQrLib(){
+  return new Promise((resolve,reject)=>{
+    if(window.QRCode){resolve();return}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    s.onload=resolve;s.onerror=()=>reject(new Error('Could not load QR generator. Check your internet connection and reload.'));
+    document.head.appendChild(s);
+  });
+}
+form.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const baseLink=urlInput.value.trim(), table=tableInput.value.trim();
+  if(!baseLink||!table)return;
+  // Build the scannable URL: base + ?table=X (avoid double ?)
+  const sep = baseLink.includes('?') ? '&' : '?';
+  const link = baseLink.replace(/\/?$/, '') + sep + 'table=' + encodeURIComponent(table);
+  try{
+    status.textContent='Generating QR code…';
+    await loadQrLib();
+    qrSlot.innerHTML='';
+    new QRCode(qrSlot,{text:link,width:320,height:320,colorDark:'#1b120d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+    tableOverlay.textContent=table;
+    qrReady=true;downloadBtn.disabled=false;
+    // Show scannable link
+    document.getElementById('scannable-url').textContent=link;
+    document.getElementById('scannable-box').style.display='block';
+    status.textContent='QR code ready. Check the preview, then download your PNG.';
+  }catch(err){status.textContent=err.message;qrReady=false;downloadBtn.disabled=true}
+});
+downloadBtn.addEventListener('click',async()=>{
+  if(!qrReady)return;
+  try{
+    status.textContent='Preparing full-size PNG…';
+    const W=1024,H=1536,canvas=document.createElement('canvas');
+    canvas.width=W;canvas.height=H;
+    const ctx=canvas.getContext('2d');
+    const bg=new Image();bg.crossOrigin='anonymous';bg.src=bgData;
+    await new Promise((resolve,reject)=>{if(bg.complete&&bg.naturalWidth)resolve();else{bg.onload=resolve;bg.onerror=reject}});
+    ctx.drawImage(bg,0,0,W,H);
+    const qrEl=qrSlot.querySelector('canvas')||qrSlot.querySelector('img');
+    if(!qrEl)throw new Error('QR code is not ready yet.');
+    const slotX=W*.301, slotY=H*.4755, slotW=W*.398, slotH=H*.252;
+    const qs=slotW*.82;
+    const qx=slotX+(slotW-qs)/2;
+    const qy=slotY+(slotH-qs)/2;
+    ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle='#fff';ctx.fillRect(qx-8,qy-8,qs+16,qs+16);
+    ctx.drawImage(qrEl,qx,qy,qs,qs);
+    const table=tableInput.value.trim();
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fffaf0';
+    ctx.font='800 42px Arial, sans-serif';
+    ctx.fillText(table,W*.6235,H*.4155, W*.12);
+    const a=document.createElement('a');
+    a.download='alemaya-table-'+table.replace(/[^a-z0-9_-]/gi,'_')+'.png';
+    a.href=canvas.toDataURL('image/png');a.click();
+    status.textContent='PNG downloaded successfully.';
+  }catch(err){status.textContent='Could not create PNG: '+err.message}
+});
+</script>
+</body></html>
