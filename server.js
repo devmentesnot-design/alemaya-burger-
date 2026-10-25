@@ -356,6 +356,11 @@ async function handleRequest(req, res) {
           const saved = await supabaseDb.createOrder(newOrder);
           return sendJson(res, 201, saved);
         }
+
+        if (req.method === 'DELETE') {
+          const resClear = await supabaseDb.clearAllOrders();
+          return sendJson(res, 200, resClear);
+        }
       }
 
       if (pathname.startsWith('/api/orders/')) {
@@ -368,10 +373,21 @@ async function handleRequest(req, res) {
           return sendJson(res, 200, { success: true, data: found });
         }
 
-        if (req.method === 'PATCH' || req.method === 'PUT') {
+        if (req.method === 'PATCH') {
           const body = await parseJsonBody(req);
           await supabaseDb.updateOrderStatus(orderId, body.status, body.statusLabel);
           return sendJson(res, 200, { success: true });
+        }
+
+        if (req.method === 'PUT') {
+          const body = await parseJsonBody(req);
+          const resUp = await supabaseDb.updateOrder(orderId, body);
+          return sendJson(res, 200, resUp);
+        }
+
+        if (req.method === 'DELETE') {
+          const resDel = await supabaseDb.deleteOrder(orderId);
+          return sendJson(res, 200, resDel);
         }
       }
 

@@ -1624,6 +1624,196 @@
   ],
   "orders": [
     {
+      "id": "AG-6500",
+      "timestamp": "07:42 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792946555916,
+      "orderType": "Dine-in (Table 06)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Grilled Special Pizza",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656231/alemaya-burger/pizza_margherita.jpg",
+          "total": 899,
+          "extras": [],
+          "basePrice": 899,
+          "productId": "item_6",
+          "unitPrice": 899,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 899,
+      "service": 0,
+      "total": 899,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-06",
+      "tableName": "Table 06",
+      "tableToken": "06"
+    },
+    {
+      "id": "AG-1925",
+      "timestamp": "07:42 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792946525286,
+      "orderType": "Dine-in (Table 06)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Vegitable Special",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656243/alemaya-burger/smoothie_tropical.jpg",
+          "total": 259,
+          "extras": [],
+          "basePrice": 259,
+          "productId": "item_59",
+          "unitPrice": 259,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 259,
+      "service": 0,
+      "total": 259,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-06",
+      "tableName": "Table 06",
+      "tableToken": "06"
+    },
+    {
+      "id": "AG-5705",
+      "timestamp": "07:41 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792946491334,
+      "orderType": "Dine-in (Table 06)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Cheese Burger",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+          "total": 569,
+          "extras": [],
+          "basePrice": 569,
+          "productId": "item_3",
+          "unitPrice": 569,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 569,
+      "service": 0,
+      "total": 569,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-06",
+      "tableName": "Table 06",
+      "tableToken": "06"
+    },
+    {
+      "id": "AG-3882",
+      "timestamp": "07:41 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792946483245,
+      "orderType": "Dine-in (Table 06)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Cheese Burger",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
+          "total": 569,
+          "extras": [],
+          "basePrice": 569,
+          "productId": "item_3",
+          "unitPrice": 569,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 569,
+      "service": 0,
+      "total": 569,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-06",
+      "tableName": "Table 06",
+      "tableToken": "06"
+    },
+    {
+      "id": "AG-2467",
+      "timestamp": "07:33 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792945980967,
+      "orderType": "Dine-in (Table 50)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Beef with Cheese Wrap",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656221/alemaya-burger/chicken_sandwich.jpg",
+          "total": 718,
+          "extras": [
+            {
+              "id": "ext_cheese",
+              "name": "Extra Melted Cheese",
+              "price": 149
+            }
+          ],
+          "basePrice": 569,
+          "productId": "item_26",
+          "unitPrice": 718,
+          "selections": {
+            "extras_addons": [
+              "ext_cheese"
+            ]
+          },
+          "customizations": []
+        }
+      ],
+      "subtotal": 718,
+      "service": 0,
+      "total": 718,
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": "table-50",
+      "tableName": "Table 50",
+      "tableToken": "50"
+    },
+    {
+      "id": "AG-9190",
+      "timestamp": "07:32 PM",
+      "date": "2026-10-25",
+      "createdAt": 1792945960499,
+      "orderType": "Dine-in (Table 50)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Avocado Shake",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+          "total": 239,
+          "extras": [],
+          "basePrice": 239,
+          "productId": "item_72",
+          "unitPrice": 239,
+          "selections": {},
+          "customizations": []
+        }
+      ],
+      "subtotal": 239,
+      "service": 0,
+      "total": 239,
+      "status": "orders",
+      "statusLabel": "Order Placed",
+      "tableId": "table-50",
+      "tableName": "Table 50",
+      "tableToken": "50"
+    },
+    {
       "id": "AG-2758",
       "timestamp": "06:56 PM",
       "date": "2026-10-25",

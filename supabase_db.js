@@ -314,6 +314,52 @@ async function createOrder(order) {
 }
 
 
+
+async function clearAllOrders() {
+  try {
+    await supabaseFetch('orders?id=neq.__none__', 'DELETE');
+  } catch (e) {
+    console.warn('Supabase clear orders warning:', e);
+  }
+  const local = readLocalDb();
+  local.orders = [];
+  writeLocalDb(local);
+  return { success: true, message: 'All orders cleared' };
+}
+
+async function deleteOrder(id) {
+  try {
+    await supabaseFetch(`orders?id=eq.${encodeURIComponent(id)}`, 'DELETE');
+  } catch (e) {
+    console.warn('Supabase delete order warning:', e);
+  }
+  const local = readLocalDb();
+  local.orders = (local.orders || []).filter(o => o.id !== id);
+  writeLocalDb(local);
+  return { success: true, message: `Order #${id} deleted` };
+}
+
+async function updateOrder(id, orderData) {
+  const local = readLocalDb();
+  const idx = (local.orders || []).findIndex(o => o.id === id);
+  if (idx !== -1) {
+    local.orders[idx] = { ...local.orders[idx], ...orderData };
+    writeLocalDb(local);
+  }
+  try {
+    const payload = {};
+    if (orderData.items) payload.items = orderData.items;
+    if (orderData.subtotal !== undefined) payload.subtotal = orderData.subtotal;
+    if (orderData.total !== undefined) payload.total = orderData.total;
+    if (orderData.status) payload.status = orderData.status;
+    if (orderData.statusLabel) payload.status_label = orderData.statusLabel;
+    await supabaseFetch(`orders?id=eq.${encodeURIComponent(id)}`, 'PATCH', payload);
+  } catch (e) {
+    console.warn('Supabase update order warning:', e);
+  }
+  return { success: true, data: (local.orders && local.orders[idx]) ? local.orders[idx] : orderData };
+}
+
 async function updateOrderStatus(id, status, statusLabel) {
   const payload = { status };
   if (statusLabel) payload.status_label = statusLabel;
@@ -569,6 +615,9 @@ module.exports = {
   getOrders,
   createOrder,
   updateOrderStatus,
+  clearAllOrders,
+  deleteOrder,
+  updateOrder,
   getExtras,
   saveExtra,
   patchExtraStock,

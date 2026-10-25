@@ -1953,6 +1953,24 @@ const API = (() => {
       } catch (e) { return { success: false, error: e.message }; }
     },
 
+    async clearAllOrders() {
+      try {
+        return await req('DELETE', '/orders');
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    async deleteOrder(id) {
+      try {
+        return await req('DELETE', `/orders/${encodeURIComponent(id)}`);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
+    async updateOrder(id, orderData) {
+      try {
+        return await req('PUT', `/orders/${encodeURIComponent(id)}`, orderData);
+      } catch (e) { return { success: false, error: e.message }; }
+    },
+
     // ── Stats ──
     // ── Extras & Add-ons CRUD ──
     async getExtras() {
@@ -2132,6 +2150,42 @@ try {
           if (APP_STATE.currentTab === 'orders') {
             renderCurrentOrders();
             renderHistory();
+          }
+        } else if (data.type === 'ALL_ORDERS_CLEARED') {
+          MASTER_ORDERS = [];
+          APP_STATE.orderHistory = [];
+          updateKitchenCounters();
+          if (APP_STATE.portal === 'chef') renderKdsTickets();
+          if (APP_STATE.portal === 'admin') {
+            renderAdminDashboard();
+            renderAdminOrdersSubpane();
+          }
+          if (APP_STATE.currentTab === 'orders') {
+            renderCurrentOrders();
+            renderHistory();
+          }
+        } else if (data.type === 'ORDER_DELETED') {
+          MASTER_ORDERS = MASTER_ORDERS.filter(o => o.id !== data.orderId);
+          APP_STATE.orderHistory = APP_STATE.orderHistory.filter(o => o.id !== data.orderId);
+          updateKitchenCounters();
+          if (APP_STATE.portal === 'chef') renderKdsTickets();
+          if (APP_STATE.portal === 'admin') renderAdminOrdersSubpane();
+          if (APP_STATE.currentTab === 'orders') {
+            renderCurrentOrders();
+            renderHistory();
+          }
+        } else if (data.type === 'ORDER_UPDATED' && data.order) {
+          const mIdx = MASTER_ORDERS.findIndex(o => o.id === data.orderId);
+          if (mIdx !== -1) MASTER_ORDERS[mIdx] = { ...MASTER_ORDERS[mIdx], ...data.order };
+          const hIdx = APP_STATE.orderHistory.findIndex(o => o.id === data.orderId);
+          if (hIdx !== -1) APP_STATE.orderHistory[hIdx] = { ...APP_STATE.orderHistory[hIdx], ...data.order };
+          if (APP_STATE.portal === 'chef') {
+            renderKdsTickets();
+            toast(`Order #${data.orderId} was updated by customer`, 3000);
+          }
+          if (APP_STATE.portal === 'admin') renderAdminOrdersSubpane();
+          if (APP_STATE.currentTab === 'orders') {
+            renderCurrentOrders();
           }
         }
         syncDataFromBackend(false);
@@ -3468,6 +3522,26 @@ function renderCurrentOrders() {
           <span>Total Amount</span>
           <span style="color:#B45309; font-size:1.05rem;">${formatMoney(ordTotal)}</span>
         </div>
+
+        ${stepNum === 1 ? `
+          <!-- Customer Edit & Cancel Actions: ONLY shown before chef starts cooking -->
+          <div class="customer-order-actions-bar">
+            <button type="button" class="btn-order-action-edit" onclick="openCustomerEditOrderModal('${ord.id}')">
+              <i data-lucide="edit-3" class="lucide-icon" style="width:14px;height:14px;"></i>
+              <span>Edit Order</span>
+            </button>
+            <button type="button" class="btn-order-action-delete" onclick="customerCancelOrder('${ord.id}')">
+              <i data-lucide="trash-2" class="lucide-icon" style="width:14px;height:14px;"></i>
+              <span>Cancel Order</span>
+            </button>
+          </div>
+        ` : `
+          <!-- Locked Notice: Once chef begins cooking, modifications are locked and buttons are removed -->
+          <div class="order-status-locked-note">
+            <i data-lucide="lock" class="lucide-icon" style="width:13px;height:13px;"></i>
+            <span>👨‍🍳 Chef is grilling your order • Modifications locked</span>
+          </div>
+        `}
       </div>
     `;
   });
@@ -6644,4 +6718,290 @@ function copyPosterUrl() {
   } else {
     toast(`Table link: ${url}`, 2500);
   }
+}
+
+
+// ══ ADMIN: CLEAR ALL ORDERS WITH CONFIRMATION ══
+async function promptClearAllOrders() {
+  const confirmed = confirm("⚠️ Are you sure you want to CLEAR ALL ORDERS from the database?\n\nThis will permanently delete all orders from the kitchen and admin history. This action cannot be undone.");
+  if (!confirmed) return;
+
+  try {
+    toast('Clearing orders from database...', 2000);
+    await API.clearAllOrders();
+    MASTER_ORDERS = [];
+    APP_STATE.orderHistory = [];
+    saveToStorage();
+    renderAdminOrdersSubpane();
+    renderAdminDashboard();
+    updateKitchenCounters();
+    if (APP_STATE.portal === 'chef') renderKdsTickets();
+    if (APP_STATE.currentTab === 'orders') {
+      renderCurrentOrders();
+      renderHistory();
+    }
+    if (SYNC_CHANNEL) {
+      try { SYNC_CHANNEL.postMessage({ type: 'ALL_ORDERS_CLEARED' }); } catch {}
+    }
+    toast('✅ All orders have been cleared from the database', 3500);
+  } catch (err) {
+    console.error('Error clearing orders:', err);
+    toast('Failed to clear orders: ' + err.message);
+  }
+}
+
+// ══ CUSTOMER: CANCEL / DELETE PRE-COOKING ORDER ══
+async function customerCancelOrder(orderId) {
+  const ord = MASTER_ORDERS.find(o => o.id === orderId) || (APP_STATE.orderHistory || []).find(o => o.id === orderId);
+  if (!ord) return;
+
+  const rawStatus = (ord.status || 'orders').toLowerCase();
+  if (rawStatus !== 'orders' && rawStatus !== 'received' && rawStatus !== 'placed') {
+    toast('👨‍🍳 The chef has already started cooking. Order can no longer be cancelled.');
+    renderCurrentOrders();
+    return;
+  }
+
+  const ok = confirm(`Are you sure you want to cancel and delete Order #${orderId}?`);
+  if (!ok) return;
+
+  closeCustomerEditOrderModal();
+
+  MASTER_ORDERS = MASTER_ORDERS.filter(o => o.id !== orderId);
+  APP_STATE.orderHistory = APP_STATE.orderHistory.filter(o => o.id !== orderId);
+  saveToStorage();
+  updateCartUI();
+  renderCurrentOrders();
+  renderHistory();
+  updateKitchenCounters();
+  if (APP_STATE.portal === 'chef') renderKdsTickets();
+  if (APP_STATE.portal === 'admin') renderAdminOrdersSubpane();
+
+  toast(`Order #${orderId} was cancelled`, 3000);
+
+  if (SYNC_CHANNEL) {
+    try {
+      SYNC_CHANNEL.postMessage({
+        type: 'ORDER_DELETED',
+        orderId: orderId
+      });
+    } catch {}
+  }
+
+  API.deleteOrder(orderId).catch(e => console.warn('Delete order error:', e));
+}
+
+// ══ CUSTOMER: EDIT & UPDATE PRE-COOKING ORDER ══
+let CURRENT_EDITING_ORDER = null;
+
+function openCustomerEditOrderModal(orderId) {
+  const ord = (APP_STATE.orderHistory || []).find(o => o.id === orderId) || MASTER_ORDERS.find(o => o.id === orderId);
+  if (!ord) {
+    toast('Order not found');
+    return;
+  }
+
+  const rawStatus = (ord.status || 'orders').toLowerCase();
+  if (rawStatus !== 'orders' && rawStatus !== 'received' && rawStatus !== 'placed') {
+    toast('👨‍🍳 The chef has already started cooking. Order modifications are locked.', 3500);
+    renderCurrentOrders();
+    return;
+  }
+
+  CURRENT_EDITING_ORDER = JSON.parse(JSON.stringify(ord));
+  renderCustomerEditOrderModal();
+
+  document.getElementById('customer-edit-order-overlay')?.classList.add('open');
+  document.getElementById('customer-edit-order-modal')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  refreshLucideIcons();
+}
+
+function closeCustomerEditOrderModal() {
+  document.getElementById('customer-edit-order-overlay')?.classList.remove('open');
+  document.getElementById('customer-edit-order-modal')?.classList.remove('open');
+  document.body.style.overflow = '';
+  CURRENT_EDITING_ORDER = null;
+}
+
+function renderCustomerEditOrderModal() {
+  const wrap = document.getElementById('customer-edit-order-content');
+  if (!wrap || !CURRENT_EDITING_ORDER) return;
+
+  const ord = CURRENT_EDITING_ORDER;
+  const items = ord.items || [];
+
+  let subtotal = 0;
+  items.forEach(i => {
+    const q = Number(i.qty) || 1;
+    const u = Number(i.unitPrice) || Number(i.basePrice) || 0;
+    subtotal += (u * q);
+  });
+  const total = subtotal;
+
+  let itemsHtml = '';
+  if (items.length === 0) {
+    itemsHtml = `
+      <div style="text-align:center; padding:24px 16px; color:#64748B;">
+        <div style="font-size:1.8rem; margin-bottom:8px;">🛒</div>
+        <p style="font-size:0.88rem; font-weight:600;">No items left in this order.</p>
+        <p style="font-size:0.75rem; margin-top:4px;">Tap Cancel Order below if you wish to remove this ticket.</p>
+      </div>
+    `;
+  } else {
+    items.forEach((item, idx) => {
+      const extras = getItemCustomizationsSummary(item);
+      const extrasStr = extras.join(' • ');
+      const uPrice = Number(item.unitPrice) || Number(item.basePrice) || 0;
+      const q = Number(item.qty) || 1;
+      const itemTotal = (uPrice * q);
+
+      itemsHtml += `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #F1F5F9; gap:10px;">
+          <div style="flex:1; min-width:0;">
+            <strong style="font-size:0.9rem; color:#0F172A; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(item.name)}</strong>
+            ${extrasStr ? `<div style="font-size:0.74rem; color:#B45309; margin-top:2px;">${escapeHtml(extrasStr)}</div>` : ''}
+            <div style="font-size:0.78rem; color:#64748B; margin-top:2px;">${formatMoney(itemTotal)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="display:inline-flex; align-items:center; background:#F1F5F9; border-radius:8px; padding:2px;">
+              <button type="button" onclick="changeCustomerEditQty(${idx}, -1)" style="width:28px; height:28px; border:none; background:#FFFFFF; border-radius:6px; font-weight:800; cursor:pointer; color:#0F172A; box-shadow:0 1px 2px rgba(0,0,0,0.06);">-</button>
+              <span style="min-width:24px; text-align:center; font-weight:700; font-size:0.85rem;">${q}</span>
+              <button type="button" onclick="changeCustomerEditQty(${idx}, 1)" style="width:28px; height:28px; border:none; background:#FFFFFF; border-radius:6px; font-weight:800; cursor:pointer; color:#0F172A; box-shadow:0 1px 2px rgba(0,0,0,0.06);">+</button>
+            </div>
+            <button type="button" onclick="removeCustomerEditItem(${idx})" title="Remove item" style="background:#FEE2E2; border:none; color:#DC2626; width:30px; height:30px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem;">
+              ✕
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  wrap.innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="font-family:var(--font-serif); font-size:1.15rem; color:#0F172A; margin:0;">Edit Order #${ord.id}</h3>
+        <span class="status-chip chip-orders" style="font-size:0.72rem;">Pending Chef</span>
+      </div>
+      <p style="font-size:0.76rem; color:#64748B; margin-top:4px;">
+        Adjust quantities or cancel before the chef starts grilling.
+      </p>
+    </div>
+
+    <div style="max-height:42vh; overflow-y:auto; margin-bottom:12px; padding-right:4px;">
+      ${itemsHtml}
+    </div>
+
+    <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:10px; padding:10px 12px; margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; font-size:0.88rem; font-weight:700; color:#92400E;">
+        <span>Updated Total</span>
+        <span style="font-size:1rem;">${formatMoney(total)}</span>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:space-between;">
+      <button type="button" onclick="customerCancelOrder('${ord.id}')" style="background:#FEF2F2; color:#DC2626; border:1px solid #FECACA; padding:10px 14px; border-radius:10px; font-weight:700; font-size:0.82rem; cursor:pointer; flex:1;">
+        Cancel Order
+      </button>
+      <button type="button" onclick="saveCustomerOrderEdits('${ord.id}')" style="background:var(--brand-terracotta, #E25D25); color:#FFFFFF; border:none; padding:10px 18px; border-radius:10px; font-weight:700; font-size:0.85rem; cursor:pointer; flex:1.5; ${items.length === 0 ? 'opacity:0.5; pointer-events:none;' : ''}">
+        Update Order ✓
+      </button>
+    </div>
+  `;
+}
+
+function changeCustomerEditQty(index, delta) {
+  if (!CURRENT_EDITING_ORDER || !CURRENT_EDITING_ORDER.items || !CURRENT_EDITING_ORDER.items[index]) return;
+  const item = CURRENT_EDITING_ORDER.items[index];
+  const newQty = (Number(item.qty) || 1) + delta;
+  if (newQty <= 0) {
+    CURRENT_EDITING_ORDER.items.splice(index, 1);
+  } else {
+    item.qty = Math.min(20, newQty);
+    const u = Number(item.unitPrice) || Number(item.basePrice) || 0;
+    item.total = u * item.qty;
+  }
+  renderCustomerEditOrderModal();
+}
+
+function removeCustomerEditItem(index) {
+  if (!CURRENT_EDITING_ORDER || !CURRENT_EDITING_ORDER.items || !CURRENT_EDITING_ORDER.items[index]) return;
+  CURRENT_EDITING_ORDER.items.splice(index, 1);
+  renderCustomerEditOrderModal();
+}
+
+async function saveCustomerOrderEdits(orderId) {
+  if (!CURRENT_EDITING_ORDER) return;
+
+  const masterOrd = MASTER_ORDERS.find(o => o.id === orderId);
+  if (masterOrd) {
+    const rawStatus = (masterOrd.status || 'orders').toLowerCase();
+    if (rawStatus !== 'orders' && rawStatus !== 'received' && rawStatus !== 'placed') {
+      alert('👨‍🍳 The chef has already started cooking this order! Modifications can no longer be accepted.');
+      closeCustomerEditOrderModal();
+      renderCurrentOrders();
+      return;
+    }
+  }
+
+  const items = CURRENT_EDITING_ORDER.items || [];
+  if (items.length === 0) {
+    if (confirm('No items left in order. Do you want to cancel this order?')) {
+      customerCancelOrder(orderId);
+      closeCustomerEditOrderModal();
+    }
+    return;
+  }
+
+  let subtotal = 0;
+  items.forEach(i => {
+    const q = Number(i.qty) || 1;
+    const u = Number(i.unitPrice) || Number(i.basePrice) || 0;
+    const t = (u * q);
+    i.total = t;
+    subtotal += t;
+  });
+  const total = subtotal;
+
+  const updatedPayload = {
+    items: items,
+    subtotal: subtotal,
+    total: total
+  };
+
+  if (masterOrd) {
+    masterOrd.items = items;
+    masterOrd.subtotal = subtotal;
+    masterOrd.total = total;
+  }
+
+  const histOrd = (APP_STATE.orderHistory || []).find(o => o.id === orderId);
+  if (histOrd) {
+    histOrd.items = items;
+    histOrd.subtotal = subtotal;
+    histOrd.total = total;
+  }
+
+  saveToStorage();
+  closeCustomerEditOrderModal();
+  renderCurrentOrders();
+  if (APP_STATE.portal === 'chef') renderKdsTickets();
+  if (APP_STATE.portal === 'admin') renderAdminOrdersSubpane();
+
+  toast(`Order #${orderId} updated successfully!`, 3000);
+
+  if (SYNC_CHANNEL) {
+    try {
+      SYNC_CHANNEL.postMessage({
+        type: 'ORDER_UPDATED',
+        orderId: orderId,
+        order: masterOrd || histOrd || CURRENT_EDITING_ORDER
+      });
+    } catch {}
+  }
+
+  API.updateOrder(orderId, updatedPayload).catch(e => {
+    console.warn('Failed to sync updated order to DB:', e);
+  });
 }
