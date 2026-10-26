@@ -3033,48 +3033,53 @@ i[data-lucide] {
 #staff-auth-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10040;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  z-index: 99990;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
+  transition: opacity 0.2s ease;
 }
 #staff-auth-overlay.open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 .staff-auth-modal {
   position: fixed;
   inset: 0;
-  z-index: 10050;
-  display: flex;
+  z-index: 99999;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 16px;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
+  transition: opacity 0.2s ease;
 }
 .staff-auth-modal.open {
-  pointer-events: auto;
-  opacity: 1;
-  visibility: visible;
+  display: flex !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 .staff-auth-card {
   width: 100%;
-  max-width: 380px;
-  background: #FFFFFF;
+  max-width: 400px;
+  background: #FFFFFF !important;
   border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08);
-  padding: 28px 24px 22px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  padding: 32px 24px 24px;
   text-align: center;
-  transform: scale(0.92);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 100000;
+  margin: auto;
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .staff-auth-modal.open .staff-auth-card {
   transform: scale(1);

@@ -2342,10 +2342,13 @@ function handleHashRouting() {
     if (!sessionStorage.getItem('staff_auth_kitchen')) {
       APP_STATE.portal = 'pending_kitchen';
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const chefView = document.getElementById('view-chef');
+      if (chefView) chefView.classList.add('active');
+      renderKdsTickets();
       if (bottomNav) bottomNav.style.display = 'none';
       if (floatBar) floatBar.classList.add('hidden');
       if (appEl) {
-        appEl.classList.remove('portal-customer');
+        appEl.classList.remove('portal-customer', 'portal-admin');
         appEl.classList.add('portal-chef');
       }
       promptStaffPassword('kitchen');
@@ -2358,10 +2361,13 @@ function handleHashRouting() {
     if (!sessionStorage.getItem('staff_auth_admin')) {
       APP_STATE.portal = 'pending_admin';
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const adminView = document.getElementById('view-admin');
+      if (adminView) adminView.classList.add('active');
+      switchAdminSubTab(APP_STATE.adminSubTab || 'overview');
       if (bottomNav) bottomNav.style.display = 'none';
       if (floatBar) floatBar.classList.add('hidden');
       if (appEl) {
-        appEl.classList.remove('portal-customer');
+        appEl.classList.remove('portal-customer', 'portal-chef');
         appEl.classList.add('portal-admin');
       }
       promptStaffPassword('admin');
@@ -2424,20 +2430,39 @@ function promptStaffPassword(portal) {
     return;
   }
 
-  const isKitchen = portal === 'kitchen' || portal === 'chef';
-  title.textContent = isKitchen ? 'Kitchen Terminal Access' : 'Admin Management Access';
-  desc.textContent = isKitchen
+  const isKitchen = portal === 'kitchen' || portal === 'chef' || portal === 'kithen';
+  if (title) title.textContent = isKitchen ? 'Kitchen Terminal Access' : 'Admin Management Access';
+  if (desc) desc.textContent = isKitchen
     ? 'Enter kitchen staff passcode to open KDS grill terminal.'
     : 'Enter manager passcode to access revenue & orders.';
   
   if (err) err.style.display = 'none';
   if (input) {
     input.value = '';
-    setTimeout(() => input.focus(), 100);
+    setTimeout(() => {
+      try {
+        input.focus();
+        input.select();
+      } catch (e) {}
+    }, 120);
   }
 
-  overlay?.classList.add('open');
-  modal?.classList.add('open');
+  if (overlay) {
+    overlay.classList.add('open');
+    overlay.style.display = 'block';
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    overlay.style.pointerEvents = 'auto';
+  }
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
+    modal.style.pointerEvents = 'auto';
+  }
+
+  refreshLucideIcons();
 }
 
 function handleStaffAuthSubmit(event) {
@@ -2515,8 +2540,22 @@ function lockStaffPortal(portal) {
 }
 
 function closeStaffAuthModal() {
-  document.getElementById('staff-auth-overlay')?.classList.remove('open');
-  document.getElementById('staff-auth-modal')?.classList.remove('open');
+  const overlay = document.getElementById('staff-auth-overlay');
+  const modal = document.getElementById('staff-auth-modal');
+  if (overlay) {
+    overlay.classList.remove('open');
+    overlay.style.display = 'none';
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+    overlay.style.pointerEvents = 'none';
+  }
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    modal.style.pointerEvents = 'none';
+  }
 }
 
 // ══ CATEGORY GRID (4-COLUMN SQUIRCLE CARDS WITH LUCIDE REACT ICONS) ══

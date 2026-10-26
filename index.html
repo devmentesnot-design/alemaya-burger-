@@ -1134,38 +1134,38 @@
     <!-- Hidden on screen, shown in @media print for bulk printing -->
     <div id="printable-qr-stand-sheet" class="printable-qr-stand-sheet" style="display:none;"></div>
 
-    <!-- ═════════════════════════════════════════════════════════════════ -->
-    <!-- STAFF PASSWORD ACCESS MODAL (KITCHEN & ADMIN ROUTES)             -->
-    <!-- ═════════════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="staff-auth-overlay"></div>
-    <div class="staff-auth-modal" id="staff-auth-modal" role="dialog" aria-modal="true">
-      <div class="staff-auth-card">
-        <div class="staff-auth-icon-wrap">
-          <i data-lucide="shield-check" class="lucide-icon"></i>
-        </div>
-        <h3 class="staff-auth-title" id="staff-auth-title">Staff Portal Access</h3>
-        <p class="staff-auth-desc" id="staff-auth-desc">Enter staff passcode to access this terminal</p>
-        
-        <form id="staff-auth-form" onsubmit="handleStaffAuthSubmit(event)">
-          <div class="staff-auth-input-wrap">
-            <input type="password" id="staff-auth-input" class="staff-auth-input" placeholder="Enter staff passcode..." required autocomplete="current-password">
-          </div>
-          <div id="staff-auth-error" class="staff-auth-error" style="display:none;">
-            Incorrect passcode. Access denied.
-          </div>
-          <div class="staff-auth-actions">
-            <button type="button" class="staff-auth-cancel-btn" onclick="cancelStaffAuth()">Cancel</button>
-            <button type="submit" class="staff-auth-submit-btn">Unlock Portal</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <!-- TOAST NOTIFICATIONS -->
     <div class="toast-popup" id="toast"></div>
 
   </div>
 
-  <script src="/app.js?v=20261026_auth_v3"></script>
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- STAFF PASSWORD ACCESS MODAL (KITCHEN & ADMIN ROUTES)             -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="staff-auth-overlay"></div>
+  <div class="staff-auth-modal" id="staff-auth-modal" role="dialog" aria-modal="true">
+    <div class="staff-auth-card">
+      <div class="staff-auth-icon-wrap">
+        <i data-lucide="shield-check" class="lucide-icon"></i>
+      </div>
+      <h3 class="staff-auth-title" id="staff-auth-title">Staff Portal Access</h3>
+      <p class="staff-auth-desc" id="staff-auth-desc">Enter staff passcode to access this terminal</p>
+      
+      <form id="staff-auth-form" onsubmit="handleStaffAuthSubmit(event)">
+        <div class="staff-auth-input-wrap">
+          <input type="password" id="staff-auth-input" class="staff-auth-input" placeholder="Enter staff passcode..." required autocomplete="current-password">
+        </div>
+        <div id="staff-auth-error" class="staff-auth-error" style="display:none;">
+          Incorrect passcode. Access denied.
+        </div>
+        <div class="staff-auth-actions">
+          <button type="button" class="staff-auth-cancel-btn" onclick="cancelStaffAuth()">Cancel</button>
+          <button type="submit" class="staff-auth-submit-btn">Unlock Portal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js?v=20261026_auth_v4"></script>
 </body>
 </html>
