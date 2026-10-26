@@ -680,27 +680,21 @@ async function updateSettings(settings) {
   try {
     const existing = await supabaseFetch('settings?select=*');
     if (Array.isArray(existing) && existing.length > 0) {
-      try {
-        await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
-      } catch (errPayload) {
-        // Fallback if password columns are missing in Supabase schema cache
-        await supabaseFetch('settings?id=eq.1', 'PATCH', { takeaway_fee: takeawayFee });
-      }
+      // Always send the full payload including passwords
+      await supabaseFetch('settings?id=eq.1', 'PATCH', payload);
     } else {
-      try {
-        await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
-      } catch (errPost) {
-        await supabaseFetch('settings', 'POST', { takeaway_fee: takeawayFee, id: 1 });
-      }
+      await supabaseFetch('settings', 'POST', { ...payload, id: 1 });
     }
   } catch (e) {
     console.warn('Supabase updateSettings warning:', e.message);
+    // Still update local cache so the change takes effect immediately
   }
 
   local.settings = updatedSettings;
   writeLocalDb(local);
   return { success: true, data: local.settings };
 }
+
 
 module.exports = {
   getCategories,

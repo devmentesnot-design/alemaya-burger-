@@ -55,10 +55,14 @@ CREATE TABLE IF NOT EXISTS public.orders (
 CREATE TABLE IF NOT EXISTS public.settings (
   id INTEGER PRIMARY KEY DEFAULT 1,
   takeaway_fee NUMERIC(10,2) DEFAULT 0,
+  admin_password TEXT DEFAULT 'admin',
+  kitchen_password TEXT DEFAULT 'kitchen',
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT single_settings_row CHECK (id = 1)
 );
-INSERT INTO public.settings (id, takeaway_fee) VALUES (1, 0) ON CONFLICT (id) DO NOTHING;
+INSERT INTO public.settings (id, takeaway_fee, admin_password, kitchen_password)
+  VALUES (1, 0, 'admin', 'kitchen')
+  ON CONFLICT (id) DO NOTHING;
 
 -- 5. CREATE EXTRAS TABLE
 CREATE TABLE IF NOT EXISTS public.extras (

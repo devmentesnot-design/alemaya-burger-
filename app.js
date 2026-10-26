@@ -2472,7 +2472,7 @@ function promptStaffPassword(portal) {
   refreshLucideIcons();
 }
 
-function handleStaffAuthSubmit(event) {
+async function handleStaffAuthSubmit(event) {
   event.preventDefault();
   unlockKitchenAudio();
 
@@ -2480,21 +2480,20 @@ function handleStaffAuthSubmit(event) {
   const err = document.getElementById('staff-auth-error');
   const entered = (input?.value || '').trim();
 
+  // Always fetch the latest password from the server before validating
+  // so that a password change immediately takes effect without a page reload
+  try {
+    const freshSettings = await API.getSettings();
+    if (freshSettings) APP_STATE.settings = freshSettings;
+  } catch (e) {}
+
   const isKitchen = PENDING_STAFF_PORTAL === 'kitchen' || PENDING_STAFF_PORTAL === 'chef';
-  const customPass = isKitchen
+  const correctPass = isKitchen
     ? (APP_STATE.settings?.kitchenPassword || 'kitchen')
     : (APP_STATE.settings?.adminPassword || 'admin');
 
-  // Accept configured password (case-insensitive) as well as default fallbacks
-  const validPasscodes = [
-    String(customPass).toLowerCase(),
-    String(customPass),
-    isKitchen ? 'kitchen' : 'admin',
-    isKitchen ? 'kitchen123' : 'admin123',
-    'alemaya123'
-  ];
-
-  if (validPasscodes.includes(entered.toLowerCase()) || entered === customPass) {
+  // Only accept the actual configured password (case-sensitive)
+  if (entered === correctPass) {
     sessionStorage.setItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'), '1');
     closeStaffAuthModal();
     const target = isKitchen ? 'chef' : 'admin';
@@ -2541,9 +2540,18 @@ function cancelStaffAuth() {
 
 function lockStaffPortal(portal) {
   const isKitchen = portal === 'kitchen' || portal === 'chef';
-  sessionStorage.removeItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'));
-  toast(`${isKitchen ? 'Kitchen' : 'Admin'} locked. Passcode required.`);
-  switchPortal('customer');
+  const authKey = 'staff_auth_' + (isKitchen ? 'kitchen' : 'admin');
+  // Clear the session so portal is locked
+  sessionStorage.removeItem(authKey);
+  toast(`${isKitchen ? 'Kitchen' : 'Admin'} terminal locked.`);
+  // Show the password prompt for this portal instead of going to menu
+  PENDING_STAFF_PORTAL = isKitchen ? 'kitchen' : 'admin';
+  // Refresh settings from DB so we're always checking the latest password
+  API.getSettings().then(fresh => {
+    if (fresh) APP_STATE.settings = fresh;
+  }).catch(() => {}).finally(() => {
+    promptStaffPassword(isKitchen ? 'kitchen' : 'admin');
+  });
 }
 
 function closeStaffAuthModal() {
