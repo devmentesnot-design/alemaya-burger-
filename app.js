@@ -6959,9 +6959,9 @@ async function downloadPosterPng() {
     ctx.fillText(table, W * 0.612, H * 0.416, W * 0.14);
 
     // 4. Download PNG
-    const cleanTable = table.replace(/[^a-z0-9_-]/gi, '_');
+    const cleanTable = table.replace(/[^a-z0-9]/gi, '');
     const a = document.createElement('a');
-    a.download = `alemaya-table-${cleanTable}.png`;
+    a.download = `grilledburger-table-${cleanTable}.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
 
