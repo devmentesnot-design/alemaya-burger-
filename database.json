@@ -1706,84 +1706,7 @@
       "customizations": []
     }
   ],
-  "orders": [
-    {
-      "id": "AG-6817",
-      "timestamp": "11:29 AM",
-      "date": "2026-10-26",
-      "createdAt": 1793003398903,
-      "orderType": "Dine-in (Table 93)",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Chicken Burger",
-          "note": "",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 874,
-          "extras": [
-            {
-              "id": "ext_jalapeno",
-              "name": "Spicy Pickled Jalapeños",
-              "price": 65
-            }
-          ],
-          "basePrice": 809,
-          "productId": "item_2",
-          "unitPrice": 874,
-          "selections": {
-            "extras_addons": [
-              "ext_jalapeno"
-            ]
-          },
-          "discountPrice": 0,
-          "customizations": [],
-          "originalBasePrice": 809
-        }
-      ],
-      "subtotal": 874,
-      "service": 0,
-      "takeawayFee": 0,
-      "total": 874,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": "table-93",
-      "tableName": "Table 93",
-      "tableToken": "93"
-    },
-    {
-      "id": "AG-2837",
-      "timestamp": "11:16 AM",
-      "date": "2026-10-26",
-      "createdAt": 1793002616729,
-      "orderType": "Dine-in (Table 06)",
-      "items": [
-        {
-          "qty": 1,
-          "name": "Beef Burger",
-          "note": "",
-          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656219/alemaya-burger/burger_classic.jpg",
-          "total": 369,
-          "extras": [],
-          "basePrice": 369,
-          "productId": "item_4",
-          "unitPrice": 369,
-          "selections": {},
-          "discountPrice": 0,
-          "customizations": [],
-          "originalBasePrice": 369
-        }
-      ],
-      "subtotal": 369,
-      "service": 0,
-      "takeawayFee": 0,
-      "total": 369,
-      "status": "completed",
-      "statusLabel": "Completed",
-      "tableId": "table-06",
-      "tableName": "Table 06",
-      "tableToken": "06"
-    }
-  ],
+  "orders": [],
   "extras": [
     {
       "id": "ext_cheese",
@@ -1976,7 +1899,7 @@
   ],
   "settings": {
     "takeawayFee": 50,
-    "adminPassword": "admin12345",
+    "adminPassword": "admin12345734676346",
     "kitchenPassword": "kitchen"
   }
 }
