@@ -1711,6 +1711,12 @@ i[data-lucide] {
   50% { opacity: 0.4; transform: scale(0.85); }
 }
 
+/* Audio unlock banner pulse */
+@keyframes audioBannerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+}
+
 /* KDS Filter Strip on Mobile */
 .kds-filter-strip {
   display: flex;

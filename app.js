@@ -2405,7 +2405,14 @@ function unlockKitchenAudio() {
       KITCHEN_AUDIO_CTX = new AudioCtx();
     }
     if (KITCHEN_AUDIO_CTX && KITCHEN_AUDIO_CTX.state === 'suspended') {
-      KITCHEN_AUDIO_CTX.resume().catch(() => {});
+      KITCHEN_AUDIO_CTX.resume().then(() => {
+        // Hide the tap-to-enable banner once context is running
+        const banner = document.getElementById('audio-unlock-banner');
+        if (banner) banner.style.display = 'none';
+      }).catch(() => {});
+    } else {
+      const banner = document.getElementById('audio-unlock-banner');
+      if (banner) banner.style.display = 'none';
     }
   } catch (e) {}
 }
@@ -4943,15 +4950,24 @@ function closeOrderModal() {
 }
 
 // ══ AUDIO SYNTHESIS CHIME (WEB AUDIO API) ══
-function playKitchenChime(type = 'new_order') {
+// NOTE: resume() is async — we MUST await it before scheduling oscillator nodes,
+// otherwise nodes get scheduled at currentTime=0 (already past) and produce no sound.
+async function playKitchenChime(type = 'new_order') {
   if (!APP_STATE.audioEnabled) return;
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
     if (!KITCHEN_AUDIO_CTX) KITCHEN_AUDIO_CTX = new AudioCtx();
+
+    // CRITICAL: await resume so context is actually running before we schedule notes
     if (KITCHEN_AUDIO_CTX.state === 'suspended') {
-      KITCHEN_AUDIO_CTX.resume().catch(() => {});
+      await KITCHEN_AUDIO_CTX.resume();
     }
+    if (KITCHEN_AUDIO_CTX.state !== 'running') return; // still blocked — give up
+
+    // Hide unlock banner since audio is now working
+    const banner = document.getElementById('audio-unlock-banner');
+    if (banner) banner.style.display = 'none';
 
     const now = KITCHEN_AUDIO_CTX.currentTime;
 
@@ -4966,7 +4982,7 @@ function playKitchenChime(type = 'new_order') {
       osc.frequency.setValueAtTime(523.25, now);
       osc.frequency.setValueAtTime(659.25, now + 0.12);
       osc.frequency.setValueAtTime(783.99, now + 0.24);
-      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.setValueAtTime(0.35, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
       osc.start(now);
       osc.stop(now + 0.75);
@@ -4979,10 +4995,10 @@ function playKitchenChime(type = 'new_order') {
       gain1.connect(KITCHEN_AUDIO_CTX.destination);
       osc1.type = 'sine';
       osc1.frequency.setValueAtTime(783.99, now);
-      gain1.gain.setValueAtTime(0.35, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      gain1.gain.setValueAtTime(0.45, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
       osc1.start(now);
-      osc1.stop(now + 0.4);
+      osc1.stop(now + 0.5);
 
       // Bell 2: 1046.5 Hz (C6) with crisp sustain
       const osc2 = KITCHEN_AUDIO_CTX.createOscillator();
@@ -4990,12 +5006,12 @@ function playKitchenChime(type = 'new_order') {
       osc2.connect(gain2);
       gain2.connect(KITCHEN_AUDIO_CTX.destination);
       osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1046.50, now + 0.16);
+      osc2.frequency.setValueAtTime(1046.50, now + 0.20);
       gain2.gain.setValueAtTime(0.001, now);
-      gain2.gain.setValueAtTime(0.4, now + 0.16);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
-      osc2.start(now + 0.16);
-      osc2.stop(now + 0.9);
+      gain2.gain.setValueAtTime(0.5, now + 0.20);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.95);
+      osc2.start(now + 0.20);
+      osc2.stop(now + 1.0);
     }
   } catch (e) {
     console.warn('Audio chime warning:', e);
