@@ -2278,7 +2278,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   await syncDataFromBackend(false);
 
   // Fast auto-refresh orders every 3s for live kitchen and order tracking
-  let PREV_KITCHEN_ORDER_IDS = null;
+  // CHIME LOGIC: We track ALL order IDs ever seen (not just active/received).
+  // A "new order" = an order ID we have NEVER seen in any previous poll.
+  // This prevents double-chiming when chef clicks "Cooking" (received->cooking)
+  // because that order was already in ALL_SEEN_ORDER_IDS from a prior poll.
+  // Pre-seed with current orders so they don't trigger a chime on first poll.
+  let ALL_SEEN_ORDER_IDS = new Set(MASTER_ORDERS.map(o => String(o.id)));
 
   setInterval(() => {
     if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.currentTab === 'orders') {
@@ -2286,18 +2291,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (Array.isArray(orders)) {
           // Detect brand new incoming orders for the kitchen terminal & trigger notification sound!
           if (APP_STATE.portal === 'chef') {
-            const currentActiveOrders = orders.filter(o => o.status === 'received' || o.status === 'cooking' || o.status === 'preparing');
-            const currentActiveIds = currentActiveOrders.map(o => String(o.id));
+            const allIds = orders.map(o => String(o.id));
 
-            if (PREV_KITCHEN_ORDER_IDS !== null) {
-              const newIncomingIds = currentActiveIds.filter(id => !PREV_KITCHEN_ORDER_IDS.has(id));
-              if (newIncomingIds.length > 0) {
-                console.log('[KITCHEN SOUND] New incoming order(s) detected via polling:', newIncomingIds);
+            if (ALL_SEEN_ORDER_IDS !== null) {
+              // "New" = order ID never seen in any previous fetch (any status)
+              const brandNewIds = allIds.filter(id => !ALL_SEEN_ORDER_IDS.has(id));
+              if (brandNewIds.length > 0) {
+                console.log('[KITCHEN SOUND] Brand new order(s) arrived:', brandNewIds);
                 playKitchenChime('new_order');
-                toast(`🔔 New Kitchen Order #${newIncomingIds.join(', #')} received!`, 4000);
+                toast(`🔔 New Order #${brandNewIds.join(', #')} — Get cooking!`, 4000);
               }
             }
-            PREV_KITCHEN_ORDER_IDS = new Set(currentActiveIds);
+            // Always merge all IDs into the seen set
+            allIds.forEach(id => ALL_SEEN_ORDER_IDS.add(id));
+
           }
 
           MASTER_ORDERS = orders;
@@ -4147,13 +4154,13 @@ function kdsSetStatus(orderId, newStatus) {
   // Persist directly to real database (database.json) via REST API
   API.updateOrderStatus(orderId, newStatus, label).catch(e => console.warn('Status update API error:', e));
 
-  // Audio chimes
+  // Audio chimes on status change
+  // Only play 'ready' chime here — new order chime is handled by polling
   if (newStatus === 'ready') {
     playKitchenChime('ready');
-    toast(`Order #${orderId} marked READY for pickup!`, 3000);
+    toast(`Order #${orderId} marked READY for pickup! 🛎️`, 3000);
   } else if (newStatus === 'cooking') {
-    playKitchenChime('new_order');
-    toast(`Order #${orderId} grilling started 🔥`, 2000);
+    toast(`Order #${orderId} — grilling started 🔥`, 2000);
   } else if (newStatus === 'completed') {
     toast(`Order #${orderId} marked completed ✓`, 2000);
   }
