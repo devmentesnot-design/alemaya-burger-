@@ -2257,7 +2257,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   populateAdminCategoryDropdowns();
   buildCategoryGrid();
   renderMenu();
-  updateCartUI();
+  if (APP_STATE.portal === 'customer') {
+    updateCartUI();
+  } else {
+    const bNav = document.getElementById('bottom-nav');
+    if (bNav) bNav.style.display = 'none';
+    const fBar = document.getElementById('floating-cart-bar');
+    if (fBar) fBar.classList.add('hidden');
+  }
   renderCustomerActiveTableBanner();
   renderCurrentOrders();
   renderHistory();
@@ -2315,37 +2322,66 @@ function handleHashRouting() {
 
   console.log('[ROUTING] Hash:', hash, 'Path:', path, 'Current Portal:', APP_STATE.portal);
 
-  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || hash.startsWith('kitchen') || hash.startsWith('chef') || 
-                         path === '/kitchen' || path.endsWith('/kitchen') || path === '/chef' || path.endsWith('/chef') ||
-                         path.includes('/kitchen') || path.includes('/chef');
-  const isAdminRoute = hash === 'admin' || hash.startsWith('admin') || path === '/admin' || path.endsWith('/admin') || path.includes('/admin');
-  const isOrdersRoute = hash === 'orders' || hash.startsWith('orders') || path === '/orders' || path.endsWith('/orders') || path.includes('/orders');
+  const isKitchenRoute = hash === 'chef' || hash === 'kitchen' || hash === 'kithen' || 
+                         hash.startsWith('kitchen') || hash.startsWith('chef') || hash.startsWith('kithen') || 
+                         path === '/kitchen' || path === '/kithen' || path === '/chef' ||
+                         path.endsWith('/kitchen') || path.endsWith('/kithen') || path.endsWith('/chef') ||
+                         path.includes('/kitchen') || path.includes('/kithen') || path.includes('/chef');
+                         
+  const isAdminRoute = hash === 'admin' || hash.startsWith('admin') || 
+                       path === '/admin' || path.endsWith('/admin') || path.includes('/admin');
+                       
+  const isOrdersRoute = hash === 'orders' || hash.startsWith('orders') || 
+                        path === '/orders' || path.endsWith('/orders') || path.includes('/orders');
+
+  const bottomNav = document.getElementById('bottom-nav');
+  const floatBar = document.getElementById('floating-cart-bar');
+  const appEl = document.getElementById('app');
 
   if (isKitchenRoute) {
     if (!sessionStorage.getItem('staff_auth_kitchen')) {
-      // Block navigateTo while auth modal is open
       APP_STATE.portal = 'pending_kitchen';
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      if (bottomNav) bottomNav.style.display = 'none';
+      if (floatBar) floatBar.classList.add('hidden');
+      if (appEl) {
+        appEl.classList.remove('portal-customer');
+        appEl.classList.add('portal-chef');
+      }
       promptStaffPassword('kitchen');
+      return;
     } else {
       switchPortal('chef');
+      return;
     }
   } else if (isAdminRoute) {
     if (!sessionStorage.getItem('staff_auth_admin')) {
-      // Block navigateTo while auth modal is open
       APP_STATE.portal = 'pending_admin';
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      if (bottomNav) bottomNav.style.display = 'none';
+      if (floatBar) floatBar.classList.add('hidden');
+      if (appEl) {
+        appEl.classList.remove('portal-customer');
+        appEl.classList.add('portal-admin');
+      }
       promptStaffPassword('admin');
+      return;
     } else {
       switchPortal('admin');
+      return;
     }
   } else if (isOrdersRoute) {
     navigateTo('orders');
+    return;
   } else {
     // Only navigate to menu if we're genuinely on a customer route (not staff portals or pending auth)
     const isStaffPortal = APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || 
                           APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen';
-    const shouldShowMenu = hash === 'menu' || (!hash && !path.includes('/admin') && !path.includes('/kitchen') && !path.includes('/chef'));
+    const shouldShowMenu = hash === 'menu' || (!hash && !path.includes('/admin') && !path.includes('/kitchen') && !path.includes('/kithen') && !path.includes('/chef'));
     
     if (!isStaffPortal && shouldShowMenu) {
+      navigateTo('menu');
+    } else if (!isStaffPortal && APP_STATE.portal === 'customer') {
       navigateTo('menu');
     }
   }

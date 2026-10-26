@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=20261025_admin_fix">
+  <link rel="stylesheet" href="/style.css?v=20261026_auth_v3">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -49,7 +49,7 @@
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <!-- VIEW 1: CUSTOMER MENU (MAIN VIEW)                                 -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <main id="view-menu" class="view active">
+    <main id="view-menu" class="view">
       <!-- SEARCH BAR (TOGGLED VIA NAVBAR SEARCH ICON) -->
       <div class="search-header hidden" id="search-section">
         <div class="search-box">
@@ -1137,7 +1137,7 @@
     <!-- ═════════════════════════════════════════════════════════════════ -->
     <!-- STAFF PASSWORD ACCESS MODAL (KITCHEN & ADMIN ROUTES)             -->
     <!-- ═════════════════════════════════════════════════════════════════ -->
-    <div class="modal-overlay" id="staff-auth-overlay" onclick="cancelStaffAuth()"></div>
+    <div class="modal-overlay" id="staff-auth-overlay"></div>
     <div class="staff-auth-modal" id="staff-auth-modal" role="dialog" aria-modal="true">
       <div class="staff-auth-card">
         <div class="staff-auth-icon-wrap">
@@ -1166,6 +1166,6 @@
 
   </div>
 
-  <script src="/app.js?v=20261023_5"></script>
+  <script src="/app.js?v=20261026_auth_v3"></script>
 </body>
 </html>

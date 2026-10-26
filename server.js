@@ -666,7 +666,12 @@ async function handleRequest(req, res) {
     const cleanPath = (pathname || '').toLowerCase().replace(/[\\\/]+$/, '');
 
     // SPA client-side routes always serve index.html
-    const isSpaRoute = !cleanPath || cleanPath === '' || cleanPath === '/kitchen' || cleanPath === '/admin' || cleanPath === '/chef' || cleanPath === '/orders' || cleanPath === '/menu';
+    const isSpaRoute = !cleanPath || cleanPath === '' || 
+                       cleanPath === '/kitchen' || cleanPath === '/kithen' || cleanPath.startsWith('/kitchen/') || cleanPath.startsWith('/kithen/') ||
+                       cleanPath === '/admin' || cleanPath.startsWith('/admin/') || 
+                       cleanPath === '/chef' || cleanPath.startsWith('/chef/') || 
+                       cleanPath === '/orders' || cleanPath.startsWith('/orders/') || 
+                       cleanPath === '/menu' || cleanPath.startsWith('/menu/');
     
     if (isSpaRoute) {
       safePath = '/index.html';
@@ -707,7 +712,12 @@ async function handleRequest(req, res) {
             res.end('404 Not Found');
             return resolve();
           }
-          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          res.writeHead(200, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          });
           res.end(content);
           return resolve();
         });
@@ -723,7 +733,13 @@ async function handleRequest(req, res) {
           res.end('500 Internal Server Error');
           return resolve();
         }
-        res.writeHead(200, { 'Content-Type': contentType });
+        const headers = { 'Content-Type': contentType };
+        if (ext === '.html' || ext === '.js' || ext === '.css') {
+          headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+          headers['Pragma'] = 'no-cache';
+          headers['Expires'] = '0';
+        }
+        res.writeHead(200, headers);
         res.end(content);
         return resolve();
       });
