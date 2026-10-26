@@ -2420,7 +2420,8 @@ function handleHashRouting() {
   } else {
     // Only navigate to menu if we're genuinely on a customer route (not staff portals or pending auth)
     const isStaffPortal = APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || 
-                          APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen';
+                          APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen' ||
+                          Boolean(PENDING_STAFF_PORTAL);
     const shouldShowMenu = hash === 'menu' || (!hash && !path.includes('/admin') && !path.includes('/kitchen') && !path.includes('/kithen') && !path.includes('/chef'));
     
     if (!isStaffPortal && shouldShowMenu) {
@@ -2464,6 +2465,14 @@ function promptStaffPassword(portal) {
   const desc = document.getElementById('staff-auth-desc');
   const input = document.getElementById('staff-auth-input');
   const err = document.getElementById('staff-auth-error');
+
+  // Prevent accessing customer navigation or search while staff terminal is locked
+  const bottomNav = document.getElementById('bottom-nav');
+  if (bottomNav) bottomNav.style.display = 'none';
+  const floatBar = document.getElementById('floating-cart-bar');
+  if (floatBar) floatBar.classList.add('hidden');
+  const searchBtn = document.getElementById('nav-search-btn');
+  if (searchBtn) searchBtn.style.display = 'none';
 
   if (!modal) {
     console.error('[AUTH DEBUG] Modal element not found!');
@@ -2528,8 +2537,9 @@ async function handleStaffAuthSubmit(event) {
   // Only accept the actual configured password (case-sensitive)
   if (entered === correctPass) {
     sessionStorage.setItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'), '1');
-    closeStaffAuthModal();
     const target = isKitchen ? 'chef' : 'admin';
+    PENDING_STAFF_PORTAL = null;
+    closeStaffAuthModal();
     switchPortal(target);
     toast(`Authenticated: ${isKitchen ? 'Kitchen' : 'Admin'} unlocked`, 2500);
   } else {
@@ -2542,33 +2552,10 @@ async function handleStaffAuthSubmit(event) {
 }
 
 function cancelStaffAuth() {
-  closeStaffAuthModal();
-  const portal = PENDING_STAFF_PORTAL;
-  PENDING_STAFF_PORTAL = null;
-  
-  const isKitchen = portal === 'kitchen' || portal === 'chef';
-  const isAuth = sessionStorage.getItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'));
-  if (!isAuth) {
-    // Reset to customer portal (was pending_admin or pending_kitchen)
-    APP_STATE.portal = 'customer';
-    const appEl = document.getElementById('app');
-    if (appEl) {
-      appEl.classList.remove('portal-chef', 'portal-admin', 'portal-pending_admin', 'portal-pending_kitchen');
-      appEl.classList.add('portal-customer');
-    }
-    const bottomNav = document.getElementById('bottom-nav');
-    if (bottomNav) bottomNav.style.display = 'flex';
-    // Redirect away from the staff path so navigation works properly
-    const staffPaths = ['/admin', '/kitchen', '/chef'];
-    const currentPath = window.location.pathname || '/';
-    const isStaffPath = staffPaths.some(p => currentPath.endsWith(p) || currentPath.includes(p));
-    if (isStaffPath) {
-      history.replaceState(null, '', '/#menu');
-    } else if (window.location.hash === '#kitchen' || window.location.hash === '#chef' || window.location.hash === '#admin') {
-      history.replaceState(null, '', '#menu');
-    }
-    navigateTo('menu');
-  }
+  // Staff portals require valid passcode unlock.
+  // Cancellation and redirection to customer menu are strictly blocked.
+  console.log('[AUTH] Cancel blocked: staff terminal remains locked until unlocked with password.');
+  return false;
 }
 
 function lockStaffPortal(portal) {
@@ -2588,6 +2575,13 @@ function lockStaffPortal(portal) {
 }
 
 function closeStaffAuthModal() {
+  // If not authenticated, do not close the modal
+  const isKitchen = PENDING_STAFF_PORTAL === 'kitchen' || PENDING_STAFF_PORTAL === 'chef';
+  const isAuth = sessionStorage.getItem('staff_auth_' + (isKitchen ? 'kitchen' : 'admin'));
+  if (!isAuth && PENDING_STAFF_PORTAL) {
+    return;
+  }
+
   const overlay = document.getElementById('staff-auth-overlay');
   const modal = document.getElementById('staff-auth-modal');
   if (overlay) {
@@ -2831,9 +2825,9 @@ function createVerticalCard(p) {
 
 // ══ NAVIGATION (BOTTOM NAV: MENU & ORDERS TABS) ══
 function navigateTo(tab) {
-  // Don't navigate customer tabs if we're in a staff portal or pending auth (prevents resetting portal)
+  // Don't navigate customer tabs if we're in a staff portal or pending auth (prevents resetting portal or bypassing auth)
   if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.portal === 'kitchen' ||
-      APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen') {
+      APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen' || Boolean(PENDING_STAFF_PORTAL)) {
     return;
   }
 
@@ -2844,7 +2838,7 @@ function navigateTo(tab) {
 
   const appEl = document.getElementById('app');
   if (appEl) {
-    appEl.classList.remove('portal-chef', 'portal-admin');
+    appEl.classList.remove('portal-chef', 'portal-admin', 'portal-pending_admin', 'portal-pending_kitchen');
     appEl.classList.add('portal-customer');
   }
 
@@ -2890,9 +2884,9 @@ function navigateTo(tab) {
 
 // ══ HANDLE LOGO CLICK (PORTAL-AWARE NAVIGATION) ══
 function handleLogoClick() {
-  // If in admin or kitchen portal, stay in that portal (don't navigate away)
-  if (APP_STATE.portal === 'admin' || APP_STATE.portal === 'chef' || APP_STATE.portal === 'kitchen') {
-    // Do nothing or refresh the current portal view
+  // If in admin or kitchen portal, or awaiting passcode, stay locked (don't navigate away)
+  if (APP_STATE.portal === 'admin' || APP_STATE.portal === 'chef' || APP_STATE.portal === 'kitchen' ||
+      APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen' || Boolean(PENDING_STAFF_PORTAL)) {
     return;
   }
   // For customer portal, navigate to menu
@@ -2900,6 +2894,12 @@ function handleLogoClick() {
 }
 
 function toggleSearch() {
+  // Block search if staff authentication is pending or in staff portal
+  if (APP_STATE.portal === 'admin' || APP_STATE.portal === 'chef' || APP_STATE.portal === 'kitchen' ||
+      APP_STATE.portal === 'pending_admin' || APP_STATE.portal === 'pending_kitchen' || Boolean(PENDING_STAFF_PORTAL)) {
+    return;
+  }
+
   const searchSec = document.getElementById('search-section');
   const searchBtn = document.getElementById('nav-search-btn');
   const input = document.getElementById('search-input');

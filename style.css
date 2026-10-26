@@ -3148,39 +3148,35 @@ i[data-lucide] {
 }
 .staff-auth-actions {
   display: flex;
-  gap: 10px;
+  width: 100%;
   margin-top: 14px;
 }
 .staff-auth-cancel-btn {
-  flex: 1;
-  padding: 11px;
-  background: #F1F5F9;
-  color: #475569;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
+  display: none !important;
 }
-.staff-auth-cancel-btn:hover {
-  background: #E2E8F0;
-  color: #0F172A;
+.staff-auth-modal .modal-close-icon,
+.staff-auth-modal .sheet-close-btn,
+.staff-auth-modal .modal-close-btn {
+  display: none !important;
 }
 .staff-auth-submit-btn {
-  flex: 1.2;
-  padding: 11px;
+  width: 100%;
+  flex: 1;
+  padding: 13px 20px;
   background: #0F172A;
   color: #FFFFFF;
   border: none;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.18);
 }
 .staff-auth-submit-btn:hover {
   background: #1E293B;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
 }
 .staff-auth-submit-btn:active {
   transform: scale(0.98);
