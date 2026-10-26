@@ -1706,7 +1706,56 @@
       "customizations": []
     }
   ],
-  "orders": [],
+  "orders": [
+    {
+      "id": "AG-2189",
+      "timestamp": "12:50 PM",
+      "date": "2026-10-26",
+      "createdAt": 1793008231141,
+      "orderType": "Dine-in (Table 4)",
+      "items": [
+        {
+          "qty": 1,
+          "name": "Pan Cake",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+          "total": 249,
+          "extras": [],
+          "basePrice": 249,
+          "productId": "item_46",
+          "unitPrice": 249,
+          "selections": {},
+          "discountPrice": 0,
+          "customizations": [],
+          "originalBasePrice": 249
+        },
+        {
+          "qty": 1,
+          "name": "Pan Cake",
+          "note": "",
+          "image": "https://res.cloudinary.com/xheul1fe/image/upload/v1792656246/alemaya-burger/milkshake_chocolate.jpg",
+          "total": 249,
+          "extras": [],
+          "basePrice": 249,
+          "productId": "item_46",
+          "unitPrice": 249,
+          "selections": {},
+          "discountPrice": 0,
+          "customizations": [],
+          "originalBasePrice": 249
+        }
+      ],
+      "subtotal": 498,
+      "service": 0,
+      "takeawayFee": 0,
+      "total": 498,
+      "status": "completed",
+      "statusLabel": "Completed",
+      "tableId": "table-4",
+      "tableName": "Table 4",
+      "tableToken": "4"
+    }
+  ],
   "extras": [
     {
       "id": "ext_cheese",
