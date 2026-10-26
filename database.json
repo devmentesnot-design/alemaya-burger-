@@ -1899,7 +1899,7 @@
   ],
   "settings": {
     "takeawayFee": 50,
-    "adminPassword": "admin12345734676346",
+    "adminPassword": "admin12345",
     "kitchenPassword": "kitchen"
   }
 }
