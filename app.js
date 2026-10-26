@@ -6921,16 +6921,17 @@ async function downloadPosterPng() {
     const qy = slotY + (slotH - qs) / 2;
 
     ctx.imageSmoothingEnabled = false;
+    // White backing for QR — width AND height both use qs+16 (qy was wrongly used as height before)
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(qx - 8, qy - 8, qs + 16, qy + 16);
+    ctx.fillRect(qx - 8, qy - 8, qs + 16, qs + 16);
     ctx.drawImage(qrEl, qx, qy, qs, qs);
 
-    // 3. Draw Table Number text
+    // 3. Draw Table Number — centered in the right half of the TABLE pill
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#fffaf0';
     ctx.font = '800 42px Arial, sans-serif';
-    ctx.fillText(table, W * 0.6235, H * 0.4155, W * 0.12);
+    ctx.fillText(table, W * 0.655, H * 0.4155, W * 0.14);
 
     // 4. Download PNG
     const cleanTable = table.replace(/[^a-z0-9_-]/gi, '_');
@@ -6987,15 +6988,16 @@ async function printPosterDirect() {
     const qy = slotY + (slotH - qs) / 2;
 
     ctx.imageSmoothingEnabled = false;
+    // White backing for QR — width AND height both use qs+16
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(qx - 8, qy - 8, qs + 16, qy + 16);
+    ctx.fillRect(qx - 8, qy - 8, qs + 16, qs + 16);
     ctx.drawImage(qrEl, qx, qy, qs, qs);
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#fffaf0';
     ctx.font = '800 42px Arial, sans-serif';
-    ctx.fillText(table, W * 0.6235, H * 0.4155, W * 0.12);
+    ctx.fillText(table, W * 0.655, H * 0.4155, W * 0.14);
 
     const posterDataUrl = canvas.toDataURL('image/png');
     const printWin = window.open('', '_blank');
