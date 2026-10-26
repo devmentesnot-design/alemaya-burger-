@@ -6295,7 +6295,7 @@ function renderAdminTablesCrud() {
 
   if (menuUrlInput && !menuUrlInput.value) {
     menuUrlInput.value = window.location.origin.includes('localhost')
-      ? 'https://alemaya-burger-5pig.vercel.app/'
+      ? 'https://grilledburger.vercel.app/'
       : (window.location.origin + '/');
   }
 
@@ -6769,7 +6769,7 @@ async function generateTablePoster() {
 
   if (!link) {
     link = window.location.origin.includes('localhost')
-      ? 'https://alemaya-burger-5pig.vercel.app/'
+      ? 'https://grilledburger.vercel.app/'
       : (window.location.origin + '/');
     if (urlInput) urlInput.value = link;
   }
