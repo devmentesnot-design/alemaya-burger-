@@ -6293,15 +6293,16 @@ function renderAdminTablesCrud() {
   const menuUrlInput = document.getElementById('menuUrl');
   const tableNoInput = document.getElementById('tableNo');
 
-  if (menuUrlInput && !menuUrlInput.value) {
-    menuUrlInput.value = window.location.origin.includes('localhost')
-      ? 'https://grilledburger.vercel.app/'
-      : (window.location.origin + '/');
+  // Always use the CURRENT domain so a stale saved URL never appears
+  const correctBaseUrl = window.location.origin + '/';
+  if (menuUrlInput) {
+    menuUrlInput.value = correctBaseUrl;
   }
 
   if (tableNoInput && !tableNoInput.value) {
     tableNoInput.value = '4';
   }
+
 
   if (!_posterQrReady) {
     setTimeout(() => {
@@ -6768,9 +6769,7 @@ async function generateTablePoster() {
   const table = (tableInput?.value || '').trim();
 
   if (!link) {
-    link = window.location.origin.includes('localhost')
-      ? 'https://grilledburger.vercel.app/'
-      : (window.location.origin + '/');
+    link = window.location.origin + '/';
     if (urlInput) urlInput.value = link;
   }
 
