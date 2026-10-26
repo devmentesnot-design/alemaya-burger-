@@ -6956,7 +6956,7 @@ async function downloadPosterPng() {
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#fffaf0';
     ctx.font = '800 44px Arial, sans-serif';
-    ctx.fillText(table, W * 0.612, H * 0.418, W * 0.14);
+    ctx.fillText(table, W * 0.612, H * 0.416, W * 0.14);
 
     // 4. Download PNG
     const cleanTable = table.replace(/[^a-z0-9_-]/gi, '_');
@@ -7022,7 +7022,7 @@ async function printPosterDirect() {
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#fffaf0';
     ctx.font = '800 44px Arial, sans-serif';
-    ctx.fillText(table, W * 0.612, H * 0.418, W * 0.14);
+    ctx.fillText(table, W * 0.612, H * 0.416, W * 0.14);
 
     const posterDataUrl = canvas.toDataURL('image/png');
     const printWin = window.open('', '_blank');
