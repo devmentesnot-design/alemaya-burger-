@@ -2149,6 +2149,9 @@ try {
             MASTER_ORDERS.unshift(data.order);
             saveToStorage();
           }
+          if (typeof SEEN_ORDER_STATUS_MAP !== 'undefined') {
+            SEEN_ORDER_STATUS_MAP.set(String(data.orderId || data.order.id), data.order.status || 'received');
+          }
           if (APP_STATE.portal === 'chef') {
             updateKitchenCounters();
             renderKdsTickets();
@@ -2158,13 +2161,31 @@ try {
         } else if (data.type === 'STATUS_UPDATE') {
           const ord = MASTER_ORDERS.find(o => o.id === data.orderId);
           if (ord) ord.status = data.status;
-          if (data.status === 'ready') {
-            playKitchenChime('ready');
-            toast(`🎉 Order #${data.orderId} is READY for pickup!`, 4000);
-          } else {
-            toast(`Order #${data.orderId} status: ${data.status}`);
+          if (typeof SEEN_ORDER_STATUS_MAP !== 'undefined') {
+            SEEN_ORDER_STATUS_MAP.set(String(data.orderId), data.status);
           }
-          if (APP_STATE.portal === 'chef') renderKdsTickets();
+          if (APP_STATE.portal === 'chef') {
+            if (data.status === 'ready') {
+              playKitchenChime('ready');
+              toast(`🎉 Order #${data.orderId} is READY for pickup!`, 4000);
+            } else if (data.status === 'cooking') {
+              playKitchenChime('cooking');
+              toast(`🔥 Order #${data.orderId} — grilling started!`, 3000);
+            } else if (data.status === 'completed') {
+              playKitchenChime('completed');
+              toast(`✓ Order #${data.orderId} completed!`, 3000);
+            } else {
+              toast(`Order #${data.orderId} status: ${data.status}`);
+            }
+            renderKdsTickets();
+          } else {
+            if (data.status === 'ready') {
+              playKitchenChime('ready');
+              toast(`🎉 Order #${data.orderId} is READY for pickup!`, 4000);
+            } else {
+              toast(`Order #${data.orderId} status: ${data.status}`);
+            }
+          }
           if (APP_STATE.currentTab === 'orders') {
             renderCurrentOrders();
             renderHistory();
@@ -2278,33 +2299,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   await syncDataFromBackend(false);
 
   // Fast auto-refresh orders every 3s for live kitchen and order tracking
-  // CHIME LOGIC: We track ALL order IDs ever seen (not just active/received).
-  // A "new order" = an order ID we have NEVER seen in any previous poll.
-  // This prevents double-chiming when chef clicks "Cooking" (received->cooking)
-  // because that order was already in ALL_SEEN_ORDER_IDS from a prior poll.
-  // Pre-seed with current orders so they don't trigger a chime on first poll.
-  let ALL_SEEN_ORDER_IDS = new Set(MASTER_ORDERS.map(o => String(o.id)));
+  // Pre-seed SEEN_ORDER_STATUS_MAP with current orders so initial load won't chime
+  if (Array.isArray(MASTER_ORDERS)) {
+    MASTER_ORDERS.forEach(o => SEEN_ORDER_STATUS_MAP.set(String(o.id), o.status || 'received'));
+  }
 
   setInterval(() => {
     if (APP_STATE.portal === 'chef' || APP_STATE.portal === 'admin' || APP_STATE.currentTab === 'orders') {
       API.getOrders().then(orders => {
         if (Array.isArray(orders)) {
-          // Detect brand new incoming orders for the kitchen terminal & trigger notification sound!
+          // Detect brand new incoming orders or remote status transitions for kitchen terminal
           if (APP_STATE.portal === 'chef') {
-            const allIds = orders.map(o => String(o.id));
-
-            if (ALL_SEEN_ORDER_IDS !== null) {
-              // "New" = order ID never seen in any previous fetch (any status)
-              const brandNewIds = allIds.filter(id => !ALL_SEEN_ORDER_IDS.has(id));
-              if (brandNewIds.length > 0) {
-                console.log('[KITCHEN SOUND] Brand new order(s) arrived:', brandNewIds);
+            orders.forEach(o => {
+              const id = String(o.id);
+              const prevStatus = SEEN_ORDER_STATUS_MAP.get(id);
+              if (prevStatus === undefined) {
+                // Brand new order arrived!
+                console.log('[KITCHEN SOUND] Brand new order arrived:', id);
                 playKitchenChime('new_order');
-                toast(`🔔 New Order #${brandNewIds.join(', #')} — Get cooking!`, 4000);
+                toast(`🔔 New Order #${id} — Get cooking!`, 4000);
+              } else if (prevStatus !== o.status) {
+                // Remote status update (e.g. from Admin or another terminal)
+                console.log(`[KITCHEN SOUND] Order #${id} status changed: ${prevStatus} -> ${o.status}`);
+                if (o.status === 'cooking') {
+                  playKitchenChime('cooking');
+                  toast(`🔥 Order #${id} — grilling started!`, 3000);
+                } else if (o.status === 'ready') {
+                  playKitchenChime('ready');
+                  toast(`🛎️ Order #${id} marked READY for pickup!`, 3500);
+                } else if (o.status === 'completed') {
+                  playKitchenChime('completed');
+                  toast(`✓ Order #${id} completed!`, 3000);
+                }
               }
-            }
-            // Always merge all IDs into the seen set
-            allIds.forEach(id => ALL_SEEN_ORDER_IDS.add(id));
-
+              SEEN_ORDER_STATUS_MAP.set(id, o.status);
+            });
+          } else {
+            orders.forEach(o => SEEN_ORDER_STATUS_MAP.set(String(o.id), o.status));
           }
 
           MASTER_ORDERS = orders;
@@ -2404,6 +2435,7 @@ function handleHashRouting() {
 
 // ══ STAFF AUTHENTICATION & SECURE ROUTES (/kitchen & /admin) ══
 let PENDING_STAFF_PORTAL = null;
+let SEEN_ORDER_STATUS_MAP = new Map();
 
 function unlockKitchenAudio() {
   try {
@@ -2412,22 +2444,16 @@ function unlockKitchenAudio() {
       KITCHEN_AUDIO_CTX = new AudioCtx();
     }
     if (KITCHEN_AUDIO_CTX && KITCHEN_AUDIO_CTX.state === 'suspended') {
-      KITCHEN_AUDIO_CTX.resume().then(() => {
-        // Hide the tap-to-enable banner once context is running
-        const banner = document.getElementById('audio-unlock-banner');
-        if (banner) banner.style.display = 'none';
-      }).catch(() => {});
-    } else {
-      const banner = document.getElementById('audio-unlock-banner');
-      if (banner) banner.style.display = 'none';
+      KITCHEN_AUDIO_CTX.resume().catch(() => {});
     }
   } catch (e) {}
 }
 
-// User interactions unlock audio context for modern browser autoplay policy
+// User interactions unlock audio context automatically for modern browser autoplay policy
 window.addEventListener('click', unlockKitchenAudio, { passive: true });
 window.addEventListener('touchstart', unlockKitchenAudio, { passive: true });
 window.addEventListener('keydown', unlockKitchenAudio, { passive: true });
+window.addEventListener('pointerdown', unlockKitchenAudio, { passive: true });
 
 function promptStaffPassword(portal) {
   console.log('[AUTH DEBUG] promptStaffPassword called for portal:', portal);
@@ -4154,14 +4180,20 @@ function kdsSetStatus(orderId, newStatus) {
   // Persist directly to real database (database.json) via REST API
   API.updateOrderStatus(orderId, newStatus, label).catch(e => console.warn('Status update API error:', e));
 
-  // Audio chimes on status change
-  // Only play 'ready' chime here — new order chime is handled by polling
+  // Update seen cache immediately to prevent duplicate chime on next poll
+  if (typeof SEEN_ORDER_STATUS_MAP !== 'undefined') {
+    SEEN_ORDER_STATUS_MAP.set(String(orderId), newStatus);
+  }
+
+  // Audio chimes on all status updates (cooking, ready, completed)
   if (newStatus === 'ready') {
     playKitchenChime('ready');
     toast(`Order #${orderId} marked READY for pickup! 🛎️`, 3000);
   } else if (newStatus === 'cooking') {
+    playKitchenChime('cooking');
     toast(`Order #${orderId} — grilling started 🔥`, 2000);
   } else if (newStatus === 'completed') {
+    playKitchenChime('completed');
     toast(`Order #${orderId} marked completed ✓`, 2000);
   }
 
@@ -4965,8 +4997,11 @@ function closeOrderModal() {
 }
 
 // ══ AUDIO SYNTHESIS CHIME (WEB AUDIO API) ══
-// NOTE: resume() is async — we MUST await it before scheduling oscillator nodes,
-// otherwise nodes get scheduled at currentTime=0 (already past) and produce no sound.
+// Sounds:
+//   new_order → loud double-bell Ding-Dong (high urgency)
+//   cooking   → single mid-tone blip (action acknowledged)
+//   ready     → cheerful ascending 3-tone Do-Mi-Sol (call customer)
+//   completed → short descending 2-tone resolution
 async function playKitchenChime(type = 'new_order') {
   if (!APP_STATE.audioEnabled) return;
   try {
@@ -4974,64 +5009,54 @@ async function playKitchenChime(type = 'new_order') {
     if (!AudioCtx) return;
     if (!KITCHEN_AUDIO_CTX) KITCHEN_AUDIO_CTX = new AudioCtx();
 
-    // CRITICAL: await resume so context is actually running before we schedule notes
+    // Always try to resume — password submit is a valid user gesture that unlocks audio
     if (KITCHEN_AUDIO_CTX.state === 'suspended') {
       await KITCHEN_AUDIO_CTX.resume();
     }
-    if (KITCHEN_AUDIO_CTX.state !== 'running') return; // still blocked — give up
+    if (KITCHEN_AUDIO_CTX.state !== 'running') return; // browser still blocking — give up
 
-    // Hide unlock banner since audio is now working
-    const banner = document.getElementById('audio-unlock-banner');
-    if (banner) banner.style.display = 'none';
+    const ctx = KITCHEN_AUDIO_CTX;
+    const now = ctx.currentTime;
 
-    const now = KITCHEN_AUDIO_CTX.currentTime;
-
-    if (type === 'ready') {
-      // 3-tone cheerful ascending chime (Do - Mi - Sol)
-      const osc = KITCHEN_AUDIO_CTX.createOscillator();
-      const gain = KITCHEN_AUDIO_CTX.createGain();
+    function beep(freq, startOffset, duration, gainPeak = 0.45, waveType = 'sine') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
       osc.connect(gain);
-      gain.connect(KITCHEN_AUDIO_CTX.destination);
+      gain.connect(ctx.destination);
+      osc.type = waveType;
+      osc.frequency.setValueAtTime(freq, now + startOffset);
+      gain.gain.setValueAtTime(gainPeak, now + startOffset);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + startOffset + duration);
+      osc.start(now + startOffset);
+      osc.stop(now + startOffset + duration + 0.01);
+    }
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now);
-      osc.frequency.setValueAtTime(659.25, now + 0.12);
-      osc.frequency.setValueAtTime(783.99, now + 0.24);
-      gain.gain.setValueAtTime(0.35, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-      osc.start(now);
-      osc.stop(now + 0.75);
+    if (type === 'new_order') {
+      // Double Ding-Dong — loud & urgent (784 Hz G5 → 1046.5 Hz C6)
+      beep(783.99, 0,    0.45, 0.5);
+      beep(1046.5, 0.22, 0.75, 0.55);
+    } else if (type === 'cooking') {
+      // Single mid-range blip — quick acknowledgement (440 Hz A4)
+      beep(440, 0, 0.18, 0.35);
+      beep(523.25, 0.12, 0.18, 0.25);
+    } else if (type === 'ready') {
+      // Cheerful ascending Do-Mi-Sol (C5-E5-G5)
+      beep(523.25, 0,    0.55, 0.38);
+      beep(659.25, 0.13, 0.45, 0.32);
+      beep(783.99, 0.26, 0.65, 0.40);
+    } else if (type === 'completed') {
+      // Short descending 2-tone resolution (G5 → C5)
+      beep(783.99, 0,    0.30, 0.30);
+      beep(523.25, 0.22, 0.45, 0.28);
     } else {
-      // High-audibility restaurant service ticket chime (Ding-Dong)
-      // Bell 1: 784 Hz (G5)
-      const osc1 = KITCHEN_AUDIO_CTX.createOscillator();
-      const gain1 = KITCHEN_AUDIO_CTX.createGain();
-      osc1.connect(gain1);
-      gain1.connect(KITCHEN_AUDIO_CTX.destination);
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(783.99, now);
-      gain1.gain.setValueAtTime(0.45, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-      osc1.start(now);
-      osc1.stop(now + 0.5);
-
-      // Bell 2: 1046.5 Hz (C6) with crisp sustain
-      const osc2 = KITCHEN_AUDIO_CTX.createOscillator();
-      const gain2 = KITCHEN_AUDIO_CTX.createGain();
-      osc2.connect(gain2);
-      gain2.connect(KITCHEN_AUDIO_CTX.destination);
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1046.50, now + 0.20);
-      gain2.gain.setValueAtTime(0.001, now);
-      gain2.gain.setValueAtTime(0.5, now + 0.20);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.95);
-      osc2.start(now + 0.20);
-      osc2.stop(now + 1.0);
+      // Fallback: single ping
+      beep(660, 0, 0.35, 0.35);
     }
   } catch (e) {
     console.warn('Audio chime warning:', e);
   }
 }
+
 
 // ══ LIVE CLOCKS & TIMER INTERVALS ══
 function initLiveClocks() {
