@@ -406,6 +406,24 @@
           </div>
           <div class="category-breakdown-list" id="admin-category-breakdown"></div>
         </div>
+
+        <!-- Itemized Sales Breakdown (Dishes, Extras & Takeaway) -->
+        <div class="admin-card-block">
+          <div class="chart-box-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 class="chart-box-title">Itemized Sales Breakdown</h3>
+              <p class="chart-box-sub">Dishes, extras &amp; takeaway packaging listed separately</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="admin-itemized-count-badge" class="range-duration-pill">0 items</span>
+              <button type="button" class="btn-copy-itemized" onclick="copyItemizedBreakdownText()" title="Copy itemized text summary">
+                <i data-lucide="copy" class="lucide-icon" style="width:13px;height:13px;"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+          </div>
+          <div class="itemized-breakdown-wrap" id="admin-itemized-breakdown"></div>
+        </div>
       </section>
 
       <!-- ── SUB-PANE 2: ITEMS CRUD ── -->

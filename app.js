@@ -4602,6 +4602,9 @@ function renderAdminDashboard() {
   // Render Category Breakdown Bars
   renderAdminCategoryShare(validOrders);
 
+  // Render Itemized Sales Breakdown (Dishes, Extras & Takeaway)
+  renderAdminItemizedBreakdown(validOrders);
+
   // Render Orders Ledger Table
   renderAdminOrdersTable(filtered);
   refreshLucideIcons();
@@ -4700,56 +4703,224 @@ function renderAdminCategoryShare(orders) {
   container.innerHTML = html;
 }
 
-function renderAdminBestsellers(orders) {
-  const container = document.getElementById('admin-bestsellers-wrap');
+let CURRENT_ITEMIZED_TEXT = '';
+
+function renderAdminItemizedBreakdown(orders) {
+  const container = document.getElementById('admin-itemized-breakdown');
+  const badgeEl = document.getElementById('admin-itemized-count-badge');
   if (!container) return;
 
-  const itemMap = {};
-  orders.forEach(o => {
-    (o.items || []).forEach(item => {
-      const pid = item.productId || item.name;
-      if (!itemMap[pid]) {
-        itemMap[pid] = { name: item.name, units: 0, revenue: 0 };
+  // Key -> { type: 'dish'|'extra'|'takeaway', name: string, unitPrice: number, qty: number, total: number }
+  const itemsMap = new Map();
+  let grandTotal = 0;
+
+  (orders || []).forEach(ord => {
+    // 1. Process items in this order
+    (ord.items || []).forEach(item => {
+      const qty = Math.max(1, Number(item.qty) || 1);
+
+      // Collect extras on this item
+      const itemExtras = [];
+      let extrasUnitSum = 0;
+
+      if (Array.isArray(item.extras) && item.extras.length > 0) {
+        item.extras.forEach(e => {
+          const eName = typeof e === 'string' ? e : (e.name || e.label || e.id);
+          let ePrice = Number(e.price) || 0;
+          if (!ePrice && typeof e === 'string') {
+            const foundEx = (EXTRAS || []).find(ex => ex.name === e || ex.id === e);
+            if (foundEx) ePrice = Number(foundEx.price) || 0;
+          }
+          if (eName) {
+            itemExtras.push({ name: eName, price: ePrice });
+            extrasUnitSum += ePrice;
+          }
+        });
+      } else if (item.selections && item.selections.extras_addons) {
+        const rawIds = Array.isArray(item.selections.extras_addons)
+          ? item.selections.extras_addons
+          : [item.selections.extras_addons];
+        rawIds.forEach(oid => {
+          const extraObj = (EXTRAS || []).find(e => e.id === oid);
+          const eName = extraObj ? extraObj.name : oid;
+          const ePrice = extraObj ? Number(extraObj.price) || 0 : 0;
+          itemExtras.push({ name: eName, price: ePrice });
+          extrasUnitSum += ePrice;
+        });
       }
-      itemMap[pid].units += item.qty;
-      itemMap[pid].revenue += item.total;
+
+      // Base dish price:
+      let dishUnitPrice = 0;
+      if (item.discountPrice && Number(item.discountPrice) > 0) {
+        dishUnitPrice = Number(item.discountPrice);
+      } else if (item.basePrice && Number(item.basePrice) > 0) {
+        dishUnitPrice = Number(item.basePrice);
+      } else if (item.unitPrice) {
+        dishUnitPrice = Math.max(0, Number(item.unitPrice) - extrasUnitSum);
+      } else if (item.total && qty > 0) {
+        dishUnitPrice = Math.max(0, Math.round(Number(item.total) / qty) - extrasUnitSum);
+      }
+
+      const dishName = (item.name || 'Dish Item').trim();
+      const dishKey = `dish_${dishName.toLowerCase()}_${dishUnitPrice}`;
+
+      if (!itemsMap.has(dishKey)) {
+        itemsMap.set(dishKey, {
+          type: 'dish',
+          name: dishName,
+          unitPrice: dishUnitPrice,
+          qty: 0,
+          total: 0
+        });
+      }
+      const dishEntry = itemsMap.get(dishKey);
+      dishEntry.qty += qty;
+      dishEntry.total += (dishUnitPrice * qty);
+      grandTotal += (dishUnitPrice * qty);
+
+      // Add each extra as a separate line item
+      itemExtras.forEach(ext => {
+        let extName = ext.name.trim();
+        if (!/^extra/i.test(extName)) {
+          extName = `Extra ${extName}`;
+        }
+        const extPrice = ext.price;
+        const extKey = `extra_${extName.toLowerCase()}_${extPrice}`;
+
+        if (!itemsMap.has(extKey)) {
+          itemsMap.set(extKey, {
+            type: 'extra',
+            name: extName,
+            unitPrice: extPrice,
+            qty: 0,
+            total: 0
+          });
+        }
+        const extEntry = itemsMap.get(extKey);
+        extEntry.qty += qty;
+        extEntry.total += (extPrice * qty);
+        grandTotal += (extPrice * qty);
+      });
     });
+
+    // 2. Process Takeaway fee as a separate line item
+    const fee = Number(ord.takeawayFee) || 0;
+    if (fee > 0) {
+      const takeKey = `takeaway_${fee}`;
+      if (!itemsMap.has(takeKey)) {
+        itemsMap.set(takeKey, {
+          type: 'takeaway',
+          name: 'Burger take away Box',
+          unitPrice: fee,
+          qty: 0,
+          total: 0
+        });
+      }
+      const takeEntry = itemsMap.get(takeKey);
+      takeEntry.qty += 1;
+      takeEntry.total += fee;
+      grandTotal += fee;
+    }
   });
 
-  const ranked = Object.values(itemMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+  const list = Array.from(itemsMap.values());
+  // Sort dishes by total revenue descending, then extras, then takeaway
+  list.sort((a, b) => {
+    const typeOrder = { dish: 1, extra: 2, takeaway: 3 };
+    if (typeOrder[a.type] !== typeOrder[b.type]) return typeOrder[a.type] - typeOrder[b.type];
+    return b.total - a.total;
+  });
 
-  if (ranked.length === 0) {
-    container.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted); padding:10px 0;">No sales in this period yet.</p>`;
+  if (badgeEl) {
+    badgeEl.textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div class="itemized-empty-box">
+        <i data-lucide="inbox" class="lucide-icon" style="width:28px;height:28px;margin-bottom:6px;opacity:0.5;"></i>
+        <p>No items sold in the selected period.</p>
+      </div>
+    `;
+    CURRENT_ITEMIZED_TEXT = 'No items sold in this period.';
+    refreshLucideIcons();
     return;
   }
 
-  let rows = '';
-  ranked.forEach((item, index) => {
-    rows += `
-      <tr>
-        <td class="bestseller-rank">#${index + 1}</td>
-        <td><strong>${escapeHtml(item.name)}</strong></td>
-        <td>${item.units} sold</td>
-        <td><strong>${formatMoney(item.revenue)}</strong></td>
-      </tr>
+  // Build clean text string matching user's exact format
+  const textLines = list.map((item, idx) => {
+    return `${idx + 1}. ${item.name} ${item.qty}×${item.unitPrice}`;
+  });
+  textLines.push('');
+  textLines.push(`Total = ${grandTotal.toLocaleString()} birr`);
+  CURRENT_ITEMIZED_TEXT = textLines.join('\n');
+
+  // Render HTML list
+  let html = '<div class="itemized-list">';
+  list.forEach((item, idx) => {
+    const tagHtml = item.type === 'extra' 
+      ? '<span class="itemized-tag tag-extra">Extra</span>' 
+      : (item.type === 'takeaway' ? '<span class="itemized-tag tag-takeaway">Takeaway</span>' : '');
+
+    html += `
+      <div class="itemized-row">
+        <div class="itemized-left">
+          <span class="itemized-num">${idx + 1}.</span>
+          <div class="itemized-name-wrap">
+            <span class="itemized-name">${escapeHtml(item.name)}</span>
+            ${tagHtml}
+          </div>
+        </div>
+        <div class="itemized-right">
+          <span class="itemized-math">${item.qty} × ${formatMoney(item.unitPrice)}</span>
+          <strong class="itemized-total">${formatMoney(item.total)}</strong>
+        </div>
+      </div>
     `;
   });
+  html += '</div>';
 
-  container.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Dish / Item</th>
-          <th>Volume</th>
-          <th>Revenue</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
+  html += `
+    <div class="itemized-grand-total">
+      <span class="grand-total-label">Total =</span>
+      <span class="grand-total-val">${formatMoney(grandTotal)}</span>
+    </div>
   `;
+
+  container.innerHTML = html;
+  refreshLucideIcons();
+}
+
+function copyItemizedBreakdownText() {
+  if (!CURRENT_ITEMIZED_TEXT) {
+    toast('No itemized data to copy');
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(CURRENT_ITEMIZED_TEXT).then(() => {
+      toast('Copied itemized list to clipboard!');
+    }).catch(() => {
+      fallbackCopyText(CURRENT_ITEMIZED_TEXT);
+    });
+  } else {
+    fallbackCopyText(CURRENT_ITEMIZED_TEXT);
+  }
+}
+
+function fallbackCopyText(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    toast('Copied itemized list to clipboard!');
+  } catch {
+    toast('Unable to copy to clipboard');
+  }
+  document.body.removeChild(ta);
 }
 
 function renderAdminOrdersTable(orders) {

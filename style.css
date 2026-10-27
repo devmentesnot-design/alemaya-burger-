@@ -3973,6 +3973,163 @@ i[data-lucide] {
 }
 
 /* =====================================================================
+   ADMIN ITEMIZED SALES BREAKDOWN (DISHES, EXTRAS, & TAKEAWAY FEES)
+===================================================================== */
+.btn-copy-itemized {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-cream);
+  color: var(--text-dark);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 3px 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-itemized:hover {
+  background: #FFFFFF;
+  border-color: var(--brand-terracotta);
+  color: var(--brand-terracotta);
+}
+
+.itemized-breakdown-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.itemized-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.itemized-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-cream);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.82rem;
+  transition: background 0.15s ease;
+}
+
+.itemized-row:hover {
+  background: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.itemized-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.itemized-num {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.itemized-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.itemized-name {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.itemized-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.itemized-tag.tag-extra {
+  background: rgba(245, 158, 11, 0.15);
+  color: #B45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.itemized-tag.tag-takeaway {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1D4ED8;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.itemized-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.itemized-math {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.itemized-total {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  min-width: 65px;
+  text-align: right;
+}
+
+.itemized-grand-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(188, 74, 21, 0.08) 0%, rgba(188, 74, 21, 0.03) 100%);
+  border: 1.5px solid rgba(188, 74, 21, 0.25);
+  border-radius: 12px;
+}
+
+.grand-total-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--brand-terracotta);
+  letter-spacing: 0.02em;
+}
+
+.grand-total-val {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--brand-terracotta);
+}
+
+.itemized-empty-box {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+/* =====================================================================
    AUTOMATIC TABLE MANAGEMENT & QR STAND CARDS
 ===================================================================== */
 /* Customer Active Table Banner */
