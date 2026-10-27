@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=20261027_range_v1">
+  <link rel="stylesheet" href="/style.css?v=20261027_clean_v1">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -388,45 +388,6 @@
           </div>
         </div>
 
-        <!-- 2x2 KPI Cards for Mobile Phone -->
-        <div class="admin-kpi-grid">
-          <div class="kpi-card revenue-card">
-            <div class="kpi-card-header">
-              <span class="kpi-label">REVENUE</span>
-              <div class="kpi-icon-wrap icon-rev"><i data-lucide="banknote" class="lucide-icon"></i></div>
-            </div>
-            <div class="kpi-value" id="kpi-revenue">Br 0</div>
-            <div class="kpi-subtext" id="kpi-revenue-sub">Filtered period</div>
-          </div>
-
-          <div class="kpi-card orders-card">
-            <div class="kpi-card-header">
-              <span class="kpi-label">ORDERS</span>
-              <div class="kpi-icon-wrap icon-orders"><i data-lucide="shopping-bag" class="lucide-icon"></i></div>
-            </div>
-            <div class="kpi-value" id="kpi-orders-count">0</div>
-            <div class="kpi-subtext" id="kpi-orders-sub">Filtered period</div>
-          </div>
-
-          <div class="kpi-card active-card">
-            <div class="kpi-card-header">
-              <span class="kpi-label">KITCHEN</span>
-              <div class="kpi-icon-wrap icon-kitchen"><i data-lucide="flame" class="lucide-icon"></i></div>
-            </div>
-            <div class="kpi-value" id="kpi-kitchen-active">0</div>
-            <div class="kpi-subtext">Active cooking</div>
-          </div>
-
-          <div class="kpi-card tables-card" onclick="switchAdminSubTab('tables')" style="cursor:pointer;" title="Click to manage restaurant tables & QR codes">
-            <div class="kpi-card-header">
-              <span class="kpi-label">TABLES &amp; QR</span>
-              <div class="kpi-icon-wrap" style="background:#FEF2F2; color:var(--brand-terracotta);"><i data-lucide="qr-code" class="lucide-icon"></i></div>
-            </div>
-            <div class="kpi-value" id="kpi-tables-count">Manage</div>
-            <div class="kpi-subtext" style="color:var(--brand-terracotta); font-weight:700;">Tap to view QR codes →</div>
-          </div>
-        </div>
-
         <!-- 7-Day Revenue Trend Chart -->
         <div class="admin-card-block">
           <div class="chart-box-header">
@@ -444,14 +405,6 @@
             <h3 class="chart-box-title">Category Revenue Share</h3>
           </div>
           <div class="category-breakdown-list" id="admin-category-breakdown"></div>
-        </div>
-
-        <!-- Top Bestsellers -->
-        <div class="admin-card-block">
-          <div class="chart-box-header">
-            <h3 class="chart-box-title">Top-Selling Dishes</h3>
-          </div>
-          <div class="bestsellers-table-wrap" id="admin-bestsellers-wrap"></div>
         </div>
       </section>
 
@@ -1211,6 +1164,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=20261027_range_v1"></script>
+  <script src="/app.js?v=20261027_clean_v1"></script>
 </body>
 </html>

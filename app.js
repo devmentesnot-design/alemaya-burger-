@@ -4602,9 +4602,6 @@ function renderAdminDashboard() {
   // Render Category Breakdown Bars
   renderAdminCategoryShare(validOrders);
 
-  // Render Top 5 Bestsellers Leaderboard
-  renderAdminBestsellers(validOrders);
-
   // Render Orders Ledger Table
   renderAdminOrdersTable(filtered);
   refreshLucideIcons();
