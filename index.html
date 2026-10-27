@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=20261026_auth_v5">
+  <link rel="stylesheet" href="/style.css?v=20261027_range_v1">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -315,7 +315,8 @@
               <option value="30days">Past 30 Days</option>
               <option value="month">This Month</option>
               <option value="all">All Time</option>
-              <option value="custom">📅 Pick Specific Date...</option>
+              <option value="range">📅 Custom Date Interval (Range)...</option>
+              <option value="custom">🗓️ Pick Single Date...</option>
             </select>
           </div>
           <button class="admin-btn-action" onclick="exportOrdersCsv()" title="Export CSV spreadsheet">
@@ -324,11 +325,59 @@
           </button>
         </div>
 
-        <!-- Custom Date Picker Field -->
+        <!-- Custom Single Date Picker Field -->
         <div id="admin-custom-date-box" class="admin-custom-date-box hidden">
           <div class="custom-date-inner">
             <span class="custom-date-label"><i data-lucide="calendar-days" class="lucide-icon" style="width:14px;height:14px;"></i> Choose Date:</span>
             <input type="date" id="admin-custom-date-input" class="admin-date-picker-input" onchange="handleAdminCustomDate(this.value)">
+          </div>
+        </div>
+
+        <!-- Custom Date Range / Interval Box (e.g. Monday up to Wednesday) -->
+        <div id="admin-custom-range-box" class="admin-custom-range-box hidden">
+          <div class="range-box-header">
+            <span class="range-box-title">
+              <i data-lucide="calendar-range" class="lucide-icon" style="width:15px;height:15px;color:var(--brand-terracotta);"></i>
+              Select Date Interval (From → To)
+            </span>
+            <span id="range-duration-pill" class="range-duration-pill">3 days</span>
+          </div>
+
+          <!-- Quick Interval Presets -->
+          <div class="range-presets-row">
+            <button type="button" class="range-preset-chip" onclick="setAdminIntervalPreset('mon-wed')">Mon – Wed</button>
+            <button type="button" class="range-preset-chip" onclick="setAdminIntervalPreset('mon-fri')">Mon – Fri</button>
+            <button type="button" class="range-preset-chip" onclick="setAdminIntervalPreset('this-week')">This Week</button>
+            <button type="button" class="range-preset-chip" onclick="setAdminIntervalPreset('last-week')">Last Week</button>
+            <button type="button" class="range-preset-chip" onclick="setAdminIntervalPreset('last-7d')">Last 7 Days</button>
+          </div>
+
+          <!-- Date Inputs Row (Start & End with Weekday Indicators) -->
+          <div class="range-inputs-row">
+            <div class="range-input-group">
+              <label for="admin-range-start" class="range-input-label">
+                <span>From (Start):</span>
+                <strong id="admin-range-start-day" class="range-day-name">Mon</strong>
+              </label>
+              <input type="date" id="admin-range-start" class="admin-date-picker-input range-date-input" onchange="handleAdminDateRangeChange()">
+            </div>
+
+            <div class="range-arrow-divider">
+              <i data-lucide="arrow-right" class="lucide-icon" style="width:16px;height:16px;"></i>
+            </div>
+
+            <div class="range-input-group">
+              <label for="admin-range-end" class="range-input-label">
+                <span>To (End):</span>
+                <strong id="admin-range-end-day" class="range-day-name">Wed</strong>
+              </label>
+              <input type="date" id="admin-range-end" class="admin-date-picker-input range-date-input" onchange="handleAdminDateRangeChange()">
+            </div>
+          </div>
+
+          <!-- Selected Interval Summary -->
+          <div class="range-summary-row" id="range-summary-text">
+            <span>Interval: <strong>Monday</strong> up to <strong>Wednesday</strong></span>
           </div>
         </div>
 
@@ -1162,6 +1211,6 @@
     </div>
   </div>
 
-  <script src="/app.js?v=20261026_auth_v5"></script>
+  <script src="/app.js?v=20261027_range_v1"></script>
 </body>
 </html>

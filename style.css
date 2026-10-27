@@ -3773,6 +3773,137 @@ i[data-lucide] {
   box-shadow: 0 0 0 3px rgba(188, 74, 21, 0.15);
 }
 
+/* ── Custom Date Range / Interval Selector ── */
+.admin-custom-range-box {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-warm);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.range-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.range-box-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.range-duration-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--brand-terracotta);
+  background: rgba(188, 74, 21, 0.08);
+  border: 1px solid rgba(188, 74, 21, 0.2);
+  border-radius: 12px;
+  padding: 2px 8px;
+}
+
+.range-presets-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  scrollbar-width: none;
+}
+.range-presets-row::-webkit-scrollbar {
+  display: none;
+}
+
+.range-preset-chip {
+  flex-shrink: 0;
+  background: var(--bg-cream);
+  color: var(--text-dark);
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.range-preset-chip:hover {
+  background: #FFFFFF;
+  border-color: var(--brand-terracotta);
+  color: var(--brand-terracotta);
+}
+
+.range-inputs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--bg-cream);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.range-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.range-input-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.range-day-name {
+  color: var(--brand-terracotta);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.range-date-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #FFFFFF !important;
+  font-size: 0.78rem;
+  padding: 6px 8px;
+}
+
+.range-arrow-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  margin-top: 14px;
+  flex-shrink: 0;
+}
+
+.range-summary-row {
+  margin-top: 10px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-warm);
+}
+
+.range-summary-row strong {
+  color: var(--text-dark);
+}
+
 /* Active Analytics Period Banner */
 .admin-period-banner {
   background: #FFFFFF;

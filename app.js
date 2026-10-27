@@ -1709,7 +1709,10 @@ let APP_STATE = {
   orderHistory: [],
   stockStatus: {},              // { [productId]: boolean }
   kdsFilter: 'active',          // 'active', 'received', 'preparing', 'ready', 'completed'
-  adminDateFilter: 'today',     // 'today', 'yesterday', 'week', 'all'
+  adminDateFilter: 'today',     // 'today', 'yesterday', 'week', 'all', 'custom', 'range'
+  adminCustomDate: '',
+  adminRangeStart: '',
+  adminRangeEnd: '',
   adminStatusFilter: 'all',     // 'all', 'received', 'preparing', 'ready', 'completed', 'cancelled'
   adminSearchQuery: '',
   audioEnabled: true,
@@ -4368,6 +4371,21 @@ function formatDateToIsoString(d) {
   return `${y}-${m}-${day}`;
 }
 
+function parseIsoDate(str) {
+  if (!str) return new Date();
+  const parts = str.split('-').map(Number);
+  return new Date(parts[0], (parts[1] || 1) - 1, parts[2] || 1);
+}
+
+function getMondayOfWeek(d) {
+  const date = new Date(d);
+  const day = date.getDay(); // 0 is Sunday, 1 is Monday...
+  const diff = (day === 0 ? -6 : 1) - day;
+  date.setDate(date.getDate() + diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
 function isOrderOnDate(order, targetDateStr) {
   if (!targetDateStr) return false;
   const ordDate = getOrderLocalDateStr(order);
@@ -4452,6 +4470,27 @@ function renderAdminDashboard() {
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     });
     periodLabel = `This Month (${now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})`;
+  } else if (filter === 'range') {
+    const startStr = APP_STATE.adminRangeStart || todayStr;
+    const endStr = APP_STATE.adminRangeEnd || todayStr;
+    const minStr = startStr <= endStr ? startStr : endStr;
+    const maxStr = startStr <= endStr ? endStr : startStr;
+
+    filtered = MASTER_ORDERS.filter(o => {
+      const od = getOrderLocalDateStr(o);
+      if (od) return od >= minStr && od <= maxStr;
+      return false;
+    });
+
+    const sDate = parseIsoDate(minStr);
+    const eDate = parseIsoDate(maxStr);
+    const sWeekday = sDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const eWeekday = eDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const diffDays = Math.max(1, Math.round((eDate.getTime() - sDate.getTime()) / 86400000) + 1);
+
+    periodLabel = (minStr === maxStr)
+      ? `${sWeekday}`
+      : `${sWeekday} up to ${eWeekday} (${diffDays} day${diffDays === 1 ? '' : 's'})`;
   } else if (filter === 'custom' && APP_STATE.adminCustomDate) {
     const custDate = APP_STATE.adminCustomDate;
     filtered = MASTER_ORDERS.filter(o => isOrderOnDate(o, custDate));
@@ -4501,7 +4540,7 @@ function renderAdminDashboard() {
     `;
   }
 
-  // Handle custom date box visibility
+  // Handle custom single date box visibility
   const customBox = document.getElementById('admin-custom-date-box');
   const customInput = document.getElementById('admin-custom-date-input');
   if (customBox) {
@@ -4515,10 +4554,46 @@ function renderAdminDashboard() {
     }
   }
 
+  // Handle custom date range / interval box visibility
+  const rangeBox = document.getElementById('admin-custom-range-box');
+  const rangeStartInput = document.getElementById('admin-range-start');
+  const rangeEndInput = document.getElementById('admin-range-end');
+  const startDayEl = document.getElementById('admin-range-start-day');
+  const endDayEl = document.getElementById('admin-range-end-day');
+  const rangeSummaryEl = document.getElementById('range-summary-text');
+  const durationPill = document.getElementById('range-duration-pill');
+
+  if (rangeBox) {
+    if (filter === 'range') {
+      rangeBox.classList.remove('hidden');
+      if (rangeStartInput) rangeStartInput.value = APP_STATE.adminRangeStart || todayStr;
+      if (rangeEndInput) rangeEndInput.value = APP_STATE.adminRangeEnd || todayStr;
+
+      const sDate = parseIsoDate(APP_STATE.adminRangeStart || todayStr);
+      const eDate = parseIsoDate(APP_STATE.adminRangeEnd || todayStr);
+      const sDay = sDate.toLocaleDateString('en-US', { weekday: 'short' });
+      const eDay = eDate.toLocaleDateString('en-US', { weekday: 'short' });
+      const sDayLong = sDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+      const eDayLong = eDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+      if (startDayEl) startDayEl.textContent = sDay;
+      if (endDayEl) endDayEl.textContent = eDay;
+
+      const diffDays = Math.max(1, Math.round((eDate.getTime() - sDate.getTime()) / 86400000) + 1);
+      if (durationPill) durationPill.textContent = diffDays === 1 ? '1 day' : `${diffDays} days`;
+
+      if (rangeSummaryEl) {
+        rangeSummaryEl.innerHTML = `<span>Interval: <strong>${sDayLong}</strong> up to <strong>${eDayLong}</strong> (${diffDays} day${diffDays === 1 ? '' : 's'})</span>`;
+      }
+    } else {
+      rangeBox.classList.add('hidden');
+    }
+  }
+
   // Sync dropdown selection
   const dateSelect = document.getElementById('admin-date-filter');
   if (dateSelect) {
-    dateSelect.value = (filter === 'custom') ? 'custom' : filter;
+    dateSelect.value = (filter === 'custom' || filter === 'range') ? filter : filter;
   }
 
   // Render 7-Day Revenue Trend Chart (interactive)
@@ -4572,7 +4647,8 @@ function renderAdminRevenueBars() {
     const heightPct = Math.max(8, Math.round((d.revenue / maxRev) * 100));
     const isSelected = (APP_STATE.adminDateFilter === 'custom' && APP_STATE.adminCustomDate === d.dateStr) ||
                        (APP_STATE.adminDateFilter === 'today' && d.isToday) ||
-                       (APP_STATE.adminDateFilter === 'yesterday' && d.isYesterday);
+                       (APP_STATE.adminDateFilter === 'yesterday' && d.isYesterday) ||
+                       (APP_STATE.adminDateFilter === 'range' && d.dateStr >= (APP_STATE.adminRangeStart || '') && d.dateStr <= (APP_STATE.adminRangeEnd || ''));
 
     html += `
       <div class="chart-bar-col ${isSelected ? 'active-chart-bar' : ''}" onclick="selectAdminChartDate('${d.dateStr}', '${d.dayName}')" title="Click to view analytics for ${d.dayName} (${d.dateStr}) • ${d.count} orders">
@@ -4742,7 +4818,17 @@ function renderAdminOrdersTable(orders) {
 }
 
 function handleAdminDateFilter(value) {
-  if (value === 'custom') {
+  if (value === 'range') {
+    APP_STATE.adminDateFilter = 'range';
+    if (!APP_STATE.adminRangeStart || !APP_STATE.adminRangeEnd) {
+      const now = new Date();
+      const mon = getMondayOfWeek(now);
+      const wed = new Date(mon);
+      wed.setDate(wed.getDate() + 2); // Monday up to Wednesday by default
+      APP_STATE.adminRangeStart = formatDateToIsoString(mon);
+      APP_STATE.adminRangeEnd = formatDateToIsoString(wed);
+    }
+  } else if (value === 'custom') {
     APP_STATE.adminDateFilter = 'custom';
     if (!APP_STATE.adminCustomDate) {
       const yesterday = new Date();
@@ -4753,6 +4839,83 @@ function handleAdminDateFilter(value) {
     APP_STATE.adminDateFilter = value;
   }
   renderAdminDashboard();
+}
+
+function handleAdminDateRangeChange() {
+  const startInput = document.getElementById('admin-range-start');
+  const endInput = document.getElementById('admin-range-end');
+  if (!startInput || !endInput) return;
+
+  let startVal = startInput.value;
+  let endVal = endInput.value;
+
+  if (!startVal && !endVal) return;
+  if (!startVal) startVal = endVal;
+  if (!endVal) endVal = startVal;
+
+  if (startVal > endVal) {
+    const temp = startVal;
+    startVal = endVal;
+    endVal = temp;
+    startInput.value = startVal;
+    endInput.value = endVal;
+  }
+
+  APP_STATE.adminDateFilter = 'range';
+  APP_STATE.adminRangeStart = startVal;
+  APP_STATE.adminRangeEnd = endVal;
+
+  const sDate = parseIsoDate(startVal);
+  const eDate = parseIsoDate(endVal);
+  const sDay = sDate.toLocaleDateString('en-US', { weekday: 'long' });
+  const eDay = eDate.toLocaleDateString('en-US', { weekday: 'long' });
+
+  renderAdminDashboard();
+  toast(`Viewing interval: ${sDay} up to ${eDay}`);
+}
+
+function setAdminIntervalPreset(preset) {
+  const now = new Date();
+  let start = new Date(now);
+  let end = new Date(now);
+
+  if (preset === 'mon-wed') {
+    start = getMondayOfWeek(now);
+    end = new Date(start);
+    end.setDate(end.getDate() + 2); // Monday up to Wednesday
+  } else if (preset === 'mon-fri') {
+    start = getMondayOfWeek(now);
+    end = new Date(start);
+    end.setDate(end.getDate() + 4); // Monday up to Friday
+  } else if (preset === 'this-week') {
+    start = getMondayOfWeek(now);
+    end = new Date(now);
+  } else if (preset === 'last-week') {
+    const thisMon = getMondayOfWeek(now);
+    start = new Date(thisMon);
+    start.setDate(start.getDate() - 7);
+    end = new Date(start);
+    end.setDate(end.getDate() + 6);
+  } else if (preset === 'last-7d') {
+    start = new Date(now);
+    start.setDate(start.getDate() - 6);
+    end = new Date(now);
+  }
+
+  APP_STATE.adminDateFilter = 'range';
+  APP_STATE.adminRangeStart = formatDateToIsoString(start);
+  APP_STATE.adminRangeEnd = formatDateToIsoString(end);
+
+  const startInput = document.getElementById('admin-range-start');
+  const endInput = document.getElementById('admin-range-end');
+  if (startInput) startInput.value = APP_STATE.adminRangeStart;
+  if (endInput) endInput.value = APP_STATE.adminRangeEnd;
+
+  const sDay = start.toLocaleDateString('en-US', { weekday: 'long' });
+  const eDay = end.toLocaleDateString('en-US', { weekday: 'long' });
+
+  renderAdminDashboard();
+  toast(`Interval: ${sDay} up to ${eDay}`);
 }
 
 function handleAdminCustomDate(dateStr) {
@@ -4876,6 +5039,15 @@ function exportOrdersCsv() {
     targetOrders = MASTER_ORDERS.filter(o => isOrderOnDate(o, todayStr));
   } else if (filter === 'yesterday') {
     targetOrders = MASTER_ORDERS.filter(o => isOrderOnDate(o, yesterdayStr));
+  } else if (filter === 'range') {
+    const startStr = APP_STATE.adminRangeStart || todayStr;
+    const endStr = APP_STATE.adminRangeEnd || todayStr;
+    const minStr = startStr <= endStr ? startStr : endStr;
+    const maxStr = startStr <= endStr ? endStr : startStr;
+    targetOrders = MASTER_ORDERS.filter(o => {
+      const od = getOrderLocalDateStr(o);
+      return od && od >= minStr && od <= maxStr;
+    });
   } else if (filter === 'custom' && APP_STATE.adminCustomDate) {
     targetOrders = MASTER_ORDERS.filter(o => isOrderOnDate(o, APP_STATE.adminCustomDate));
   }
